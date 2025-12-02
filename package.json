@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "dist": "ng build --progress=false --configuration production",
+    "lint": "eslint src/app --fix",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "prettier": "prettier --write 'src/**/*.{ts,js,json,scss,html}' '*.{scss,js,json}'",
@@ -21,9 +22,13 @@
     "@angular/platform-browser": "^19.1.3",
     "@angular/platform-browser-dynamic": "^19.1.3",
     "@angular/router": "^19.1.3",
+    "@stylistic/eslint-plugin": "^5.6.1",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "eslint": "^9.20.1",
     "prettier": "^3.7.3",
     "rxjs": "^7.5.5",
     "tslib": "^2.3.0",
+    "typescript-eslint": "^8.48.1",
     "zone.js": "^0.15.0"
   },
   "engines": {
@@ -34,6 +39,7 @@
     "@angular-devkit/build-angular": "^19.1.4",
     "@angular/cli": "^19.1.4",
     "@angular/compiler-cli": "^19.1.3",
+    "@eslint/eslintrc": "^3.2.0",
     "typescript": "^5.5.4"
   }
 }
