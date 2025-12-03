@@ -5,10 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "clean": "rm -rf coverage && rm -rf dist",
     "dist": "ng build --progress=false --configuration production",
     "lint": "eslint src/app --fix",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "test:dev": "jest --collect-coverage",
     "prettier": "prettier --write 'src/**/*.{ts,js,json,scss,html}' '*.{scss,js,json}'",
     "prettier:ci": "prettier --list-different 'src/**/*.{ts,js,json,scss,html}' '*.{js,json}'"
   },
@@ -36,10 +37,14 @@
     "npm": ">=10.1.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.19",
+    "@angular-devkit/build-angular": "^19.1.4",
     "@angular/cli": "^19.1.4",
     "@angular/compiler-cli": "^19.1.3",
     "@eslint/eslintrc": "^3.2.0",
+    "@types/jest": "^30.0.0",
+    "jest": "^29.7.0",
+    "jest-preset-angular": "^14.6.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }
 }
