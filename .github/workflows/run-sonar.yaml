@@ -1,0 +1,28 @@
+name: '- helper (sonar)'
+on: workflow_call
+jobs:
+  run-sonar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag_name || github.event.pull_request.head.ref }}
+      - name: Get Project LCOV
+        uses: actions/download-artifact@master
+        with:
+          name: appLcov
+          path: ./lcov.info
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args:
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.organization=europeana
+            -Dsonar.projectKey=europeana_clio-ui
+            -Dsonar.test.inclusions=**/*.spec.ts
+            -Dsonar.sources=src/app
+            -Dsonar.exclusions=src/**/_mocked/**
+            -Dsonar.javascript.lcov.reportPaths=./lcov.info/lcov.info

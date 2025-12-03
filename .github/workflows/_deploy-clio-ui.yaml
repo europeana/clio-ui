@@ -47,11 +47,11 @@ jobs:
     uses: ./.github/workflows/run-tests.yaml
     secrets: inherit
 
-  #run-sonar:
-  #  if: ${{ github.event.inputs.run_build == 'true' }}
-  #  needs: [run-unit]
-  #  uses: ./.github/workflows/run-sonar.yaml
-  #  secrets: inherit
+  run-sonar:
+    if: ${{ github.event.inputs.run_build == 'true' }}
+    needs: [run-unit]
+    uses: ./.github/workflows/run-sonar.yaml
+    secrets: inherit
 
   build-dist:
     if: ${{ github.event.inputs.run_build == 'true' }}
@@ -73,7 +73,7 @@ jobs:
           path: ./dist
 
   push-docker-image:
-    needs: [build-dist]
+    needs: [build-dist, run-unit]
     if: ${{ github.event.inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
     steps:
