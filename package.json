@@ -8,9 +8,11 @@
     "clean": "rm -rf coverage && rm -rf dist",
     "dist": "ng build --progress=false --configuration production",
     "lint": "eslint src/app --fix",
+    "lint:ci": "eslint src/app",
     "watch": "ng build --watch --configuration development",
     "test:dev": "jest --collect-coverage",
     "prep-test-data": "node tools/rename-files-to-mjs.mjs ./out-tsc",
+    "start:ci": "ng serve --port 4280 --live-reload=false --configuration=e2e",
     "start:ci-data": "tsc --project tsconfig.test-data.json && npm run prep-test-data && (node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index.mjs)",
     "prettier": "prettier --write 'src/**/*.{ts,js,json,scss,html}' '*.{scss,js,json}'",
     "prettier:ci": "prettier --list-different 'src/**/*.{ts,js,json,scss,html}' '*.{js,json}'"

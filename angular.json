@@ -59,6 +59,20 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "e2e": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "100kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/apisettings.ts",
+                  "with": "src/environments/apisettings-ci.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -74,6 +88,9 @@
             },
             "development": {
               "buildTarget": "clio-ui:build:development"
+            },
+            "e2e": {
+              "buildTarget": "clio-ui:build:e2e"
             }
           },
           "defaultConfiguration": "development"
