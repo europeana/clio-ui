@@ -10,6 +10,8 @@
     "lint": "eslint src/app --fix",
     "watch": "ng build --watch --configuration development",
     "test:dev": "jest --collect-coverage",
+    "prep-test-data": "node tools/rename-files-to-mjs.mjs ./out-tsc",
+    "start:ci-data": "tsc --project tsconfig.test-data.json && npm run prep-test-data && (node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index.mjs)",
     "prettier": "prettier --write 'src/**/*.{ts,js,json,scss,html}' '*.{scss,js,json}'",
     "prettier:ci": "prettier --list-different 'src/**/*.{ts,js,json,scss,html}' '*.{js,json}'"
   },
