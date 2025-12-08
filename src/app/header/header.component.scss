@@ -1,8 +1,23 @@
+h1 {
+  border-top: 5px solid purple;
+  display: flex;
+  padding: 0;
+  position: fixed;
+  width: 100%;
+  top: 0;
+}
+
 .logo {
   background-image: url("/assets/images/europeana-logo-default.png");
   display: block;
   height: 3rem;
+  min-width: 8rem;
   background-repeat: no-repeat;
   background-position: top left;
   background-size: contain;
+}
+
+.text {
+  display: block;
+  margin-left: 1em;
 }

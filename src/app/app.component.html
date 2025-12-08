@@ -1,6 +1,91 @@
 <app-header></app-header>
+
+<ng-template
+  #endpointConnection
+  let-endpoint="endpoint"
+  let-desc="desc"
+  let-action="action"
+  let-input="input"
+>
+  <li>
+    <a class="go" (click)="action()">go</a>
+  </li>
+  <li class="parameter-field">
+    @if (input) {
+      <input #batchId />
+    }
+  </li>
+  <li class="path">
+    {{ endpoint }}
+  </li>
+  <li class="desc">
+    {{ desc }}
+  </li>
+</ng-template>
+
 <div class="page-content">
-  <h1>Hello</h1>
-  <span> Here you can find the CLIO </span>
-  <span> The API endpoint is here: {{ endpoint }} </span>
+  <ul class="end-points">
+    <!-- batchid needed -->
+    <ng-container
+      *ngTemplateOutlet="
+        endpointConnection;
+        context: {
+          action: loadReportByBatchId.bind(this),
+          endpoint: '/report-by-batch-id',
+          input: 'batch-id',
+          desc: 'Get a report by creation timestamp',
+        }
+      "
+    ></ng-container>
+
+    <ng-container
+      *ngTemplateOutlet="
+        endpointConnection;
+        context: {
+          action: loadLatestReport.bind(this),
+          endpoint: '/latest-report',
+          desc: 'Get full report with the the latest link checking results',
+        }
+      "
+    ></ng-container>
+
+    <ng-container
+      *ngTemplateOutlet="
+        endpointConnection;
+        context: {
+          action: loadBatches.bind(this),
+          endpoint: '/batches',
+          desc: 'Get a historic overview of the most recent link checking batches',
+        }
+      "
+    ></ng-container>
+
+    <ng-container
+      *ngTemplateOutlet="
+        endpointConnection;
+        context: {
+          action: loadAvailableReports.bind(this),
+          endpoint: '/available-reports',
+          desc: 'Get all available report details',
+        }
+      "
+    ></ng-container>
+  </ul>
+
+  <br />
+  <br />
+
+  <pre>
+  {{ data | json }}
+  </pre>
+
+  <ul *ngIf="error" class="error">
+    <li>{{ error.status }} / {{ error.statusText }}</li>
+    <li>
+      {{ error.message }}
+    </li>
+    <li *ngIf="error.error; let errInner">
+      {{ errInner.text }}
+    </li>
+  </ul>
 </div>
