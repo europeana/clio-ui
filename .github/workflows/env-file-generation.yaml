@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-        touch env_file
-        echo APP_SERVER_API=${{ secrets.APP_SERVER_API }} >> env_file
-        cat env_file
+          touch env_file
+          echo APP_SERVER_API=${{ secrets.APP_SERVER_API }} >> env_file
+          cat env_file
       #- run: |
       #    touch env_file
       #    case ${{ github.event.inputs.deploy_environment }} in
