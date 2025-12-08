@@ -20,13 +20,17 @@ ul {
   font-weight: bold;
 }
 
+.path,
+.go {
+  cursor: pointer;
+}
+
 .go {
   background: #777;
   border: 1px solid #333;
   color: #fff;
   font-weight: bold;
   padding: 0.4em;
-  cursor: pointer;
 }
 
 .desc {

@@ -9,23 +9,28 @@ on:
         default: 'test'
         type: string
 jobs:
+  environment: ${{ github.event.inputs.deploy_environment }}
   create-env-file:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          touch env_file
-          case ${{ github.event.inputs.deploy_environment }} in
-            'production')
-              echo APP_SERVER_API=${{ secrets.PRODUCTION_SERVER_API }} >> env_file
-            ;;
-            'acceptance')
-              echo APP_SERVER_API=${{ secrets.ACCEPTANCE_SERVER_API }} >> env_file
-            ;;
-            'test')
-              echo APP_SERVER_API=${{ secrets.TEST_SERVER_API }} >> env_file
-            ;;
-          esac
-          cat env_file
+        touch env_file
+        echo APP_SERVER_API=${{ secrets.APP_SERVER_API }} >> env_file
+        cat env_file
+      #- run: |
+      #    touch env_file
+      #    case ${{ github.event.inputs.deploy_environment }} in
+      #      'production')
+      #        echo APP_SERVER_API=${{ secrets.PRODUCTION_SERVER_API }} >> env_file
+      #      ;;
+      #      'acceptance')
+      #        echo APP_SERVER_API=${{ secrets.ACCEPTANCE_SERVER_API }} >> env_file
+      #      ;;
+      #      'test')
+      #        echo APP_SERVER_API=${{ secrets.TEST_SERVER_API }} >> env_file
+      #      ;;
+      #    esac
+      #    cat env_file
       - uses: actions/upload-artifact@master
         with:
           name: envFile
