@@ -22,8 +22,8 @@ export class APIService {
     const url = `${apiSettings.serverAPI}/latest-report`;
     const headers = new HttpHeaders().set('accept', 'text/csv');
     return this.http.get<string>(url, {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       headers: headers,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       responseType: 'text' as any,
     });
   }

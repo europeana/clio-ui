@@ -22,9 +22,9 @@ export class AppComponent {
   @ViewChild('batchId') batchId!: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor!: ElementRef;
 
-  loadReportByBatchId(): void {
+  loadReportByBatchId(batchParam: string): void {
     this.error = undefined;
-    this.api.reportByBatchId('1234').subscribe(
+    this.api.reportByBatchId(batchParam).subscribe(
       (data: string) => {
         this.data = data;
       },

@@ -1,6 +1,5 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { apiSettings } from '../../environments/apisettings-ci';
 import { APIService } from './';
 import {
   provideHttpClient,
