@@ -11,13 +11,14 @@ ul {
 
 .end-points {
   display: grid;
-  grid-template-columns: auto 1fr 1fr auto;
+  grid-template-columns: auto 1fr 1fr 1fr auto;
   grid-column-gap: 1em;
   grid-row-gap: 1em;
 }
 
 .path {
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .path,

@@ -1,8 +1,8 @@
 import { JsonPipe, NgIf, NgTemplateOutlet } from '@angular/common';
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-
-import { APIService } from './_services';
+import { AvailableReport, BatchItem } from './_models';
+import { APIService, ExportCSVService } from './_services';
 import { HeaderComponent } from './header';
 
 @Component({
@@ -14,10 +14,13 @@ import { HeaderComponent } from './header';
 export class AppComponent {
   title = 'Clio UI';
   api = inject(APIService);
+  exportCSV = inject(ExportCSVService);
+
   data?: string;
   error?: HttpErrorResponse;
 
   @ViewChild('batchId') batchId!: ElementRef;
+  @ViewChild('downloadAnchor') downloadAnchor!: ElementRef;
 
   loadReportByBatchId(): void {
     this.error = undefined;
@@ -31,11 +34,14 @@ export class AppComponent {
     );
   }
 
-  loadLatestReport(): void {
+  loadLatestReport(download = false): void {
     this.error = undefined;
     this.api.latestReport().subscribe(
       (data: string) => {
         this.data = data;
+        if (download) {
+          this.exportCSV.download(data, 'latest-report');
+        }
       },
       (err: HttpErrorResponse) => {
         this.error = err;
@@ -43,11 +49,19 @@ export class AppComponent {
     );
   }
 
-  loadBatches(): void {
+  downloadLatestReport(): void {
+    this.loadLatestReport(true);
+  }
+
+  loadBatches(download = false): void {
     this.error = undefined;
     this.api.batches().subscribe(
-      (data: string) => {
-        this.data = data;
+      (data: Array<BatchItem>) => {
+        this.data = JSON.stringify(data);
+        if (download) {
+          const fileData = this.exportCSV.csvFromBatchItem(data);
+          this.exportCSV.download(fileData, 'recent-batches');
+        }
       },
       (err: HttpErrorResponse) => {
         this.error = err;
@@ -55,15 +69,27 @@ export class AppComponent {
     );
   }
 
-  loadAvailableReports(): void {
+  downloadBatches(): void {
+    this.loadBatches(true);
+  }
+
+  loadAvailableReports(download = false): void {
     this.error = undefined;
     this.api.availableReports().subscribe(
-      (data: string) => {
-        this.data = data;
+      (data: Array<AvailableReport>) => {
+        this.data = JSON.stringify(data);
+        if (download) {
+          const fileData = this.exportCSV.csvFromAvailableReport(data);
+          this.exportCSV.download(fileData, 'available-reports');
+        }
       },
       (err: HttpErrorResponse) => {
         this.error = err;
       },
     );
+  }
+
+  downloadAvailableReports(): void {
+    this.loadAvailableReports(true);
   }
 }

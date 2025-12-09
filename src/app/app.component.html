@@ -1,11 +1,14 @@
 <app-header></app-header>
 
+<a #downloadAnchor tabindex="-1"></a>
+
 <ng-template
   #endpointConnection
   let-endpoint="endpoint"
   let-desc="desc"
   let-action="action"
   let-input="input"
+  let-download="download"
 >
   <li>
     <a class="go" (click)="action()">go</a>
@@ -17,6 +20,11 @@
   </li>
   <li class="path" (click)="action()">
     {{ endpoint }}
+  </li>
+  <li class="download">
+    @if (download) {
+      <a class="csv" (click)="download()">csv</a>
+    }
   </li>
   <li class="desc">
     {{ desc }}
@@ -43,6 +51,7 @@
         endpointConnection;
         context: {
           action: loadLatestReport.bind(this),
+          download: downloadLatestReport.bind(this),
           endpoint: '/latest-report',
           desc: 'Get full report with the the latest link checking results',
         }
@@ -54,6 +63,7 @@
         endpointConnection;
         context: {
           action: loadBatches.bind(this),
+          download: downloadBatches.bind(this),
           endpoint: '/batches',
           desc: 'Get a historic overview of the most recent link checking batches',
         }
@@ -65,6 +75,7 @@
         endpointConnection;
         context: {
           action: loadAvailableReports.bind(this),
+          download: downloadAvailableReports.bind(this),
           endpoint: '/available-reports',
           desc: 'Get all available report details',
         }

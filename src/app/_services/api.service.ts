@@ -1,25 +1,31 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AvailableReport, BatchItem } from '../_models';
 import { apiSettings } from '../../environments/apisettings';
 
 @Injectable({ providedIn: 'root' })
 export class APIService {
   constructor(private readonly http: HttpClient) {}
 
-  availableReports(): Observable<string> {
+  availableReports(): Observable<Array<AvailableReport>> {
     const url = `${apiSettings.serverAPI}/available-reports`;
-    return this.http.get<string>(url);
+    return this.http.get<Array<AvailableReport>>(url);
   }
 
-  batches(): Observable<string> {
+  batches(): Observable<Array<BatchItem>> {
     const url = `${apiSettings.serverAPI}/batches?maxResults=1`;
-    return this.http.get<string>(url);
+    return this.http.get<Array<BatchItem>>(url);
   }
 
   latestReport(): Observable<string> {
     const url = `${apiSettings.serverAPI}/latest-report`;
-    return this.http.get<string>(url);
+    const headers = new HttpHeaders().set('accept', 'text/csv');
+    return this.http.get<string>(url, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      headers: headers,
+      responseType: 'text' as any,
+    });
   }
 
   reportByBatchId(id: string): Observable<string> {

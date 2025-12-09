@@ -1,19 +1,17 @@
 import { Observable, of } from 'rxjs';
+import { AvailableReport, BatchItem } from '../_models';
 
 export class MockAPIService {
-  availableReports(): Observable<string> {
-    return of('{ data: []}');
-  }
-
-  batches(): Observable<string> {
-    return of('{ data: []}');
-  }
-
-  latestReport(): Observable<string> {
-    return of('{ data: []}');
-  }
-
   reportByBatchId(id: string): Observable<string> {
-    return of('{ data: []}');
+    return of('');
+  }
+  latestReport(): Observable<string> {
+    return of('');
+  }
+  batches(): Observable<Array<BatchItem>> {
+    return of([{} as unknown as BatchItem]);
+  }
+  availableReports(): Observable<Array<AvailableReport>> {
+    return of([{} as unknown as AvailableReport]);
   }
 }
