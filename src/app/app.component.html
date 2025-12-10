@@ -15,7 +15,7 @@
   </li>
   <li class="parameter-field">
     @if (input) {
-      <input #batchId />
+      <input (keydown.enter)="loadReportByBatchId()" #batchId />
     }
   </li>
   <li class="path" (click)="action()">
@@ -40,7 +40,7 @@
         context: {
           action: loadReportByBatchId.bind(this),
           endpoint: '/report-by-batch-id',
-          input: 'batch-id',
+          input: true,
           desc: 'Get a report by creation timestamp',
         }
       "

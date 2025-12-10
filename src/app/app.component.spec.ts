@@ -5,11 +5,12 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
+
 import { AppComponent } from './app.component';
 import { APIService, ExportCSVService } from './_services';
 import { MockAPIService, MockAPIServiceErrors } from './_mocked';
 
-fdescribe('AppComponent', () => {
+describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let csv: ExportCSVService;
@@ -33,6 +34,7 @@ fdescribe('AppComponent', () => {
       configureTestbed();
       fixture = TestBed.createComponent(AppComponent);
       component = fixture.componentInstance;
+      fixture.detectChanges();
     });
 
     it('should create', () => {
@@ -40,7 +42,7 @@ fdescribe('AppComponent', () => {
     });
 
     it('should loadReportByBatchId', () => {
-      component.loadReportByBatchId('1');
+      component.loadReportByBatchId();
       expect(component).toBeTruthy();
     });
 
@@ -89,10 +91,11 @@ fdescribe('AppComponent', () => {
       configureTestbed(true);
       fixture = TestBed.createComponent(AppComponent);
       component = fixture.componentInstance;
+      fixture.detectChanges();
     });
 
     it('should handle errors with loadReportByBatchId', fakeAsync(() => {
-      component.loadReportByBatchId('1');
+      component.loadReportByBatchId();
       tick(1);
       expect(component.error).toBeTruthy();
     }));

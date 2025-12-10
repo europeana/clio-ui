@@ -19,12 +19,12 @@ export class AppComponent {
   data?: string;
   error?: HttpErrorResponse;
 
-  @ViewChild('batchId') batchId!: ElementRef;
-  @ViewChild('downloadAnchor') downloadAnchor!: ElementRef;
+  @ViewChild('batchId') batchId: ElementRef;
+  @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
 
-  loadReportByBatchId(batchParam: string): void {
+  loadReportByBatchId(): void {
     this.error = undefined;
-    this.api.reportByBatchId(batchParam).subscribe(
+    this.api.reportByBatchId(this.batchId.nativeElement.value).subscribe(
       (data: string) => {
         this.data = data;
       },

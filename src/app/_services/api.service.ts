@@ -8,6 +8,15 @@ import { apiSettings } from '../../environments/apisettings';
 export class APIService {
   constructor(private readonly http: HttpClient) {}
 
+  loadCSV(url: string): Observable<string> {
+    const headers = new HttpHeaders().set('accept', 'text/csv');
+    return this.http.get<string>(url, {
+      headers: headers,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      responseType: 'text' as any,
+    });
+  }
+
   availableReports(): Observable<Array<AvailableReport>> {
     const url = `${apiSettings.serverAPI}/available-reports`;
     return this.http.get<Array<AvailableReport>>(url);
@@ -19,17 +28,12 @@ export class APIService {
   }
 
   latestReport(): Observable<string> {
-    const url = `${apiSettings.serverAPI}/latest-report`;
-    const headers = new HttpHeaders().set('accept', 'text/csv');
-    return this.http.get<string>(url, {
-      headers: headers,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseType: 'text' as any,
-    });
+    return this.loadCSV(`${apiSettings.serverAPI}/latest-report`);
   }
 
   reportByBatchId(id: string): Observable<string> {
-    const url = `${apiSettings.serverAPI}/report-by-batch-id?batchId=${id}`;
-    return this.http.get<string>(url);
+    return this.loadCSV(
+      `${apiSettings.serverAPI}/report-by-batch-id?batchId=${id}`,
+    );
   }
 }

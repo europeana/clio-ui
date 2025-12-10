@@ -20,6 +20,7 @@ export class MockAPIService {
     }
     return of('');
   }
+
   latestReport(): Observable<string> {
     if (this.errorMode) {
       return this.getError('mock getDebiasReport throws error');
