@@ -22,16 +22,24 @@ export class AppComponent {
   @ViewChild('batchId') batchId: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
 
-  loadReportByBatchId(): void {
+  loadReportByBatchId(download = false): void {
     this.error = undefined;
-    this.api.reportByBatchId(this.batchId.nativeElement.value).subscribe(
+    const param = this.batchId.nativeElement.value;
+    this.api.reportByBatchId(param).subscribe(
       (data: string) => {
         this.data = data;
+        if (download) {
+          this.exportCSV.download(data, `batch-id-${param}`);
+        }
       },
       (err: HttpErrorResponse) => {
         this.error = err;
       },
     );
+  }
+
+  downloadReportByBatchId(): void {
+    this.loadReportByBatchId(true);
   }
 
   loadLatestReport(download = false): void {

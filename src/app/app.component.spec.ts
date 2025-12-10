@@ -46,6 +46,14 @@ describe('AppComponent', () => {
       expect(component).toBeTruthy();
     });
 
+    it('should downloadReportByBatchId', () => {
+      jest.spyOn(component, 'loadReportByBatchId');
+      jest.spyOn(csv, 'download');
+      component.downloadReportByBatchId();
+      expect(component.loadReportByBatchId).toHaveBeenCalled();
+      expect(csv.download).toHaveBeenCalled();
+    });
+
     it('should loadLatestReport', () => {
       component.loadLatestReport();
       expect(component).toBeTruthy();

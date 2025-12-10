@@ -39,6 +39,7 @@
         endpointConnection;
         context: {
           action: loadReportByBatchId.bind(this),
+          download: downloadReportByBatchId.bind(this),
           endpoint: '/report-by-batch-id',
           input: true,
           desc: 'Get a report by creation timestamp',
