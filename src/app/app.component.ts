@@ -1,4 +1,4 @@
-import { JsonPipe, NgIf, NgTemplateOutlet } from '@angular/common';
+import { DatePipe, JsonPipe, NgIf, NgTemplateOutlet } from '@angular/common';
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AvailableReport, BatchItem } from './_models';
@@ -9,7 +9,7 @@ import { HeaderComponent } from './header';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [HeaderComponent, JsonPipe, NgIf, NgTemplateOutlet],
+  imports: [DatePipe, HeaderComponent, JsonPipe, NgIf, NgTemplateOutlet],
 })
 export class AppComponent {
   title = 'Clio UI';
@@ -19,7 +19,10 @@ export class AppComponent {
   data?: string;
   error?: HttpErrorResponse;
 
+  batches: Array<BatchItem>;
+
   @ViewChild('batchId') batchId: ElementRef;
+  @ViewChild('maxResults') maxResults: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
 
   loadReportByBatchId(download = false): void {
@@ -63,8 +66,10 @@ export class AppComponent {
 
   loadBatches(download = false): void {
     this.error = undefined;
-    this.api.batches().subscribe(
+    const param = this.maxResults.nativeElement.value ?? 1;
+    this.api.batches(param).subscribe(
       (data: Array<BatchItem>) => {
+        this.batches = data;
         this.data = JSON.stringify(data);
         if (download) {
           const fileData = this.exportCSV.csvFromBatchItem(data);

@@ -7,15 +7,19 @@
   let-endpoint="endpoint"
   let-desc="desc"
   let-action="action"
-  let-input="input"
+  let-inputBatchId="inputBatchId"
+  let-inputMaxResults="inputMaxResults"
   let-download="download"
 >
   <li>
     <a class="go" (click)="action()">go</a>
   </li>
   <li class="parameter-field">
-    @if (input) {
+    @if (inputBatchId) {
       <input (keydown.enter)="loadReportByBatchId()" #batchId />
+    }
+    @if (inputMaxResults) {
+      <input (keydown.enter)="loadBatches()" #maxResults value="1" />
     }
   </li>
   <li class="path" (click)="action()">
@@ -41,7 +45,7 @@
           action: loadReportByBatchId.bind(this),
           download: downloadReportByBatchId.bind(this),
           endpoint: '/report-by-batch-id',
-          input: true,
+          inputBatchId: true,
           desc: 'Get a report by creation timestamp',
         }
       "
@@ -66,6 +70,7 @@
           action: loadBatches.bind(this),
           download: downloadBatches.bind(this),
           endpoint: '/batches',
+          inputMaxResults: true,
           desc: 'Get a historic overview of the most recent link checking batches',
         }
       "
@@ -85,11 +90,59 @@
   </ul>
 
   <br />
-  <br />
 
   <pre>
-  {{ data | json }}
+    {{ data | json }}
   </pre>
+
+  <ng-template #tmpBatch let-batch="batch">
+    <ul class="batch-item">
+      <li>
+        <b>Creation Time:</b
+        ><span>{{ batch.creationTime | date: "dd/MM/yyyy - HH:mm" }}</span>
+      </li>
+      <li>
+        <b>Last Update Time In Solr:</b
+        ><span>{{
+          batch.lastUpdateTimeInSolr | date: "dd/MM/yyyy - HH:mm"
+        }}</span>
+      </li>
+      <li>
+        <b>Last Update Time In Metis Core:</b
+        ><span>{{
+          batch.lastUpdateTimeInMetisCore | date: "dd/MM/yyyy - HH:mm"
+        }}</span>
+      </li>
+      <li>
+        <b>Datasets Excluded Already Running:</b
+        ><span>{{ batch.datasetsExcludedAlreadyRunning }}</span>
+      </li>
+      <li>
+        <b>Datasets Excluded Not Indexed:</b
+        ><span>{{ batch.datasetsExcludedNotIndexed }}</span>
+      </li>
+      <li>
+        <b>Datasets Excluded Without Links:</b
+        ><span>{{ batch.datasetsExcludedWithoutLinks }}</span>
+      </li>
+      <li>
+        <b>Datasets Processed:</b><span>{{ batch.datasetsProcessed }}</span>
+      </li>
+      <li>
+        <b>Datasets Pending:</b><span>{{ batch.datasetsPending }}</span>
+      </li>
+    </ul>
+  </ng-template>
+
+  <ul *ngIf="batches" class="batch-list">
+    @for (batch of batches; track batch) {
+      <li>
+        <ng-container
+          *ngTemplateOutlet="tmpBatch; context: { batch }"
+        ></ng-container>
+      </li>
+    }
+  </ul>
 
   <ul *ngIf="error" class="error">
     <li>{{ error.status }} / {{ error.statusText }}</li>

@@ -22,8 +22,8 @@ export class APIService {
     return this.http.get<Array<AvailableReport>>(url);
   }
 
-  batches(): Observable<Array<BatchItem>> {
-    const url = `${apiSettings.serverAPI}/batches?maxResults=1`;
+  batches(maxResults = 1): Observable<Array<BatchItem>> {
+    const url = `${apiSettings.serverAPI}/batches?maxResults=${maxResults}`;
     return this.http.get<Array<BatchItem>>(url);
   }
 

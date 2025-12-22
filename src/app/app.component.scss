@@ -9,6 +9,25 @@ ul {
   list-style: none;
 }
 
+.batch-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+
+  li {
+    display: contents;
+  }
+
+  span {
+    text-align: right;
+  }
+}
+
+.batch-list {
+  ul {
+    margin-bottom: 1em;
+  }
+}
+
 .end-points {
   display: grid;
   grid-template-columns: auto 1fr 1fr 1fr auto;
