@@ -37,8 +37,8 @@ a:focus {
 
   .icon {
     align-self: center;
-    background:
-      icon_urls.svg-url-icon-europeana(variables.$clio-colour) center no-repeat;
+    background: icon_urls.svg-url-icon-europeana(variables.$clio-colour) center
+      no-repeat;
     height: 48px;
     transform: translateX(4px);
     width: 39px;
@@ -103,7 +103,6 @@ a:focus {
   }
 }
 
-
 .link-login,
 .link-logout {
   $link-dimension: 2.2em;
@@ -113,25 +112,31 @@ a:focus {
 }
 
 .link-login {
-  background: icon_urls.svg-url-icon-sign-in(variables.$clio-colour) center / cover no-repeat;
+  background: icon_urls.svg-url-icon-sign-in(variables.$clio-colour) center /
+    cover no-repeat;
   &:hover {
-    background: icon_urls.svg-url-icon-sign-in(variables.$clio-highlight-colour) center / cover
-      no-repeat;
+    background: icon_urls.svg-url-icon-sign-in(variables.$clio-highlight-colour)
+      center / cover no-repeat;
   }
   &:active {
-    background: icon_urls.svg-url-icon-sign-in(variables.$clio-highlight-colour) center /
-      cover no-repeat;
+    background: icon_urls.svg-url-icon-sign-in(variables.$clio-highlight-colour)
+      center / cover no-repeat;
   }
 }
 
 .link-logout {
-  background: icon_urls.svg-url-icon-sign-out(variables.$clio-colour) center / cover no-repeat;
+  background: icon_urls.svg-url-icon-sign-out(variables.$clio-colour) center /
+    cover no-repeat;
   &:hover {
-    background: icon_urls.svg-url-icon-sign-out(variables.$clio-highlight-colour) center /
-      cover no-repeat;
+    background: icon_urls.svg-url-icon-sign-out(
+        variables.$clio-highlight-colour
+      )
+      center / cover no-repeat;
   }
   &:active {
-    background: icon_urls.svg-url-icon-sign-out(variables.$clio-highlight-colour) center /
-      cover no-repeat;
+    background: icon_urls.svg-url-icon-sign-out(
+        variables.$clio-highlight-colour
+      )
+      center / cover no-repeat;
   }
 }

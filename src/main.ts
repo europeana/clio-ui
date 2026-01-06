@@ -7,8 +7,16 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 
+import { provideKeycloakAngular } from './app/authentication/keycloak.config';
+
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
+
+const keycloakSettings = {
+  url: '',
+  realm: '',
+  clientId: '',
+};
 
 if (environment.production) {
   enableProdMode();
@@ -18,5 +26,8 @@ bootstrapApplication(AppComponent, {
   providers: [
     importProvidersFrom(AppRoutingModule, BrowserModule),
     provideHttpClient(withInterceptorsFromDi()),
+    provideKeycloakAngular(keycloakSettings)
   ],
 }).catch((err) => console.log(err));
+
+console.log('UP!!!');

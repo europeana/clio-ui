@@ -1,3 +1,4 @@
+import { NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import Keycloak from 'keycloak-js';
 
@@ -5,9 +6,8 @@ import Keycloak from 'keycloak-js';
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  imports: [NgIf],
 })
 export class HeaderComponent {
-
   public readonly keycloak = inject(Keycloak);
-
 }
