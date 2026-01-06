@@ -1,0 +1,25 @@
+/* RESET */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+div,
+h1,
+header,
+footer,
+nav,
+section {
+  margin: 0;
+  padding: 0;
+}
+
+header,
+footer,
+nav,
+section,
+main {
+  display: block;
+}

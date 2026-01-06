@@ -1,17 +1,6 @@
-body,
-html {
-  background: #fff;
-}
-
-body,
-html,
-h1 {
-  margin: 0;
-  padding: 0;
-}
-
-.page-content {
-  width: 80%;
-  margin: 6rem auto 8rem auto;
-  color: #1a1a1a;
-}
+@charset "UTF-8";
+@use "scss/reset";
+@use "scss/headings";
+@use "scss/main";
+@use "scss/functions/icon_urls";
+@use "scss/variables";

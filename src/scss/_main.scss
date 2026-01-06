@@ -1,0 +1,40 @@
+@use "functions/_icon_urls";
+@use "variables";
+
+body {
+  background: variables.$offwhite;
+  color: variables.$textcolour_body;
+  font: 16px / 1.6 variables.$font-primary;
+  -webkit-text-size-adjust: 100%;
+  word-break: normal;
+  word-wrap: break-word;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.fit-to-page {
+  $default-margin-size: 32px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+
+  @media (min-width: variables.$bp-small-3) {
+    margin-top: 0;
+    margin-right: $default-margin-size;
+    margin-bottom: $default-margin-size;
+    margin-left: $default-margin-size;
+  }
+
+  @media (min-width: variables.$bp-xl) {
+    margin-top: 0;
+    margin-right: auto;
+    margin-bottom: $default-margin-size;
+    margin-left: auto;
+
+    max-width: variables.$max-width;
+    width: 80%;
+  }
+}

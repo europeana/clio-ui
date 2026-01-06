@@ -1,8 +1,10 @@
+@use "../scss/variables";
+
 input:empty,
 .error {
-  border: 1px solid red;
-  border: 1xp solid red;
-  color: red;
+  border: 1px solid variables.$eu-red;
+  border: 1xp solid variables.$eu-red;
+  color: variables.$eu-red;
 }
 
 ul {
@@ -46,7 +48,7 @@ ul {
 }
 
 .go {
-  background: #777;
+  background: variables.$clio-colour;
   border: 1px solid #333;
   color: #fff;
   font-weight: bold;
