@@ -29,5 +29,3 @@ bootstrapApplication(AppComponent, {
     provideKeycloakAngular(keycloakSettings)
   ],
 }).catch((err) => console.log(err));
-
-console.log('UP!!!');

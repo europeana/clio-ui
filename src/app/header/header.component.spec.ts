@@ -1,5 +1,8 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import Keycloak from 'keycloak-js';
+
+import { mockedKeycloak } from '../_mocked';
 import { HeaderComponent } from '.';
 
 describe('HeaderComponent', () => {
@@ -10,6 +13,12 @@ describe('HeaderComponent', () => {
     TestBed.configureTestingModule({
       imports: [HeaderComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [
+        {
+          provide: Keycloak,
+          useValue: mockedKeycloak
+        }
+      ]
     }).compileComponents();
   };
 
@@ -17,6 +26,9 @@ describe('HeaderComponent', () => {
     configureTestbed();
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
+    //component.keycloak = {
+    //  authenticated: true
+    //}
   };
 
   beforeEach(b4Each);

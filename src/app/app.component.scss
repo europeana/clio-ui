@@ -1,14 +1,11 @@
 @use "../scss/variables";
 
-input:empty,
-.error {
+.error,
+//:empty,
+:invalid,
+:placeholder-shown {
   border: 1px solid variables.$eu-red;
-  border: 1xp solid variables.$eu-red;
   color: variables.$eu-red;
-}
-
-ul {
-  list-style: none;
 }
 
 .batch-item {
@@ -48,11 +45,14 @@ ul {
 }
 
 .go {
-  background: variables.$clio-colour;
+  background-color: variables.$clio-colour;
   border: 1px solid #333;
   color: #fff;
   font-weight: bold;
   padding: 0.4em;
+  &:hover {
+    background-color: variables.$clio-highlight-colour;
+  }
 }
 
 .desc {

@@ -23,7 +23,7 @@ describe('AppComponent', () => {
         {
           provide: APIService,
           useClass: errorMode ? MockAPIServiceErrors : MockAPIService,
-        },
+        }
       ],
     }).compileComponents();
     csv = TestBed.inject(ExportCSVService);
