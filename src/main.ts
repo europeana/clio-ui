@@ -4,19 +4,11 @@ import { AppRoutingModule } from './app/app-routing.module';
 
 import {
   provideHttpClient,
-  withInterceptorsFromDi,
+  withInterceptorsFromDi
 } from '@angular/common/http';
-
-import { provideKeycloakAngular } from './app/authentication/keycloak.config';
 
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
-
-const keycloakSettings = {
-  url: '',
-  realm: '',
-  clientId: '',
-};
 
 if (environment.production) {
   enableProdMode();
@@ -25,7 +17,6 @@ if (environment.production) {
 bootstrapApplication(AppComponent, {
   providers: [
     importProvidersFrom(AppRoutingModule, BrowserModule),
-    provideHttpClient(withInterceptorsFromDi()),
-    provideKeycloakAngular(keycloakSettings)
-  ],
+    provideHttpClient(withInterceptorsFromDi())
+  ]
 }).catch((err) => console.log(err));

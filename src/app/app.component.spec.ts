@@ -3,7 +3,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick,
+  tick
 } from '@angular/core/testing';
 
 import { AppComponent } from './app.component';
@@ -22,9 +22,9 @@ describe('AppComponent', () => {
       providers: [
         {
           provide: APIService,
-          useClass: errorMode ? MockAPIServiceErrors : MockAPIService,
+          useClass: errorMode ? MockAPIServiceErrors : MockAPIService
         }
-      ],
+      ]
     }).compileComponents();
     csv = TestBed.inject(ExportCSVService);
   };

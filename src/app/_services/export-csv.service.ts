@@ -7,7 +7,7 @@ export class ExportCSVService {
     'report-id',
     'batch-id',
     'creation-time',
-    'url',
+    'url'
   ];
 
   fieldNamesAvailableReport = ['reportId', 'batchId', 'creationTime', 'url'];
@@ -19,7 +19,7 @@ export class ExportCSVService {
     'datasets-excluded-not-indexed',
     'datasets-excluded-without-links',
     'datasets-processed',
-    'datasets-pending',
+    'datasets-pending'
   ];
 
   fieldNamesBatchItem = [
@@ -30,7 +30,7 @@ export class ExportCSVService {
     'datasetsExcludedNotIndexed',
     'datasetsExcludedWithoutLinks',
     'datasetsProcessed',
-    'datasetsPending',
+    'datasetsPending'
   ];
 
   sanitiseVal(str: string): string {
@@ -40,7 +40,7 @@ export class ExportCSVService {
 
   pushToTuple(
     arr: Array<string | number | undefined>,
-    val: string | number | undefined,
+    val: string | number | undefined
   ): void {
     val = val && typeof val === 'string' ? this.sanitiseVal(val) : val;
     arr.push(val);
@@ -85,7 +85,7 @@ export class ExportCSVService {
 
   joinCSV(
     headers: Array<string>,
-    tuples: Array<Array<string | number | undefined>>,
+    tuples: Array<Array<string | number | undefined>>
   ): string {
     return (
       headers.join(',') +
@@ -101,7 +101,7 @@ export class ExportCSVService {
   async download(data: string, downloadName: string): Promise<void> {
     const anchor = document.createElement('a');
     anchor.href = window.URL.createObjectURL(
-      new Blob([data], { type: 'text/csv;charset=utf-8' }),
+      new Blob([data], { type: 'text/csv;charset=utf-8' })
     );
     anchor.target = '_blank';
     anchor.download = downloadName;

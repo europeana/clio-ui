@@ -9,7 +9,7 @@ import { HeaderComponent } from './header';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [DatePipe, HeaderComponent, JsonPipe, NgIf, NgTemplateOutlet],
+  imports: [DatePipe, HeaderComponent, JsonPipe, NgIf, NgTemplateOutlet]
 })
 export class AppComponent {
   title = 'Clio UI';
@@ -37,7 +37,7 @@ export class AppComponent {
       },
       (err: HttpErrorResponse) => {
         this.error = err;
-      },
+      }
     );
   }
 
@@ -56,7 +56,7 @@ export class AppComponent {
       },
       (err: HttpErrorResponse) => {
         this.error = err;
-      },
+      }
     );
   }
 
@@ -78,7 +78,7 @@ export class AppComponent {
       },
       (err: HttpErrorResponse) => {
         this.error = err;
-      },
+      }
     );
   }
 
@@ -98,7 +98,7 @@ export class AppComponent {
       },
       (err: HttpErrorResponse) => {
         this.error = err;
-      },
+      }
     );
   }
 

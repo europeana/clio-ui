@@ -10,7 +10,7 @@ export class MockAPIService {
     return timer(1).pipe(
       switchMap(() => {
         return throwError(new Error(msg));
-      }),
+      })
     );
   }
 

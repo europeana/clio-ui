@@ -9,29 +9,5 @@
         <br />clio
       </span>
     </a>
-
-    @if (keycloak.authenticated) {
-      <a class="link-logout"></a>
-      <!--
-    <a
-      class="link-logout"
-      (click)="logOut()"
-      (keydown.enter)="logOut()"
-      tabindex="0"
-      title="logout"
-    ></a>
-      -->
-    } @else {
-      <a class="link-login"></a>
-      <!--
-    <a
-      class="link-login"
-      (click)="goToLogin()"
-      (keydown.enter)="goToLogin()"
-      tabindex="0"
-      title="login"
-    ></a>
-      -->
-    }
   </div>
 </header>

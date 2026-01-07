@@ -13,7 +13,7 @@ export class APIService {
     return this.http.get<string>(url, {
       headers: headers,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseType: 'text' as any,
+      responseType: 'text' as any
     });
   }
 
@@ -33,7 +33,7 @@ export class APIService {
 
   reportByBatchId(id: string): Observable<string> {
     return this.loadCSV(
-      `${apiSettings.serverAPI}/report-by-batch-id?batchId=${id}`,
+      `${apiSettings.serverAPI}/report-by-batch-id?batchId=${id}`
     );
   }
 }

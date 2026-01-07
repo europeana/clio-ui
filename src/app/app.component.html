@@ -46,7 +46,7 @@
           download: downloadReportByBatchId.bind(this),
           endpoint: '/report-by-batch-id',
           inputBatchId: true,
-          desc: 'Get a report by creation timestamp',
+          desc: 'Get a report by creation timestamp'
         }
       "
     ></ng-container>
@@ -58,7 +58,7 @@
           action: loadLatestReport.bind(this),
           download: downloadLatestReport.bind(this),
           endpoint: '/latest-report',
-          desc: 'Get full report with the the latest link checking results',
+          desc: 'Get full report with the the latest link checking results'
         }
       "
     ></ng-container>
@@ -71,7 +71,7 @@
           download: downloadBatches.bind(this),
           endpoint: '/batches',
           inputMaxResults: true,
-          desc: 'Get a historic overview of the most recent link checking batches',
+          desc: 'Get a historic overview of the most recent link checking batches'
         }
       "
     ></ng-container>
@@ -83,7 +83,7 @@
           action: loadAvailableReports.bind(this),
           download: downloadAvailableReports.bind(this),
           endpoint: '/available-reports',
-          desc: 'Get all available report details',
+          desc: 'Get all available report details'
         }
       "
     ></ng-container>
@@ -99,18 +99,18 @@
     <ul class="batch-item">
       <li>
         <b>Creation Time:</b
-        ><span>{{ batch.creationTime | date: "dd/MM/yyyy - HH:mm" }}</span>
+        ><span>{{ batch.creationTime | date: 'dd/MM/yyyy - HH:mm' }}</span>
       </li>
       <li>
         <b>Last Update Time In Solr:</b
         ><span>{{
-          batch.lastUpdateTimeInSolr | date: "dd/MM/yyyy - HH:mm"
+          batch.lastUpdateTimeInSolr | date: 'dd/MM/yyyy - HH:mm'
         }}</span>
       </li>
       <li>
         <b>Last Update Time In Metis Core:</b
         ><span>{{
-          batch.lastUpdateTimeInMetisCore | date: "dd/MM/yyyy - HH:mm"
+          batch.lastUpdateTimeInMetisCore | date: 'dd/MM/yyyy - HH:mm'
         }}</span>
       </li>
       <li>

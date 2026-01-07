@@ -1,8 +1,8 @@
-@use "sass:string";
+@use 'sass:string';
 
-@use "../_variables";
+@use '../_variables';
 
-@function str-replace($string, $search, $replace: "") {
+@function str-replace($string, $search, $replace: '') {
   $index: string.index($string, $search);
   @if $index {
     @return string.slice($string, 1, $index - 1) + $replace +
@@ -17,11 +17,11 @@
 
 @function url-encode-color($string) {
   $map: (
-    "#": "%23",
+    '#': '%23'
   );
   $new: $string;
   @each $search, $replace in $map {
-    $new: str-replace("#{$new}", $search, $replace);
+    $new: str-replace('#{$new}', $search, $replace);
   }
   @return $new;
 }

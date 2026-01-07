@@ -10,19 +10,19 @@ describe('ExportCSVService', () => {
       reportId: 1,
       batchId: 2,
       creationTime: timestamp,
-      url: 'https://clio-reporting/1?batchId=2',
+      url: 'https://clio-reporting/1?batchId=2'
     },
     {
       reportId: 1,
       batchId: 2,
       creationTime: timestamp,
-      url: 'https://clio-reporting/2?batchId=2',
-    },
+      url: 'https://clio-reporting/2?batchId=2'
+    }
   ];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [ExportCSVService],
+      providers: [ExportCSVService]
     }).compileComponents();
     service = TestBed.inject(ExportCSVService);
   }));
@@ -51,9 +51,9 @@ describe('ExportCSVService', () => {
           datasetsExcludedNotIndexed: 1,
           datasetsExcludedWithoutLinks: 1,
           datasetsProcessed: 1,
-          datasetsPending: 1,
-        },
-      ]),
+          datasetsPending: 1
+        }
+      ])
     ).toBeTruthy();
   });
 

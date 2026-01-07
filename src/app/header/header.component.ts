@@ -1,13 +1,8 @@
-import { NgIf } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import Keycloak from 'keycloak-js';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
-  imports: [NgIf],
+  styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent {
-  public readonly keycloak = inject(Keycloak);
-}
+export class HeaderComponent {}

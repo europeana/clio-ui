@@ -3,7 +3,7 @@ import { TestBed, waitForAsync } from '@angular/core/testing';
 import { APIService } from './';
 import {
   provideHttpClient,
-  withInterceptorsFromDi,
+  withInterceptorsFromDi
 } from '@angular/common/http';
 
 describe('API Service', () => {
@@ -14,8 +14,8 @@ describe('API Service', () => {
       providers: [
         APIService,
         provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-      ],
+        provideHttpClientTesting()
+      ]
     }).compileComponents();
     service = TestBed.inject(APIService);
   }));

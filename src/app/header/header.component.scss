@@ -1,10 +1,10 @@
-@use "sass:color";
-@use "../../scss/functions/icon_urls";
-@use "../../scss/variables";
+@use 'sass:color';
+@use '../../scss/functions/icon_urls';
+@use '../../scss/variables';
 
 @font-face {
   font-family: Chevin-Medium;
-  src: url("/assets/fonts/chevin/ChevinMedium.otf") format("opentype");
+  src: url('/assets/fonts/chevin/ChevinMedium.otf') format('opentype');
 }
 
 a:focus {
@@ -63,7 +63,7 @@ a:focus {
 
     &::after,
     &::before {
-      content: "";
+      content: '';
       display: block;
       position: absolute;
     }
