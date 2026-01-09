@@ -1,11 +1,11 @@
+@use '../scss/colours';
 @use '../scss/variables';
 
 .error,
-//:empty,
 :invalid,
 :placeholder-shown {
-  border: 1px solid variables.$eu-red;
-  color: variables.$eu-red;
+  border: 1px solid colours.$eu-red;
+  color: colours.$eu-red;
 }
 
 .batch-item {
@@ -34,6 +34,31 @@
   grid-row-gap: 1em;
 }
 
+.columns {
+  display: flex;
+}
+.left-col {
+  margin-right: 2em;
+}
+
+h4 {
+  margin: 0.5em 0 0 0.5em;
+}
+
+select {
+  color: variables.$text-colour;
+  margin-top: 1em;
+  padding-left: 0;
+  font-size: 1em;
+  font-weight: bold;
+  padding: 0.75em 0 0.5em 0.5em;
+
+  background: colours.$offwhite;
+  &:focus-visible {
+    outline: 1px solid variables.$clio-highlight-colour;
+  }
+}
+
 .path {
   font-weight: bold;
   white-space: nowrap;
@@ -57,4 +82,17 @@
 
 .desc {
   font-style: italic;
+}
+
+.opener {
+  display: flex;
+  &::after {
+    content: '>';
+    font-weight: bold;
+    position: relative;
+    transform: rotate(0deg) translateX(0.4em);
+  }
+  &.expanded::after {
+    transform: rotate(90deg) translateY(-0.4em);
+  }
 }

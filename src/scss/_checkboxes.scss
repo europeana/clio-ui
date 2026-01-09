@@ -1,0 +1,72 @@
+@use 'variables';
+@use 'functions/icon_urls';
+
+$width-icon-filter: 18px;
+//$filter-row-height: 32px;
+$filter-row-height: 28px;
+$filter-row-height: 30px;
+
+.checkboxes-list .checkbox-labelled {
+  cursor: pointer;
+}
+
+.checkbox {
+  opacity: 0;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  //font-weight: bold;
+  line-height: $filter-row-height;
+  margin: 0 8px;
+  white-space: nowrap;
+  .term-highlight {
+    font-weight: bold;
+  }
+}
+
+.checkbox-labelled {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
+  position: relative;
+
+  :first-child {
+    min-width: $width-icon-filter;
+  }
+
+  :last-child {
+    cursor: pointer;
+    width: 100%;
+  }
+}
+
+.checkmarked-checkbox {
+  height: $width-icon-filter;
+  position: relative;
+  width: $width-icon-filter;
+
+  &::before {
+    bottom: 0;
+    background-image: icon_urls.svg-url-icon-checkbox(variables.$text-colour);
+    background-position: center;
+    background-repeat: no-repeat;
+    content: '';
+    display: block;
+    position: absolute;
+    min-width: $width-icon-filter;
+    height: $width-icon-filter;
+  }
+
+  &.checked::before {
+    background-image: icon_urls.svg-url-icon-checkbox-checked(
+      variables.$clio-colour
+    );
+  }
+
+  &:has(:focus-visible)::before {
+    outline: 2px solid variables.$clio-highlight-colour;
+  }
+}

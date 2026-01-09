@@ -1,7 +1,8 @@
 @use 'variables';
+@use 'colours';
 
 .page-title-wrapper {
-  background: variables.$offwhite;
+  background: colours.$offwhite;
   padding: 16px;
   display: grid;
   grid-template-rows: 1fr;

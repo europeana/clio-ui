@@ -27,17 +27,27 @@ export class MockAPIService {
     }
     return of('');
   }
+
   batches(): Observable<Array<BatchItem>> {
     if (this.errorMode) {
       return this.getError('mock getDebiasReport throws error');
     }
     return of([{} as unknown as BatchItem]);
   }
+
   availableReports(): Observable<Array<AvailableReport>> {
     if (this.errorMode) {
       return this.getError('mock getDebiasReport throws error');
     }
     return of([{} as unknown as AvailableReport]);
+  }
+
+  loadLatestListJSON(): Observable<Array<AvailableReport>> {
+    return of([{} as unknown as AvailableReport]);
+  }
+
+  loadLatestReportJSON(): Observable<Array<ReportItem>> {
+    return of([{} as unknown as ReportItem]);
   }
 }
 

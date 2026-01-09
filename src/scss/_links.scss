@@ -1,0 +1,27 @@
+@use './functions/icon_urls';
+@use './colours';
+
+a {
+  color: colours.$eu-purple;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    color: colours.$eu-raspberry;
+  }
+
+  &.external-link {
+    align-items: center;
+    display: flex;
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 1em;
+      padding: 0 0.2em;
+      height: 1em;
+      background-image: icon_urls.svg-url-icon-external(colours.$eu-purple);
+      background-repeat: no-repeat;
+      background-position: center 0.1em;
+    }
+  }
+}

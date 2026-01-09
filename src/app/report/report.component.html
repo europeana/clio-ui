@@ -1,0 +1,95 @@
+<ul class="nav">
+  <li>
+    <a (click)="nav(-1)">&lt;&lt;prev</a>
+  </li>
+  <li class="index">{{ index + 1 }} of {{ report.length }}</li>
+  <li>
+    <a (click)="nav(+1)">next&gt;&gt;</a>
+  </li>
+</ul>
+
+<ng-container *ngFor="let reportItem of report; let itemIndex = index">
+  @if (index === itemIndex) {
+    <ul class="report-item">
+      <li>
+        <span>Dataset Id</span>
+        <span>
+          <span>{{ reportItem.datasetId }}</span>
+          <a
+            class="external-link"
+            target="_blank"
+            [attr.href]="reportItem.portalUrl"
+            >edit</a
+          >
+        </span>
+      </li>
+      <li>
+        <span>Dataset Size</span><span>{{ reportItem.datasetSize }}</span>
+      </li>
+
+      <li class="full-width"></li>
+
+      <li>
+        <span>Provider</span><span>{{ reportItem.provider }}</span>
+      </li>
+      <li>
+        <span>Data Provider</span><span>{{ reportItem.dataProvider }}</span>
+      </li>
+
+      <li class="full-width"></li>
+
+      <li>
+        <span>Time of Check</span
+        ><span>{{ reportItem.timeOfChecking | date }}</span>
+      </li>
+      <li>
+        <span>Last Record Index</span
+        ><span>{{ reportItem.lastRecordIndex | date }}</span>
+      </li>
+
+      <li class="full-width"></li>
+
+      <li>
+        <span>Record Id</span><span>{{ reportItem.recordId }}</span>
+      </li>
+      <li>
+        <span>Record Edm Type</span
+        ><span class="code">{{ reportItem.recordEdmType }}</span>
+      </li>
+      <li>
+        <span>Record Content Tier</span
+        ><span>{{ reportItem.recordContentTier }}</span>
+      </li>
+      <li>
+        <span>Record Metadata Tier</span
+        ><span> {{ reportItem.recordMetadataTier }}</span>
+      </li>
+
+      <li class="full-width"></li>
+
+      <li>
+        <span>Link Type</span>
+        <span class="error">{{ reportItem.linkType }}</span>
+      </li>
+      <li>
+        <span>Link</span><span class="error">{{ reportItem.link }}</span>
+      </li>
+      <li>
+        <span>Link Server</span>
+        <span class="error">{{ reportItem.linkServer }}</span>
+      </li>
+
+      <li class="full-width"></li>
+
+      <li>
+        <span>Error</span><span class="error">{{ reportItem.error }}</span>
+      </li>
+    </ul>
+  }
+</ng-container>
+
+<br />
+
+<pre
+  >{{ report | json }}
+</pre>

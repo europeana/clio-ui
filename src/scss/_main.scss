@@ -1,9 +1,10 @@
 @use 'functions/_icon_urls';
+@use 'colours';
 @use 'variables';
 
 body {
-  background: variables.$offwhite;
-  color: variables.$textcolour_body;
+  background: colours.$offwhite;
+  color: variables.$text-colour;
   font: 16px / 1.6 variables.$font-primary;
   -webkit-text-size-adjust: 100%;
   word-break: normal;

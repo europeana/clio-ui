@@ -1,17 +1,43 @@
-import { DatePipe, JsonPipe, NgIf, NgTemplateOutlet } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import {
+  DatePipe,
+  JsonPipe,
+  NgClass,
+  NgIf,
+  NgTemplateOutlet
+} from '@angular/common';
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AvailableReport, BatchItem } from './_models';
+
+import { AvailableReport, BatchItem, ReportItem } from './_models';
 import { APIService, ExportCSVService } from './_services';
 import { HeaderComponent } from './header';
+import { ReportComponent } from './report';
+import { FiltersComponent } from './filters';
+import { ListingComponent } from './listing';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [DatePipe, HeaderComponent, JsonPipe, NgIf, NgTemplateOutlet]
+  imports: [
+    DatePipe,
+    FiltersComponent,
+    HeaderComponent,
+    JsonPipe,
+    ListingComponent,
+    NgClass,
+    NgIf,
+    NgTemplateOutlet,
+    ReportComponent
+  ]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Clio UI';
   api = inject(APIService);
   exportCSV = inject(ExportCSVService);
@@ -20,10 +46,15 @@ export class AppComponent {
   error?: HttpErrorResponse;
 
   batches: Array<BatchItem>;
+  browsableReport?: Array<ReportItem>;
 
   @ViewChild('batchId') batchId: ElementRef;
   @ViewChild('maxResults') maxResults: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
+
+  ngOnInit(): void {
+    this.loadAvailableReports();
+  }
 
   loadReportByBatchId(download = false): void {
     this.error = undefined;
@@ -90,7 +121,11 @@ export class AppComponent {
     this.error = undefined;
     this.api.availableReports().subscribe(
       (data: Array<AvailableReport>) => {
-        this.data = JSON.stringify(data);
+        this.data = JSON.stringify(data).replace(/"/g, "'");
+
+        //this.data = JSON.stringify(data.replace(/\\"/, ''));
+        //this.batches = JSON.parse(data);
+
         if (download) {
           const fileData = this.exportCSV.csvFromAvailableReport(data);
           this.exportCSV.download(fileData, 'available-reports');
@@ -104,5 +139,20 @@ export class AppComponent {
 
   downloadAvailableReports(): void {
     this.loadAvailableReports(true);
+  }
+
+  browseReport(): void {
+    if (this.browsableReport) {
+      this.browsableReport = undefined;
+    } else {
+      this.api.loadLatestReportJSON().subscribe(
+        (data: Array<ReportItem>) => {
+          this.browsableReport = data;
+        },
+        (err: HttpErrorResponse) => {
+          this.error = err;
+        }
+      );
+    }
   }
 }

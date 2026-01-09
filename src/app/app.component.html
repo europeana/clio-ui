@@ -36,6 +36,40 @@
 </ng-template>
 
 <div class="fit-to-page">
+  <div class="columns">
+    <div class="left-col">
+      <select>
+        <option value="0">All Providers</option>
+        <option value="1">Provider 1</option>
+        <option value="2">Provider 2</option>
+      </select>
+      <h4 style="">Filters</h4>
+      <app-filters> </app-filters>
+    </div>
+    <div class="right-col">
+      <app-listing></app-listing>
+    </div>
+  </div>
+
+  <br />
+  <br />
+
+  <div style="position: relative">
+    <hr />
+    <a
+      (click)="browseReport()"
+      class="opener"
+      [ngClass]="{ expanded: browsableReport }"
+      >Browse Report</a
+    >
+    @if (browsableReport) {
+      <app-report [report]="browsableReport"></app-report>
+    }
+    <hr />
+  </div>
+  <br />
+  <br />
+
   <ul class="end-points">
     <!-- batchid needed -->
     <ng-container

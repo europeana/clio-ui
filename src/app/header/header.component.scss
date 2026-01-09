@@ -1,5 +1,5 @@
-@use 'sass:color';
 @use '../../scss/functions/icon_urls';
+@use '../../scss/colours';
 @use '../../scss/variables';
 
 @font-face {
@@ -19,7 +19,7 @@ a:focus {
 
 .header {
   align-items: center;
-  background: variables.$white;
+  background: colours.$white;
   border-top: 1px solid variables.$clio-colour;
   border-bottom: 1px solid variables.$clio-colour;
   padding: 4px 0;
@@ -47,13 +47,13 @@ a:focus {
 
   .icon-wrapper {
     align-content: center;
-    color: variables.$white;
+    color: colours.$white;
     display: flex;
     justify-content: center;
     overflow: hidden;
     position: relative;
     width: 73px;
-    background-color: variables.$white;
+    background-color: colours.$white;
 
     border-right: 1.125px solid variables.$clio-colour;
     border-bottom: 1.125px solid variables.$clio-colour;
@@ -83,7 +83,7 @@ a:focus {
       height: 132px;
       transform: rotate(23deg);
       top: -16px;
-      left: 0px;
+      left: 0.125px;
     }
   }
 

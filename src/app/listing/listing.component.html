@@ -1,0 +1,28 @@
+<ul class="listing">
+  <li>
+    <span class="list-header">Report Id</span>
+    <span class="list-header">Batch Id</span>
+    <span class="list-header">Download</span>
+    <span class="list-header">Browse</span>
+    <span class="list-header">Creation Time</span>
+  </li>
+  @for (latestItem of latestList; track latestItem) {
+    @let isExpanded = previewedId === latestItem.reportId;
+    <li [ngClass]="{ hightlight: isExpanded }">
+      <span>{{ latestItem.reportId }}</span>
+      <span>{{ latestItem.batchId }}</span>
+      <a class="centre csv-download" [href]="latestItem.url">CSV</a>
+      <a class="centre browse" (click)="openPreview(latestItem.reportId)"></a>
+      <span>{{ latestItem.creationTime | date: DATE_VERBOSE_FMT }}</span>
+    </li>
+
+    @if (isExpanded) {
+      <li class="expanded-item">
+        <span> EXPANDED REPORT HERE </span>
+      </li>
+    }
+  }
+</ul>
+<!--
+{{ latestList | json }}
+-->

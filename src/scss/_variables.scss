@@ -1,17 +1,9 @@
-$white: #fff;
-$offwhite: #ededed;
-$eu-grey-dark: #4d4d4d;
+@use 'colours';
 
-/* Zeplin styleguide colours */
-$eu-red: #f22f24;
-$eu-purple: #b47da7;
-$eu-raspberry: #e95a81;
-
-$clio-colour: $eu-purple;
-$clio-highlight-colour: $eu-raspberry;
-
-$focus-highlight-colour: $eu-raspberry;
-$textcolour_body: $eu-grey-dark;
+$clio-colour: colours.$eu-purple;
+$clio-highlight-colour: colours.$eu-raspberry;
+$focus-highlight-colour: colours.$eu-raspberry;
+$text-colour: colours.$eu-grey-dark;
 
 $font-primary: 'Open Sans', 'Arial', sans-serif;
 

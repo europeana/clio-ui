@@ -11,7 +11,8 @@ h1,
 header,
 footer,
 nav,
-section {
+section,
+ul {
   margin: 0;
   padding: 0;
 }
@@ -22,6 +23,10 @@ nav,
 section,
 main {
   display: block;
+}
+
+select {
+  border: none;
 }
 
 ul {

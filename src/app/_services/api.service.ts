@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AvailableReport, BatchItem } from '../_models';
+import { of } from 'rxjs';
+import { AvailableReport, BatchItem, ReportItem } from '../_models';
+import {
+  latestListJSON,
+  latestReportJSON
+} from '../_data/static/available-report-json';
 import { apiSettings } from '../../environments/apisettings';
 
 @Injectable({ providedIn: 'root' })
@@ -29,6 +34,14 @@ export class APIService {
 
   latestReport(): Observable<string> {
     return this.loadCSV(`${apiSettings.serverAPI}/latest-report`);
+  }
+
+  loadLatestListJSON(): Observable<Array<AvailableReport>> {
+    return of(latestListJSON);
+  }
+
+  loadLatestReportJSON(): Observable<Array<ReportItem>> {
+    return of(latestReportJSON);
   }
 
   reportByBatchId(id: string): Observable<string> {
