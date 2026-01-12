@@ -8,14 +8,13 @@ import {
 import {
   Component,
   ElementRef,
+  HostListener,
   inject,
-  OnInit,
   ViewChild
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-
 import { AvailableReport, BatchItem, ReportItem } from './_models';
-import { APIService, ExportCSVService } from './_services';
+import { APIService, ClickService, ExportCSVService } from './_services';
 import { HeaderComponent } from './header';
 import { ReportComponent } from './report';
 import { FiltersComponent } from './filters';
@@ -37,10 +36,11 @@ import { ListingComponent } from './listing';
     ReportComponent
   ]
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'Clio UI';
   api = inject(APIService);
   exportCSV = inject(ExportCSVService);
+  clickService = inject(ClickService);
 
   data?: string;
   error?: HttpErrorResponse;
@@ -52,8 +52,15 @@ export class AppComponent implements OnInit {
   @ViewChild('maxResults') maxResults: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
 
-  ngOnInit(): void {
-    this.loadAvailableReports();
+  /**
+   * documentClick
+   * - global document click handler
+   * - push the clicked element to the clickService
+   * - (picked up by the click-aware directive)
+   **/
+  @HostListener('document:click', ['$event'])
+  documentClick(event: { target: HTMLElement }): boolean | void {
+    this.clickService.documentClickedTarget.next(event.target);
   }
 
   loadReportByBatchId(download = false): void {

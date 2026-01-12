@@ -1,7 +1,7 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { AvailableReport, BatchItem } from '../_models';
+import { AvailableReport, BatchItem, ReportItem } from '../_models';
 
 export class MockAPIService {
   errorMode = false;

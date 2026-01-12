@@ -22,10 +22,10 @@ export const latestListJSON: Array<AvailableReport> = [
     url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1395'
   },
   {
-    reportId: 1317,
-    batchId: 1395,
-    creationTime: '2025-12-25T04:48:32.423Z',
-    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1395'
+    reportId: 1313,
+    batchId: 1392,
+    creationTime: '2025-11-30T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1392'
   }
 ];
 

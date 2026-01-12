@@ -36,18 +36,21 @@
 
 .columns {
   display: flex;
-}
-.left-col {
-  margin-right: 2em;
+  .left-col {
+    margin-right: 2em;
+  }
+  .right-col {
+    width: 100%;
+  }
 }
 
 h4 {
-  margin: 0.5em 0 0 0.5em;
+  margin: 0.5em 0 0 1em;
 }
 
 select {
   color: variables.$text-colour;
-  margin-top: 1em;
+  margin-top: 0.6em;
   padding-left: 0;
   font-size: 1em;
   font-weight: bold;

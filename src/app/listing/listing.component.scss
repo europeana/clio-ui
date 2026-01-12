@@ -2,11 +2,14 @@
 @use '../../scss/variables';
 @use '../../scss/functions/icon_urls';
 
+.report {
+  grid-column: 1 / -1;
+}
+
 .listing {
   $col-gap: 1em;
-  border: 1px solid variables.$clio-colour;
   display: grid;
-  grid-template-columns: repeat(5, auto);
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
   grid-column-gap: $col-gap;
   margin-top: 1em;
   padding: 0;
@@ -16,21 +19,42 @@
     font-weight: bold;
   }
 
-  li,
-  .expanded-item > * {
-    grid-column: 1 / 6;
-  }
-
   li {
+    grid-column: 1 / -1;
     display: grid;
     grid-template-columns: subgrid;
-    padding: 2px 0.5em;
+
     background-color: #fff;
+    :not(.expanded-item) {
+      padding: 2px 0.5em;
+    }
+  }
+
+  &:has(.expanded-item) {
+    li:not(.expanded-item, :has(+ .expanded-item)) {
+      background-color: colours.$offwhite;
+      transition: background-color 0.3s linear;
+    }
+  }
+
+  &:not(:has(.expanded-item)) {
+    border: 1px solid variables.$clio-colour;
+
+    .list-header {
+      position: sticky;
+    }
+
+    .list-header,
+    .expanded-item {
+      background-color: #fff;
+    }
   }
 }
 
 .centre {
+  align-items: center;
   justify-self: center;
+  text-align: center;
 }
 
 .browse,
@@ -40,12 +64,19 @@
 }
 
 .browse {
+  position: relative;
   &::after {
     content: '';
     width: 1em;
     height: 1em;
     display: block;
     background-image: icon_urls.svg-url-icon-eye(variables.$clio-colour);
+    background-position: center;
+    position: absolute;
+    left: 50%;
+    bottom: -1.25em;
+
+    transform: translateX(-50%);
   }
   &:hover::after {
     background-image: icon_urls.svg-url-icon-eye(
@@ -69,19 +100,14 @@
   }
 }
 
-.hightlight,
-.hightlight + li + li {
-  border-top: 1px solid variables.$clio-colour;
-  margin-top: -1px;
-}
-
 .expanded-item {
-  background: #fff;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .list-header {
-  background-color: #fff;
   padding: 0.4em 0;
-  position: sticky;
   top: 4em;
 }

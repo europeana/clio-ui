@@ -8,6 +8,7 @@ import { ListingComponent } from '.';
 describe('ListingComponent', () => {
   let component: ListingComponent;
   let fixture: ComponentFixture<ListingComponent>;
+  let api: APIService;
 
   const configureTestbed = (): void => {
     TestBed.configureTestingModule({
@@ -26,11 +27,23 @@ describe('ListingComponent', () => {
     configureTestbed();
     fixture = TestBed.createComponent(ListingComponent);
     component = fixture.componentInstance;
+    api = TestBed.inject(APIService);
   };
 
   beforeEach(b4Each);
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should open the preview', () => {
+    jest.spyOn(api, 'loadLatestReportJSON');
+    component.openPreview(123);
+    expect(api.loadLatestReportJSON).toHaveBeenCalled();
+    expect(component.previewedId).toBeTruthy();
+
+    component.openPreview(123);
+    expect(api.loadLatestReportJSON).toHaveBeenCalledTimes(1);
+    expect(component.previewedId).toBeFalsy();
   });
 });

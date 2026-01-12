@@ -1,19 +1,9 @@
-<ul class="nav">
-  <li>
-    <a (click)="nav(-1)">&lt;&lt;prev</a>
-  </li>
-  <li class="index">{{ index + 1 }} of {{ report.length }}</li>
-  <li>
-    <a (click)="nav(+1)">next&gt;&gt;</a>
-  </li>
-</ul>
-
 <ng-container *ngFor="let reportItem of report; let itemIndex = index">
   @if (index === itemIndex) {
     <ul class="report-item">
       <li>
-        <span>Dataset Id</span>
-        <span>
+        <span class="report-title">Dataset Id</span>
+        <span class="dataset-id-value-wrapper">
           <span>{{ reportItem.datasetId }}</span>
           <a
             class="external-link"
@@ -23,73 +13,109 @@
           >
         </span>
       </li>
-      <li>
-        <span>Dataset Size</span><span>{{ reportItem.datasetSize }}</span>
-      </li>
 
-      <li class="full-width"></li>
-
-      <li>
-        <span>Provider</span><span>{{ reportItem.provider }}</span>
-      </li>
-      <li>
-        <span>Data Provider</span><span>{{ reportItem.dataProvider }}</span>
-      </li>
-
-      <li class="full-width"></li>
+      <!--spacer-->
+      <li><span></span></li>
+      <li><span></span></li>
+      <li><span></span></li>
 
       <li>
-        <span>Time of Check</span
-        ><span>{{ reportItem.timeOfChecking | date }}</span>
-      </li>
-      <li>
-        <span>Last Record Index</span
-        ><span>{{ reportItem.lastRecordIndex | date }}</span>
+        <span class="report-title">Dataset Size</span
+        ><span>{{ reportItem.datasetSize }}</span>
       </li>
 
-      <li class="full-width"></li>
+      <li><span></span></li>
 
       <li>
-        <span>Record Id</span><span>{{ reportItem.recordId }}</span>
+        <div style="position: relative">
+          <ul class="nav">
+            <li>
+              <a (click)="nav(-1)"> &lt; </a>
+            </li>
+            <li class="index">{{ index + 1 }} of {{ report.length }}</li>
+            <li>
+              <a (click)="nav(+1)"> &gt; </a>
+            </li>
+          </ul>
+        </div>
       </li>
+
+      <li><span></span></li>
+
       <li>
-        <span>Record Edm Type</span
+        <span class="report-title">Record Id</span
+        ><span style="grid-column: 2 / 6">{{ reportItem.recordId }}</span>
+      </li>
+
+      <li>
+        <span class="report-title">Record Content Tier</span
+        ><span>{{ reportItem.recordContentTier }}</span>
+
+        <span style="grid-column: 4 / 6"></span>
+      </li>
+
+      <li>
+        <span class="report-title">Record Metadata Tier</span
+        ><span> {{ reportItem.recordMetadataTier }}</span>
+        <span style="grid-column: 4 / 6"></span>
+      </li>
+
+      <li>
+        <span class="report-title">Record Edm Type</span
         ><span class="code">{{ reportItem.recordEdmType }}</span>
       </li>
-      <li>
-        <span>Record Content Tier</span
-        ><span>{{ reportItem.recordContentTier }}</span>
-      </li>
-      <li>
-        <span>Record Metadata Tier</span
-        ><span> {{ reportItem.recordMetadataTier }}</span>
-      </li>
 
-      <li class="full-width"></li>
+      <li><span></span></li>
+      <li><span></span></li>
+      <li><span></span></li>
 
       <li>
-        <span>Link Type</span>
-        <span class="error">{{ reportItem.linkType }}</span>
-      </li>
-      <li>
-        <span>Link</span><span class="error">{{ reportItem.link }}</span>
-      </li>
-      <li>
-        <span>Link Server</span>
-        <span class="error">{{ reportItem.linkServer }}</span>
+        <span class="report-title">Error</span>
+        <span style="grid-column: 2 / 6" class="error">{{
+          reportItem.error
+        }}</span>
       </li>
 
-      <li class="full-width"></li>
+      <li>
+        <span class="report-title">Provider</span>
+        <span style="grid-column: 2 / 6">{{ reportItem.provider }}</span>
+      </li>
 
       <li>
-        <span>Error</span><span class="error">{{ reportItem.error }}</span>
+        <span class="report-title">Data Provider</span>
+        <span style="grid-column: 2 / 6">{{ reportItem.dataProvider }}</span>
+      </li>
+
+      <li>
+        <span class="report-title">Link</span>
+        <span style="grid-column: 2 / 6">{{ reportItem.link }}</span>
+      </li>
+
+      <li>
+        <span class="report-title">Link Type</span>
+        <span class="code" style="grid-column: 2 / 4">{{
+          reportItem.linkType
+        }}</span>
+      </li>
+
+      <li>
+        <span class="report-title">Time of Check</span
+        ><span style="font-size: 1rem">{{
+          reportItem.timeOfChecking | date: DATE_VERBOSE_FMT
+        }}</span>
+      </li>
+
+      <li>
+        <span class="report-title">Link Server</span>
+        <span style="grid-column: 2 / 4">{{ reportItem.linkServer }}</span>
+      </li>
+
+      <li>
+        <span class="report-title">Last Record Index</span
+        ><span style="font-size: 1rem">{{
+          reportItem.lastRecordIndex | date: DATE_VERBOSE_FMT
+        }}</span>
       </li>
     </ul>
   }
 </ng-container>
-
-<br />
-
-<pre
-  >{{ report | json }}
-</pre>
