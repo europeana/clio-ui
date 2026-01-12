@@ -19,6 +19,7 @@ li {
 
 .error {
   color: colours.$eu-red;
+  white-space: break-spaces;
 }
 
 .external-link {
@@ -50,6 +51,7 @@ li {
     .report-title {
       font-weight: bold;
       text-align: right;
+      white-space: nowrap;
 
       &::after {
         content: ':';
