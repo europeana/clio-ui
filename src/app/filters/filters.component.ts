@@ -1,4 +1,4 @@
-import { JsonPipe, NgFor } from '@angular/common';
+import { NgFor } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import {
   FormControl,
@@ -12,7 +12,7 @@ import { CheckboxComponent } from '../checkbox';
   selector: 'app-filters',
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.scss'],
-  imports: [NgFor, CheckboxComponent, JsonPipe]
+  imports: [NgFor, CheckboxComponent]
 })
 export class FiltersComponent implements OnInit {
   private readonly fb = inject(UntypedFormBuilder);

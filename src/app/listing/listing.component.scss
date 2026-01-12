@@ -17,6 +17,7 @@
 
 .listing {
   $col-gap: 1em;
+  border: 1px solid transparent;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
   grid-column-gap: $col-gap;
@@ -66,7 +67,7 @@
   }
 
   &:not(:has(.expanded-item)) {
-    border: 1px solid variables.$clio-colour;
+    border-color: variables.$clio-colour;
 
     .list-header {
       position: sticky;

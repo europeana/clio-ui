@@ -1,4 +1,4 @@
-import { DatePipe, JsonPipe, NgClass } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 
 import { DATE_VERBOSE_FMT } from '../_data/static/date-formats';
@@ -12,7 +12,7 @@ import { ReportComponent } from '../report';
   selector: 'app-listing',
   templateUrl: './listing.component.html',
   styleUrls: ['./listing.component.scss'],
-  imports: [ClickAwareDirective, DatePipe, JsonPipe, NgClass, ReportComponent]
+  imports: [ClickAwareDirective, DatePipe, NgClass, ReportComponent]
 })
 export class ListingComponent implements OnInit {
   public DATE_VERBOSE_FMT = DATE_VERBOSE_FMT;
