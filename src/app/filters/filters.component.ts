@@ -23,16 +23,25 @@ export class FiltersComponent implements OnInit {
     {
       name: 'content_tier',
       options: [
-        { name: 'field_1', label: 'label 1' },
-        { name: 'field_2', label: 'label 2' },
-        { name: 'field_3', label: 'label 3' }
+        { name: '0', label: 'Zero' },
+        { name: '1', label: '1' },
+        { name: '2', label: '2' },
+        { name: '3', label: '3' },
+        { name: '4', label: '4' }
       ]
     },
     {
       name: 'metadata_tier',
       options: [
-        { name: 'field_4', label: 'label 4' },
-        { name: 'field_5', label: 'label 5' }
+        { name: 'A', label: 'A' },
+        { name: 'B', label: 'B' }
+      ]
+    },
+    {
+      name: 'media_type',
+      options: [
+        { name: 'TEXT', label: 'TEXT' },
+        { name: 'Video', label: 'VIDEO' }
       ]
     }
   ];
@@ -46,11 +55,22 @@ export class FiltersComponent implements OnInit {
     );
     this.form = new UntypedFormGroup({
       content_tier: formGroup,
-      metadata_tier: formGroup
+      metadata_tier: formGroup,
+      media_type: formGroup
     });
   }
 
   updateFilter(): void {
-    console.log('updateFilter ');
+    console.log(JSON.stringify(this.form.value));
+  }
+
+  clearCheckboxes(): void {
+    Object.keys(this.form.controls).forEach((group: string) => {
+      Object.keys((this.form.get(group) as UntypedFormGroup).controls).forEach(
+        (key) => {
+          (this.form.get(group + '.' + key) as FormControl).setValue(false);
+        }
+      );
+    });
   }
 }

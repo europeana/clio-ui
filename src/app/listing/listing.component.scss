@@ -11,15 +11,6 @@
   }
 }
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0.5;
-  }
-}
-
 .report {
   grid-column: 1 / -1;
 }
@@ -31,6 +22,7 @@
   grid-column-gap: $col-gap;
   margin-top: 1em;
   padding: 0;
+  position: relative;
 
   a,
   .list-header {
@@ -57,21 +49,15 @@
       z-index: 1;
     }
 
-    &::after,
-    &::before {
+    &::after {
       content: '';
-      width: 100vw;
+      width: 100%;
       display: block;
       bottom: 0;
       left: 0;
       right: 0;
       top: -100vh;
       position: absolute;
-    }
-    &::before {
-      animation: fadeIn 0.3s linear;
-      animation-fill-mode: forwards;
-      background: #fff;
     }
     &::after {
       animation: blurIn 0.3s linear;

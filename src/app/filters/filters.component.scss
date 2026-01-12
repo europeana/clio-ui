@@ -1,14 +1,30 @@
-.filters {
-  margin-left: 0.5em;
-}
+@use '../../scss/colours';
+@use '../../scss/variables';
 
-.filter-label {
-  font-weight: bold;
-  margin-left: 1em;
-  text-transform: capitalize;
+h4 {
+  margin: 0.5em 0 0 1em;
 }
 
 input {
   padding: 0.25em;
-  margin: 0.5em 0;
+  margin: 1.75em 0 0.5em 0;
+}
+
+select {
+  background: colours.$offwhite;
+  color: variables.$text-colour;
+  margin-top: 0.6em;
+  font-size: 1em;
+  font-weight: bold;
+  padding: 0.75em 0 0.5em 0;
+  margin-bottom: 1em;
+
+  &:focus-visible {
+    outline: 1px solid variables.$clio-highlight-colour;
+  }
+}
+
+.filter-label {
+  font-weight: bold;
+  text-transform: capitalize;
 }

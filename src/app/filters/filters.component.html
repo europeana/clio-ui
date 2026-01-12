@@ -1,4 +1,10 @@
 <div class="filters">
+  <select (change)="clearCheckboxes()">
+    <option value="0">All Providers</option>
+    <option value="1">Provider 1</option>
+    <option value="2">Provider 2</option>
+  </select>
+
   <ng-container *ngFor="let field of formControlFields">
     <span class="filter-label">{{ field.name }}</span>
     <ng-container *ngFor="let option of field.options">
