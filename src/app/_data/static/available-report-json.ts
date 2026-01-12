@@ -26,6 +26,84 @@ export const latestListJSON: Array<AvailableReport> = [
     batchId: 1392,
     creationTime: '2025-11-30T11:43:03.029Z',
     url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1392'
+  },
+  {
+    reportId: 1277,
+    batchId: 1422,
+    creationTime: '2025-10-30T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1422'
+  },
+  {
+    reportId: 1276,
+    batchId: 1420,
+    creationTime: '2025-09-30T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1420'
+  },
+  {
+    reportId: 1275,
+    batchId: 1412,
+    creationTime: '2025-08-30T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1412'
+  },
+  {
+    reportId: 1402,
+    batchId: 1392,
+    creationTime: '2025-07-30T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1392'
+  },
+  {
+    reportId: 855,
+    batchId: 1092,
+    creationTime: '2025-07-29T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1092'
+  },
+  {
+    reportId: 854,
+    batchId: 1091,
+    creationTime: '2025-07-28T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1091'
+  },
+  {
+    reportId: 853,
+    batchId: 1090,
+    creationTime: '2025-07-27T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1090'
+  },
+  {
+    reportId: 852,
+    batchId: 1089,
+    creationTime: '2025-07-26T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1089'
+  },
+  {
+    reportId: 851,
+    batchId: 1088,
+    creationTime: '2025-07-25T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1088'
+  },
+  {
+    reportId: 850,
+    batchId: 1087,
+    creationTime: '2025-07-24T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1087'
+  },
+  {
+    reportId: 849,
+    batchId: 1086,
+    creationTime: '2025-07-23T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1086'
+  },
+  {
+    reportId: 848,
+    batchId: 1085,
+    creationTime: '2025-07-22T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1085'
+  },
+  {
+    reportId: 847,
+    batchId: 1084,
+    creationTime: '2025-07-21T11:43:03.029Z',
+    url: 'https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1084'
   }
 ];
 

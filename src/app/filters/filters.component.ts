@@ -18,21 +18,36 @@ export class FiltersComponent implements OnInit {
   private readonly fb = inject(UntypedFormBuilder);
 
   form: UntypedFormGroup;
+
   formControlFields = [
-    { name: 'field_1', label: 'label 1' },
-    { name: 'field_2', label: 'label 2' },
-    { name: 'field_3', label: 'label 3' },
-    { name: 'field_4', label: 'label 4' },
-    { name: 'field_5', label: 'label 5' }
+    {
+      name: 'content_tier',
+      options: [
+        { name: 'field_1', label: 'label 1' },
+        { name: 'field_2', label: 'label 2' },
+        { name: 'field_3', label: 'label 3' }
+      ]
+    },
+    {
+      name: 'metadata_tier',
+      options: [
+        { name: 'field_4', label: 'label 4' },
+        { name: 'field_5', label: 'label 5' }
+      ]
+    }
   ];
 
   ngOnInit(): void {
     const formGroup = new UntypedFormGroup({});
     this.formControlFields.forEach((f) =>
-      formGroup.addControl(f.name, new FormControl(null, []))
+      f.options.forEach((o) =>
+        formGroup.addControl(o.name, new FormControl(null, []))
+      )
     );
-    this.form = new UntypedFormGroup({ items: formGroup });
-    //console.log(this.form);
+    this.form = new UntypedFormGroup({
+      content_tier: formGroup,
+      metadata_tier: formGroup
+    });
   }
 
   updateFilter(): void {

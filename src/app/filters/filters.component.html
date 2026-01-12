@@ -1,12 +1,17 @@
 <div class="filters">
   <ng-container *ngFor="let field of formControlFields">
-    <app-checkbox
-      [form]="form"
-      [controlName]="field.name"
-      [labelText]="field.label"
-      [group]="'items'"
-      (valueChanged)="updateFilter()"
-      title="Test"
-    ></app-checkbox>
+    <span class="filter-label">{{ field.name }}</span>
+    <ng-container *ngFor="let option of field.options">
+      <app-checkbox
+        [form]="form"
+        [controlName]="option.name"
+        [labelText]="option.label"
+        [group]="field.name"
+        (valueChanged)="updateFilter()"
+        title="Test"
+      ></app-checkbox>
+    </ng-container>
   </ng-container>
+
+  <input placeholder="dataset id" />
 </div>
