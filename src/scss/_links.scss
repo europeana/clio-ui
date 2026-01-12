@@ -1,5 +1,6 @@
 @use './functions/icon_urls';
 @use './colours';
+@use './variables';
 
 a {
   color: colours.$eu-purple;
@@ -23,5 +24,23 @@ a {
       background-repeat: no-repeat;
       background-position: center 0.1em;
     }
+  }
+}
+
+.csv-download {
+  align-items: center;
+  display: flex;
+
+  &::after {
+    content: '';
+    width: 1em;
+    height: 1em;
+    display: block;
+    background-image: icon_urls.svg-url-icon-download(variables.$clio-colour);
+  }
+  &:hover::after {
+    background-image: icon_urls.svg-url-icon-download(
+      variables.$clio-highlight-colour
+    );
   }
 }

@@ -57,8 +57,7 @@
   text-align: center;
 }
 
-.browse,
-.csv-download {
+.browse {
   display: flex;
   align-items: center;
 }
@@ -80,21 +79,6 @@
   }
   &:hover::after {
     background-image: icon_urls.svg-url-icon-eye(
-      variables.$clio-highlight-colour
-    );
-  }
-}
-
-.csv-download {
-  &::after {
-    content: '';
-    width: 1em;
-    height: 1em;
-    display: block;
-    background-image: icon_urls.svg-url-icon-download(variables.$clio-colour);
-  }
-  &:hover::after {
-    background-image: icon_urls.svg-url-icon-download(
       variables.$clio-highlight-colour
     );
   }
