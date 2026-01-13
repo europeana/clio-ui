@@ -18,7 +18,18 @@
         <a class="browse" (click)="openPreview(latestItem.reportId)"></a>
       </span>
 
-      <span>{{ latestItem.creationTime | date: DATE_VERBOSE_FMT }}</span>
+      <span style="display: flex; align-items: center">
+        <span>
+          {{ latestItem.creationTime | date: DATE_VERBOSE_FMT }}
+        </span>
+        <app-checkbox
+          [form]="form"
+          [controlName]="latestItem.reportId + ''"
+          [title]="'include in top-level download'"
+          [group]="'record_ids'"
+          (valueChanged)="updateIds()"
+        ></app-checkbox>
+      </span>
     </li>
 
     @if (isExpanded) {

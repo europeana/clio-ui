@@ -15,5 +15,7 @@
       [formControlName]="controlName"
     />
   </span>
-  <span class="checkbox-label" [innerHTML]="labelText"> </span>
+  @if (labelText) {
+    <span class="checkbox-label" [innerHTML]="labelText"> </span>
+  }
 </label>

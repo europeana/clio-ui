@@ -19,10 +19,6 @@ $view-box-down-12: '0 -12 #{$icon-width} #{$icon-height}';
   height: #{($icon-height / $icon-width) * $state-width}em;
   display: block;
   width: #{$state-width}em;
-
-  &:not(.clio-open) {
-    margin: 0.25em 1em;
-  }
 }
 
 // storm cloud

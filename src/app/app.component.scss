@@ -36,6 +36,7 @@
 
 .columns {
   display: flex;
+  margin-top: 1em;
   .left-col {
     margin-right: 2em;
   }
@@ -65,6 +66,10 @@
   }
 }
 
+.csv-download-block {
+  margin-left: auto;
+}
+
 .desc {
   font-style: italic;
 }
@@ -80,4 +85,35 @@
   &.expanded::after {
     transform: rotate(90deg) translateY(-0.4em);
   }
+}
+
+.clio-state {
+  position: absolute;
+  left: 12.75rem;
+
+  &.clio-state-0 {
+    top: 0px;
+  }
+  &.clio-state-1 {
+    top: 0px;
+  }
+  &.clio-state-2 {
+    top: 5px;
+  }
+  &.clio-state-3 {
+    top: 5px;
+  }
+  &.clio-state-4 {
+    top: 5px;
+  }
+}
+
+.status-bar {
+  font-weight: bold;
+  display: flex;
+  color: variables.$clio-colour;
+  border-top: 1px solid variables.$clio-colour;
+  border-bottom: 1px solid variables.$clio-colour;
+  padding: 0.5rem 0;
+  position: relative;
 }

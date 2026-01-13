@@ -34,6 +34,7 @@ describe('AppComponent', () => {
       configureTestbed();
       fixture = TestBed.createComponent(AppComponent);
       component = fixture.componentInstance;
+      component.showSwaggerEndpoints = true;
       fixture.detectChanges();
     });
 
@@ -99,6 +100,7 @@ describe('AppComponent', () => {
       configureTestbed(true);
       fixture = TestBed.createComponent(AppComponent);
       component = fixture.componentInstance;
+      component.showSwaggerEndpoints = true;
       fixture.detectChanges();
     });
 

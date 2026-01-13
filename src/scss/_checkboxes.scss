@@ -2,9 +2,6 @@
 @use 'functions/icon_urls';
 
 $width-icon-filter: 18px;
-//$filter-row-height: 32px;
-$filter-row-height: 28px;
-$filter-row-height: 30px;
 
 .checkboxes-list .checkbox-labelled {
   cursor: pointer;
@@ -16,8 +13,6 @@ $filter-row-height: 30px;
 
 .checkbox-label {
   font-size: 14px;
-  //font-weight: bold;
-  line-height: $filter-row-height;
   margin: 0 8px;
   white-space: nowrap;
   .term-highlight {
@@ -37,7 +32,7 @@ $filter-row-height: 30px;
     min-width: $width-icon-filter;
   }
 
-  :last-child {
+  .checkbox-label {
     cursor: pointer;
     width: 100%;
   }

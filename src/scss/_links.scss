@@ -44,3 +44,27 @@ a {
     );
   }
 }
+
+.csv-download-block {
+  align-items: center;
+  display: flex;
+
+  &::before {
+    content: attr(label);
+    font-weight: bold;
+    margin-right: 0.4rem;
+  }
+
+  &::after {
+    content: '';
+    border-radius: 4px;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: block;
+    background-color: variables.$clio-colour;
+    background-image: icon_urls.svg-url-icon-download(#fff);
+  }
+  &:hover::after {
+    background-color: variables.$clio-highlight-colour;
+  }
+}

@@ -13,10 +13,9 @@ import {
   ViewChild
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AvailableReport, BatchItem, ReportItem } from './_models';
+import { AvailableReport, BatchItem } from './_models';
 import { APIService, ClickService, ExportCSVService } from './_services';
 import { HeaderComponent } from './header';
-import { ReportComponent } from './report';
 import { FiltersComponent } from './filters';
 import { ListingComponent } from './listing';
 
@@ -32,8 +31,7 @@ import { ListingComponent } from './listing';
     ListingComponent,
     NgClass,
     NgIf,
-    NgTemplateOutlet,
-    ReportComponent
+    NgTemplateOutlet
   ]
 })
 export class AppComponent {
@@ -46,7 +44,7 @@ export class AppComponent {
   error?: HttpErrorResponse;
 
   batches: Array<BatchItem>;
-  browsableReport?: Array<ReportItem>;
+  showSwaggerEndpoints = false;
 
   @ViewChild('batchId') batchId: ElementRef;
   @ViewChild('maxResults') maxResults: ElementRef;
@@ -129,10 +127,6 @@ export class AppComponent {
     this.api.availableReports().subscribe(
       (data: Array<AvailableReport>) => {
         this.data = JSON.stringify(data).replace(/"/g, "'");
-
-        //this.data = JSON.stringify(data.replace(/\\"/, ''));
-        //this.batches = JSON.parse(data);
-
         if (download) {
           const fileData = this.exportCSV.csvFromAvailableReport(data);
           this.exportCSV.download(fileData, 'available-reports');
@@ -146,20 +140,5 @@ export class AppComponent {
 
   downloadAvailableReports(): void {
     this.loadAvailableReports(true);
-  }
-
-  browseReport(): void {
-    if (this.browsableReport) {
-      this.browsableReport = undefined;
-    } else {
-      this.api.loadLatestReportJSON().subscribe(
-        (data: Array<ReportItem>) => {
-          this.browsableReport = data;
-        },
-        (err: HttpErrorResponse) => {
-          this.error = err;
-        }
-      );
-    }
   }
 }
