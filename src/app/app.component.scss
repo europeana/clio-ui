@@ -87,9 +87,14 @@
   }
 }
 
-.clio-state {
-  position: absolute;
+.indent-left {
   left: 12.75rem;
+  position: absolute;
+}
+
+.clio-state {
+  margin: 0 4px;
+  position: absolute;
 
   &.clio-state-0 {
     top: 0px;
@@ -111,7 +116,6 @@
 .status-bar {
   font-weight: bold;
   display: flex;
-  color: variables.$clio-colour;
   border-top: 1px solid variables.$clio-colour;
   border-bottom: 1px solid variables.$clio-colour;
   padding: 0.5rem 0;
