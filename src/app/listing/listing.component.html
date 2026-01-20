@@ -6,16 +6,28 @@
     <span class="list-header centre">Browse</span>
     <span class="list-header">Creation Time</span>
   </li>
-  @for (latestItem of latestList; track latestItem) {
+  @for (latestItem of clioInfo().list; track latestItem) {
     @let isExpanded = previewedId === latestItem.reportId;
     <li [ngClass]="{ hightlight: isExpanded }">
-      <span>{{ latestItem.reportId }}</span>
-      <span>{{ latestItem.batchId }}</span>
+      <a style="display: flex; align-items: center" (click)="setSummary()"
+        >{{ latestItem.reportId }}
+        <span
+          [ngClass]="{
+            'clio-state-0': latestItem.score === 0,
+            'clio-state-1': latestItem.score === 1,
+            'clio-state-2': latestItem.score === 2,
+            'clio-state-3': latestItem.score === 3,
+            'clio-state-4': latestItem.score === 4
+          }"
+          class="clio-state"
+        ></span
+      ></a>
+      <a (click)="setSummary()">{{ latestItem.batchId }}</a>
       <span class="centre">
         <a class="csv-download" target="_blank" [href]="latestItem.url">CSV</a>
       </span>
       <span class="centre">
-        <a class="browse" (click)="openPreview(latestItem.reportId)"></a>
+        <a class="browse"></a>
       </span>
 
       <span style="display: flex; align-items: center">
@@ -36,19 +48,12 @@
       <li
         class="expanded-item"
         libClickAware
-        (clickOutside)="closeReport()"
+        (clickOutside)="clickOutside()"
         [ignoreClasses]="['browse', 'nav']"
       >
-        @if (browsableReport) {
-          <app-report
-            style="
-              display: grid;
-              grid-template-columns: subgrid;
-              grid-column: 1 / -1;
-            "
-            [report]="browsableReport"
-          ></app-report>
-        }
+        <!--
+        TODO: remove expanded
+        -->
       </li>
     }
   }

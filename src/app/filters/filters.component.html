@@ -1,25 +1,51 @@
 <div class="filters">
-  <select (change)="clearCheckboxes()">
-    <option value="0">All Providers</option>
-    <option value="1">Provider 1</option>
-    <option value="2">Provider 2</option>
-  </select>
-
-  <ng-container *ngFor="let field of formControlFields">
-    <span class="filter-label">{{ field.name }}</span>
+  <ng-container *ngFor="let field of filteringOptions | keyvalue">
+    <span class="filter-label">{{ field.key }}</span>
     <div class="filter">
-      <ng-container *ngFor="let option of field.options">
+      <ng-container *ngFor="let option of field.value">
         <app-checkbox
           [form]="form"
-          [controlName]="option.name"
-          [labelText]="option.label"
-          [group]="field.name"
-          (valueChanged)="updateFilter()"
+          [controlName]="option"
+          [labelText]="option"
+          [group]="field.key"
+          (valueChanged)="updatePageUrl()"
           title="Test"
         ></app-checkbox>
       </ng-container>
     </div>
   </ng-container>
 
-  <input placeholder="dataset id" />
+  <div [formGroup]="form">
+    <span class="filter-label">Batch Id</span>
+    <input
+      data-e2e="batch-id"
+      placeholder="batch id"
+      formControlName="batchId"
+      (keyUp.enter)="updatePageUrl()"
+    />
+
+    <span class="filter-label">Dataset Id</span>
+    <input
+      data-e2e="dataset-id"
+      placeholder="dataset id"
+      formControlName="datasetId"
+      (keyUp.enter)="updatePageUrl()"
+    />
+
+    <span class="filter-label">From</span>
+    <input
+      type="date"
+      data-e2e="date-from"
+      formControlName="dateFrom"
+      (change)="updatePageUrl()"
+    />
+
+    <span class="filter-label">To</span>
+    <input
+      type="date"
+      data-e2e="date-to"
+      formControlName="dateTo"
+      (change)="updatePageUrl()"
+    />
+  </div>
 </div>

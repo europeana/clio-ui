@@ -6,6 +6,7 @@ import {
   NgTemplateOutlet
 } from '@angular/common';
 import {
+  //ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
@@ -36,9 +37,16 @@ import { ListingComponent } from './listing';
 })
 export class AppComponent {
   title = 'Clio UI';
-  api = inject(APIService);
-  exportCSV = inject(ExportCSVService);
-  clickService = inject(ClickService);
+  private readonly api = inject(APIService);
+  private readonly exportCSV = inject(ExportCSVService);
+  private readonly clickService = inject(ClickService);
+
+  /*
+  changeDetector = inject(ChangeDetectorRef);
+  x(): void {
+    this.changeDetector.detectChanges();
+  }
+  */
 
   data?: string;
   error?: HttpErrorResponse;
@@ -49,6 +57,9 @@ export class AppComponent {
   @ViewChild('batchId') batchId: ElementRef;
   @ViewChild('maxResults') maxResults: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
+
+  @ViewChild('listing', { static: false }) listing: ListingComponent;
+  @ViewChild('filters', { static: false }) filters: FiltersComponent;
 
   /**
    * documentClick

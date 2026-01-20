@@ -5,26 +5,41 @@
 <div class="fit-to-page">
   <br />
 
-  <span class="status-bar">
-    @if (listing && listing.latestList) {
-      <a class="clio-state" [ngClass]="'clio-state-' + listing.listScore"></a>
-      <span class="indent-left">Checking Links In Operation</span>
-
-      @let totalNumber = listing.latestList.length;
-      @let count = listing.listSelectionCount;
-      @let textAll = count === totalNumber ? ' all ' : '';
-      @let text =
-        'download ' + textAll + count + ' report' + (count !== 1 ? 's' : '');
-      <a class="csv-download-block" [attr.label]="text" href=""></a>
-    }
-  </span>
-
   <div class="columns">
     <div class="left-col">
-      <app-filters> </app-filters>
+      <app-filters #filters> </app-filters>
     </div>
     <div class="right-col">
-      <app-listing #listing></app-listing>
+      @let clioInfo = filters.modelClioInfo();
+      @if (listing && clioInfo && clioInfo.listLength) {
+        <div class="summary-bar">
+          <span
+            title="score: {{ clioInfo.listAverageScore }}"
+            [ngClass]="{
+              'clio-state-0': clioInfo.listAverageScore === 0,
+              'clio-state-1': clioInfo.listAverageScore === 1,
+              'clio-state-2': clioInfo.listAverageScore === 2,
+              'clio-state-3': clioInfo.listAverageScore === 3,
+              'clio-state-4': clioInfo.listAverageScore === 4
+            }"
+            class="clio-state"
+          ></span>
+
+          <span>TODO - generate title</span>
+
+          @let totalNumber = clioInfo.listLength;
+          @let count = listing.listSelectionCount;
+          @let textAll = count === totalNumber ? ' all ' : '';
+          @let text =
+            'download ' +
+            textAll +
+            count +
+            ' report' +
+            (count !== 1 ? 's' : '');
+          <a class="csv-download-block" [attr.label]="text" href=""></a>
+        </div>
+      }
+      <app-listing #listing [clioInfo]="filters.modelClioInfo"></app-listing>
     </div>
   </div>
 

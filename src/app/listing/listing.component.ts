@@ -1,6 +1,5 @@
 import { DatePipe, NgClass } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-
+import { Component, effect, inject, Input, ModelSignal } from '@angular/core';
 import {
   FormControl,
   UntypedFormBuilder,
@@ -8,86 +7,84 @@ import {
 } from '@angular/forms';
 
 import { DATE_VERBOSE_FMT } from '../_data/static/date-formats';
-import { ClickAwareDirective } from '../_directives';
-import { AvailableReport, ReportItem } from '../_models';
-import { APIService } from '../_services';
-import { CheckboxComponent } from '../checkbox';
+import { ClioInfo, Run } from '../_models';
 
-import { ReportComponent } from '../report';
+import { ClickAwareDirective } from '../_directives';
+import { CheckboxComponent } from '../checkbox';
 
 @Component({
   selector: 'app-listing',
   templateUrl: './listing.component.html',
   styleUrls: ['./listing.component.scss'],
-  imports: [
-    CheckboxComponent,
-    ClickAwareDirective,
-    DatePipe,
-    NgClass,
-    ReportComponent
-  ]
+  imports: [CheckboxComponent, ClickAwareDirective, DatePipe, NgClass]
 })
-export class ListingComponent implements OnInit {
+export class ListingComponent {
   public DATE_VERBOSE_FMT = DATE_VERBOSE_FMT;
-
-  api = inject(APIService);
-  latestList: Array<AvailableReport>;
-  listSelectionCount = 0;
-  listScore = 0;
-
-  previewedId?: number;
-  browsableReport?: Array<ReportItem>;
-
   private readonly fb = inject(UntypedFormBuilder);
 
-  form: UntypedFormGroup;
+  listSelectionCount = 0;
+  summary = true;
+  previewedId?: number;
 
-  ngOnInit(): void {
-    const formGroup = new UntypedFormGroup({});
-    this.form = new UntypedFormGroup({
-      record_ids: formGroup
+  form = new UntypedFormGroup({
+    record_ids: new UntypedFormGroup({})
+  });
+
+  @Input() clioInfo: ModelSignal<ClioInfo>;
+
+  constructor() {
+    effect(() => {
+      if (this.clioInfo().list) {
+        this.setCheckboxes(false);
+        const list = this.clioInfo().list;
+        const formGroup = this.form.get('record_ids') as UntypedFormGroup;
+
+        list.forEach((report: Run) => {
+          const fName = `${report.reportId}`;
+          const ctrl = this.form.get(fName);
+          if (!ctrl) {
+            formGroup.addControl(fName, new FormControl(true, []));
+          }
+        });
+
+        this.listSelectionCount = list.length;
+        this.setCheckboxes(true);
+      }
     });
-    this.loadLatestReports();
   }
 
-  closeReport(): void {
-    this.previewedId = undefined;
-    this.browsableReport = undefined;
+  setCheckboxes(val: boolean): void {
+    Object.keys(this.form.controls).forEach((group: string) => {
+      Object.keys((this.form.get(group) as UntypedFormGroup).controls).forEach(
+        (key) => {
+          const ctrl = this.form.get(group + '.' + key) as FormControl;
+          if (val) {
+            const arrVisible = this.clioInfo().list.map((item: Run) => {
+              return `${item.reportId}`;
+            });
+            if (arrVisible.includes(key)) {
+              ctrl.setValue(val);
+            }
+          } else {
+            ctrl.setValue(false);
+          }
+        }
+      );
+    });
+  }
+
+  clickOutside(): void {
+    console.log('clickOutside... TODO: DELETE?');
   }
 
   updateIds(): void {
     const vals = this.form.value['record_ids'];
-
     this.listSelectionCount = Object.keys(vals).filter((key: string) => {
       return vals[key];
     }).length;
-
-    this.listScore = Math.floor(Math.random() * 5);
   }
 
-  loadLatestReports(): void {
-    this.api.loadLatestListJSON().subscribe((data: Array<AvailableReport>) => {
-      const formGroup = this.form.get('record_ids') as UntypedFormGroup;
-      data.forEach((report: AvailableReport) => {
-        formGroup.addControl(report.reportId + '', new FormControl(true, []));
-      });
-
-      setTimeout(() => {
-        this.listSelectionCount = data.length;
-        this.latestList = data;
-      }, 100);
-    });
-  }
-
-  openPreview(id: number): void {
-    this.previewedId = this.previewedId === id ? undefined : id;
-
-    if (!this.previewedId) {
-      return;
-    }
-
-    this.api.loadLatestReportJSON().subscribe((data: Array<ReportItem>) => {
-      this.browsableReport = data;
-    });
+  setSummary(): void {
+    this.summary = !this.summary;
   }
 }

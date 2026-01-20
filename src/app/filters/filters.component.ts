@@ -1,76 +1,294 @@
-import { NgFor } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { KeyValuePipe, NgFor } from '@angular/common';
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  model,
+  ModelSignal,
+  OnInit
+} from '@angular/core';
 import {
   FormControl,
+  FormsModule,
+  ReactiveFormsModule,
   UntypedFormBuilder,
   UntypedFormGroup
 } from '@angular/forms';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 
+import { map } from 'rxjs/operators';
+
+import { APIService } from '../_services';
+import { getDateAsISOString } from '../_helpers/date-helpers';
+import {
+  fromCSL,
+  fromInputSafeName,
+  toInputSafeName,
+  validateDateGeneric
+} from '../_helpers/date-helpers';
+
+import { BreakdownRequest, BreakdownResults, ClioInfo } from '../_models';
 import { CheckboxComponent } from '../checkbox';
 
 @Component({
   selector: 'app-filters',
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.scss'],
-  imports: [NgFor, CheckboxComponent]
+  imports: [
+    NgFor,
+    CheckboxComponent,
+    KeyValuePipe,
+    FormsModule,
+    ReactiveFormsModule
+  ]
 })
 export class FiltersComponent implements OnInit {
   private readonly fb = inject(UntypedFormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly api = inject(APIService);
+
+  changeDetector = inject(ChangeDetectorRef);
+
+  queryParams: Params = {};
+
+  // TODO: move into modelClioInfo
+  filteringOptions: { [key: string]: Array<string> } = {};
+
+  modelClioInfo: ModelSignal<ClioInfo> = model({
+    list: [],
+    listLength: -1,
+    listAverageScore: -1
+  } as ClioInfo);
 
   form: UntypedFormGroup;
 
-  formControlFields = [
-    {
-      name: 'content_tier',
-      options: [
-        { name: '0', label: 'Zero' },
-        { name: '1', label: '1' },
-        { name: '2', label: '2' },
-        { name: '3', label: '3' },
-        { name: '4', label: '4' }
-      ]
-    },
-    {
-      name: 'metadata_tier',
-      options: [
-        { name: 'A', label: 'A' },
-        { name: 'B', label: 'B' }
-      ]
-    },
-    {
-      name: 'media_type',
-      options: [
-        { name: 'TEXT', label: 'TEXT' },
-        { name: 'Video', label: 'VIDEO' }
-      ]
-    }
-  ];
-
   ngOnInit(): void {
-    const formGroup = new UntypedFormGroup({});
-    this.formControlFields.forEach((f) =>
-      f.options.forEach((o) =>
-        formGroup.addControl(o.name, new FormControl(null, []))
-      )
-    );
     this.form = new UntypedFormGroup({
-      content_tier: formGroup,
-      metadata_tier: formGroup,
-      media_type: formGroup
+      dataProvider: new UntypedFormGroup({}),
+      provider: new UntypedFormGroup({}),
+
+      dateFrom: new FormControl(),
+      dateTo: new FormControl(),
+
+      datasetId: new FormControl(),
+      datasetIds: new UntypedFormGroup({}),
+
+      batchId: new FormControl(),
+      batchIds: new UntypedFormGroup({})
     });
-  }
 
-  updateFilter(): void {
-    console.log(JSON.stringify(this.form.value));
-  }
+    // parse the url param values into the form
+    this.route.queryParams
+      .pipe(
+        map((qp) => {
+          console.log('raw qp = ' + JSON.stringify(qp, null, 4));
+          const qpValArrays: Params = {};
+          Object.keys(qp).forEach((paramName: string) => {
+            qpValArrays[paramName] = (
+              Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
+            ).map((qpValue: string) => {
+              return toInputSafeName(qpValue);
+            });
+          });
+          return qpValArrays;
+        })
+      )
+      .subscribe((queryParams) => {
+        const datasetId = queryParams['datasetId'];
+        const batchId = queryParams['batchId'];
 
-  clearCheckboxes(): void {
-    Object.keys(this.form.controls).forEach((group: string) => {
-      Object.keys((this.form.get(group) as UntypedFormGroup).controls).forEach(
-        (key) => {
-          (this.form.get(group + '.' + key) as FormControl).setValue(false);
+        if (datasetId) {
+          const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
+          `${datasetId}`.split(',').forEach((part: string) => {
+            datasetIds.addControl(part.trim(), new FormControl(''));
+          });
         }
-      );
+
+        if (batchId) {
+          const batchIds = this.form.get('batchIds') as UntypedFormGroup;
+          `${batchId}`.split(',').forEach((part: string) => {
+            batchIds.addControl(part.trim(), new FormControl(''));
+          });
+        }
+
+        this.queryParams = queryParams;
+
+        const paramFrom = this.queryParams['date-from'];
+        const paramTo = this.queryParams['date-to'];
+        this.form.controls.dateFrom.setValue(paramFrom ? paramFrom[0] : '');
+        this.form.controls.dateTo.setValue(paramTo ? paramTo[0] : '');
+
+        this.form.controls.datasetId.setValue(datasetId ? datasetId[0] : '');
+        this.form.controls.batchId.setValue(batchId ? batchId[0] : '');
+
+        this.loadData();
+      });
+  }
+
+  getDataServerDataRequest(): BreakdownRequest {
+    const breakdownRequest: BreakdownRequest = { filters: {} };
+
+    Object.keys(this.queryParams).forEach((key: string) => {
+      breakdownRequest.filters[key] = { values: this.queryParams[key] };
     });
+
+    const valDatasetId = this.form.value.datasetId;
+
+    if (valDatasetId) {
+      breakdownRequest.filters['datasetId'] = {
+        values: fromCSL(valDatasetId)
+      };
+    }
+
+    const valBatchId = this.form.value.batchId;
+
+    if (valBatchId) {
+      breakdownRequest.filters['batchId'] = {
+        values: fromCSL(valBatchId)
+      };
+    }
+
+    return breakdownRequest;
+  }
+
+  addOrUpdateFilterControls(name: string, options: Array<string>): void {
+    const checkboxes = this.form.get(name) as UntypedFormGroup;
+
+    options.forEach((option: string) => {
+      const fName = toInputSafeName(option);
+      const ctrl = this.form.get(`${name}.${fName}`);
+      const defaultValue = `${this.queryParams[name]}`.includes(fName);
+
+      if (!ctrl) {
+        checkboxes.addControl(fName, new FormControl(defaultValue));
+      } else {
+        ctrl.setValue(defaultValue);
+      }
+    });
+  }
+
+  /** loadData
+   **/
+  loadData(): void {
+    this.api
+      .getBreakdowns(this.getDataServerDataRequest())
+      .subscribe((breakdownResults: BreakdownResults) => {
+        const list = breakdownResults.results;
+        const ops = breakdownResults.filteringOptions;
+        this.filteringOptions = ops;
+        Object.keys(ops).forEach((key: string) => {
+          this.addOrUpdateFilterControls(key, ops[key]);
+        });
+
+        this.modelClioInfo.set({
+          list: list,
+          listLength: list.length,
+          listAverageScore: Math.floor(
+            list.reduce((sum, obj) => sum + obj.score, 0) / list.length
+          )
+        });
+      });
+  }
+
+  /** validateDateFrom
+  /* @param {FormControl} control - the field to validate
+  /* - returns an errors object map
+  */
+  validateDateFrom(control: FormControl): { [key: string]: boolean } | null {
+    return validateDateGeneric(control, 'dateFrom');
+  }
+
+  /** validateDateTo
+  /* @param {FormControl} control - the field to validate
+  /* - returns an errors object map
+  */
+  validateDateTo(control: FormControl): { [key: string]: boolean } | null {
+    return validateDateGeneric(control, 'dateTo');
+  }
+
+  /** getFormattedDatasetIdParam
+  /* @returns { string } - concatenated datasetId value(s) if present
+  /* @returns { string } - empty string not present
+  */
+  getFormattedDatasetIdParam(): string {
+    const filterDatasetIdParam = this.form.value.datasetId;
+    if (filterDatasetIdParam && filterDatasetIdParam.length > 0) {
+      const values = fromCSL(filterDatasetIdParam)
+        .map((id: string) => {
+          return `${id}_*`;
+        })
+        .join(' OR ');
+      return `edm_datasetName:(${values})`;
+    }
+    return '*';
+  }
+
+  getSetCheckboxValues(filterName: string): Array<string> {
+    const vals = this.form.value[filterName];
+    const res = vals
+      ? Object.keys(vals).filter((key: string) => {
+          return vals[key];
+        })
+      : [];
+
+    return res;
+  }
+
+  /** updatePageUrl
+  /* Navigate to url according to form state
+  */
+  updatePageUrl(): void {
+    const qp: Params = {};
+
+    Object.keys(this.filteringOptions).forEach((filterName: string) => {
+      const filterVals = this.getSetCheckboxValues(filterName);
+      if (filterVals.length > 0) {
+        qp[filterName] = filterVals;
+      }
+    });
+
+    const dataset = this.form.value.datasetId;
+    const batch = this.form.value.batchId;
+    const valFrom = this.form.value.dateFrom;
+    const valTo = this.form.value.dateTo;
+
+    if (valFrom) {
+      qp['date-from'] = getDateAsISOString(new Date(valFrom));
+    }
+    if (valTo) {
+      qp['date-to'] = getDateAsISOString(new Date(valTo));
+    }
+    if (dataset) {
+      qp['datasetId'] = dataset;
+    }
+    if (batch) {
+      qp['batchId'] = batch;
+    }
+
+    this.router.navigate([''], {
+      queryParams: qp
+    });
+  }
+
+  /** getFormattedDateParam
+  /* get an empty string or the formatted date range
+  /* @returns string
+  */
+  getFormattedDateParam(): string {
+    const valFrom = this.form.value.dateFrom;
+    const valTo = this.form.value.dateTo;
+
+    if (valFrom && valTo) {
+      const valToDate = new Date(valTo);
+      valToDate.setDate(valToDate.getDate() + 1);
+      const range = `${new Date(valFrom).toISOString()}+TO+${new Date(
+        valToDate.getTime() - 1
+      ).toISOString()}`;
+      return `&qf=timestamp_update:${encodeURIComponent(
+        '['
+      )}${range}${encodeURIComponent(']')}`;
+    }
+    return '';
   }
 }

@@ -1,7 +1,7 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { AvailableReport, BatchItem, ReportItem } from '../_models';
+import { AvailableReport, BatchItem } from '../_models';
 
 export class MockAPIService {
   errorMode = false;
@@ -40,14 +40,6 @@ export class MockAPIService {
       return this.getError('mock getDebiasReport throws error');
     }
     return of([{} as unknown as AvailableReport]);
-  }
-
-  loadLatestListJSON(): Observable<Array<AvailableReport>> {
-    return of([{} as unknown as AvailableReport]);
-  }
-
-  loadLatestReportJSON(): Observable<Array<ReportItem>> {
-    return of([{} as unknown as ReportItem]);
   }
 }
 

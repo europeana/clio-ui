@@ -5,6 +5,7 @@ import {
   TestBed,
   tick
 } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppComponent } from './app.component';
 import { APIService, ExportCSVService } from './_services';
@@ -17,7 +18,7 @@ describe('AppComponent', () => {
 
   const configureTestbed = (errorMode = false): void => {
     TestBed.configureTestingModule({
-      imports: [AppComponent],
+      imports: [AppComponent, RouterTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
@@ -26,6 +27,7 @@ describe('AppComponent', () => {
         }
       ]
     }).compileComponents();
+
     csv = TestBed.inject(ExportCSVService);
   };
 

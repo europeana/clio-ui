@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { of } from 'rxjs';
-import { AvailableReport, BatchItem, ReportItem } from '../_models';
 import {
-  latestListJSON,
-  latestReportJSON
-} from '../_data/static/available-report-json';
+  AvailableReport,
+  BatchItem,
+  BreakdownRequest,
+  BreakdownResults
+} from '../_models';
+import { dataServerRequest } from '../_data/static/available-report-json';
 import { apiSettings } from '../../environments/apisettings';
 
 @Injectable({ providedIn: 'root' })
@@ -36,17 +38,17 @@ export class APIService {
     return this.loadCSV(`${apiSettings.serverAPI}/latest-report`);
   }
 
-  loadLatestListJSON(): Observable<Array<AvailableReport>> {
-    return of(latestListJSON);
-  }
-
-  loadLatestReportJSON(): Observable<Array<ReportItem>> {
-    return of(latestReportJSON);
-  }
-
   reportByBatchId(id: string): Observable<string> {
     return this.loadCSV(
       `${apiSettings.serverAPI}/report-by-batch-id?batchId=${id}`
     );
+  }
+
+  //replaceDoubleSlashes(s: string): string {
+  //  return s.replace(/([^:]\/)\/+/g, '$1');
+  //}
+
+  getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
+    return of(dataServerRequest(request));
   }
 }

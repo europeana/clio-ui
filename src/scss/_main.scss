@@ -3,7 +3,7 @@
 @use 'variables';
 
 body {
-  background: colours.$offwhite;
+  background: #fff; // lemonchiffon;//colours.$offwhite;
   color: variables.$text-colour;
   font: 16px / 1.6 variables.$font-primary;
   -webkit-text-size-adjust: 100%;
@@ -38,4 +38,28 @@ body {
     max-width: variables.$max-width;
     width: 80%;
   }
+}
+
+$header-height: 4.3rem;
+//$summary-height: 10rem;
+
+.summary-bar {
+  //height: $summary-height;
+  position: sticky;
+  top: $header-height;
+
+  border-top: 1px solid variables.$clio-colour;
+  border-bottom: 1px solid variables.$clio-colour;
+
+  z-index: 2;
+  background: #fff;
+}
+
+.listing .list-header {
+  top: 4em;
+}
+
+.summary-bar + * > .listing .list-header {
+  //top: $summary-height + $header-height;
+  top: $header-height;
 }
