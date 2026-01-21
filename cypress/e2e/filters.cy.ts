@@ -3,13 +3,13 @@ describe('Filters', () => {
 describe('prefilling', () => {
   it('prefills the dataset id', () => {
     const id = 71;
-    cy.visit(`/?datasetId=${id}`);
+    cy.visit(`/?dataset-id=${id}`);
     cy.get('[data-e2e=dataset-id]').should('have.value', id);
   })
 
   it('prefills the batch id', () => {
     const id = 25;
-    cy.visit(`/?batchId=${id}`);
+    cy.visit(`/?batch-id=${id}`);
     cy.get('[data-e2e=batch-id]').should('have.value', id);
   })
 

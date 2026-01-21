@@ -3,29 +3,6 @@ export interface InputDescription {
   group: string;
 }
 
-/*
-export interface ReportItem {
-  datasetId: number;
-  portalUrl: string;
-  datasetSize: number;
-  provider: string;
-  dataProvider: string;
-  recordId: string;
-  lastRecordIndex: string;
-  //  recordEdmType: "TEXT",
-  recordEdmType: string;
-  recordContentTier: number;
-  recordMetadataTier: number | string;
-  linkType: string;
-  link: string;
-  linkServer: string;
-  timeOfChecking: string;
-  error: string;
-}
-*/
-
-//////////////////
-
 export interface Dataset {
   id: number;
   name: string;
@@ -43,11 +20,6 @@ export interface Run {
   reportId: number;
   score: number;
   url: string;
-}
-
-export interface Run_DATA extends Run {
-  provider: string;
-  dataProvider: string;
 }
 
 export interface Link {

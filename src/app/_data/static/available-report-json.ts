@@ -3,18 +3,20 @@ import {
   BreakdownResults,
   RequestFilter
 } from '../../_models';
-import { Dataset, Run_DATA } from '../../_models/new';
+import { Dataset, Run } from '../../_models/new';
 
 export const today = new Date().toISOString().split('T')[0];
 export const yearZero = new Date(Date.parse('20 Nov 2008 12:00:00 GMT'));
 
-interface IdName {
+interface DataProvider {
   id: number;
   name: string;
+  providers: Array<number>;
 }
 
-interface DataProvider extends IdName {
-  providers: Array<number>;
+interface Run_DATA extends Run {
+  provider: string;
+  dataProvider: string;
 }
 
 const providers: Array<string> = [
@@ -118,7 +120,6 @@ const runs: Array<Run_DATA> = new Array(numRuns)
     };
   });
 
-//export
 const allRunData: Array<Run_DATA> = runs;
 
 // MOCK STATS SERVER...
@@ -145,33 +146,34 @@ function getDistinctValues(
 export function dataServerRequest(
   breakdownRequest: BreakdownRequest
 ): BreakdownResults {
-  const filteredReports = allRunData.slice().filter((run: Run_DATA) => {
-    let res = true;
-    Object.keys(breakdownRequest.filters).forEach((fName: string) => {
-      const filter = breakdownRequest.filters[fName] as RequestFilter;
+  const filterproof: Array<string> = [];
+  const specifiedFilterNames = Object.keys(breakdownRequest.filters);
+  const filteredReports = structuredClone(allRunData).filter(
+    (run: Run_DATA) => {
+      let res = true;
 
-      if (fName === 'date-from' && filter.values) {
-        const dateParam = Date.parse(filter.values[0]);
-        const runDate = Date.parse(run['creationTime']);
-        if (runDate < dateParam) {
-          res = false;
-        }
-      } else if (fName === 'date-to' && filter.values) {
-        const dateParam = Date.parse(filter.values[0]);
-        const runDate = Date.parse(run['creationTime']);
-        if (runDate > dateParam) {
-          res = false;
-        }
-      } else {
+      specifiedFilterNames.forEach((fName: string) => {
+        const filter = breakdownRequest.filters[fName] as RequestFilter;
+
         if (filter.values) {
-          if (fName === 'datasetId') {
-            res = true;
+          if (fName === 'dataset-id') {
             if (!filter.values.includes(`${run.datasetId}`)) {
               res = false;
             }
-          } else if (fName === 'batchId') {
-            res = true;
+          } else if (fName === 'batch-id') {
             if (!filter.values.includes(`${run.batchId}`)) {
+              res = false;
+            }
+          } else if (fName === 'date-from') {
+            const dateParam = Date.parse(filter.values[0]);
+            const runDate = Date.parse(run['creationTime']);
+            if (runDate < dateParam) {
+              res = false;
+            }
+          } else if (fName === 'date-to') {
+            const dateParam = Date.parse(filter.values[0]);
+            const runDate = Date.parse(run['creationTime']);
+            if (runDate > dateParam) {
               res = false;
             }
           } else if (
@@ -180,21 +182,25 @@ export function dataServerRequest(
             )
           ) {
             res = false;
+          } else {
+            filterproof.push(fName);
           }
         }
-      }
-    });
-    return res;
-  });
+      });
+      return res;
+    }
+  );
 
   const facetNames = ['dataProvider', 'provider'];
 
   const filterOptions = facetNames.reduce(
     (result: { [key: string]: Array<string> }, fName: string) => {
-      const nonExcluded = ['dataProvider'].includes(fName)
-        ? filteredReports
-        : allRunData;
-      const possibleValues = getDistinctValues(nonExcluded, fName);
+      const possibleValues = getDistinctValues(
+        filterproof.includes(fName)
+          ? structuredClone(allRunData)
+          : filteredReports,
+        fName
+      );
       result[fName] = possibleValues;
       return result;
     },

@@ -71,4 +71,36 @@ describe('FiltersComponent', () => {
     component.updatePageUrl();
     expect(router.navigate).toHaveBeenCalled();
   });
+
+  it('should react to the page params (dataset-id)', () => {
+    jest.spyOn(component, 'loadData');
+    component.ngOnInit();
+    fixture.detectChanges();
+    queryParams.next({ 'dataset-id': '1' });
+    expect(component.loadData).toHaveBeenCalled();
+  });
+
+  it('should react to the page params (batch-id)', () => {
+    jest.spyOn(component, 'loadData');
+    component.ngOnInit();
+    fixture.detectChanges();
+    queryParams.next({ 'batch-id': '1' });
+    expect(component.loadData).toHaveBeenCalled();
+  });
+
+  it('should react to the page params (from-date)', () => {
+    jest.spyOn(component, 'loadData');
+    component.ngOnInit();
+    fixture.detectChanges();
+    queryParams.next({ 'date-from': '2026-01-06' });
+    expect(component.loadData).toHaveBeenCalled();
+  });
+
+  it('should react to the page params (to-date)', () => {
+    jest.spyOn(component, 'loadData');
+    component.ngOnInit();
+    fixture.detectChanges();
+    queryParams.next({ 'date-to': '2026-01-06' });
+    expect(component.loadData).toHaveBeenCalled();
+  });
 });

@@ -93,8 +93,8 @@ export class FiltersComponent implements OnInit {
         })
       )
       .subscribe((queryParams) => {
-        const datasetId = queryParams['datasetId'];
-        const batchId = queryParams['batchId'];
+        const datasetId = queryParams['dataset-id'];
+        const batchId = queryParams['batch-id'];
 
         if (datasetId) {
           const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
@@ -179,7 +179,7 @@ export class FiltersComponent implements OnInit {
     const valDatasetId = this.form.value.datasetId;
 
     if (valDatasetId) {
-      breakdownRequest.filters['datasetId'] = {
+      breakdownRequest.filters['dataset-id'] = {
         values: fromCSL(valDatasetId)
       };
     }
@@ -187,7 +187,7 @@ export class FiltersComponent implements OnInit {
     const valBatchId = this.form.value.batchId;
 
     if (valBatchId) {
-      breakdownRequest.filters['batchId'] = {
+      breakdownRequest.filters['batch-id'] = {
         values: fromCSL(valBatchId)
       };
     }
@@ -307,10 +307,10 @@ export class FiltersComponent implements OnInit {
       qp['date-to'] = getDateAsISOString(new Date(valTo));
     }
     if (dataset) {
-      qp['datasetId'] = dataset;
+      qp['dataset-id'] = dataset;
     }
     if (batch) {
-      qp['batchId'] = batch;
+      qp['batch-id'] = batch;
     }
 
     this.router.navigate([''], {

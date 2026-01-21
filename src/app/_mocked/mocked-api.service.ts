@@ -1,7 +1,12 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { AvailableReport, BatchItem } from '../_models';
+import {
+  AvailableReport,
+  BatchItem,
+  BreakdownRequest,
+  BreakdownResults
+} from '../_models';
 
 export class MockAPIService {
   errorMode = false;
@@ -12,6 +17,16 @@ export class MockAPIService {
         return throwError(new Error(msg));
       })
     );
+  }
+
+  getBreakdowns(_: BreakdownRequest): Observable<BreakdownResults> {
+    if (this.errorMode) {
+      return this.getError('mock getBreakdowns throws error');
+    }
+    return of({
+      filteringOptions: {},
+      results: []
+    } as BreakdownResults);
   }
 
   reportByBatchId(_: string): Observable<string> {
