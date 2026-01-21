@@ -3,14 +3,12 @@
     <span class="list-header">Report Id</span>
     <span class="list-header">Batch Id</span>
     <span class="list-header centre">Download</span>
-    <span class="list-header centre">Browse</span>
+    <span class="list-header centre">Dataset Id</span>
     <span class="list-header">Creation Time</span>
   </li>
   @for (latestItem of clioInfo().list; track latestItem) {
-    @let isExpanded = previewedId === latestItem.reportId;
-    <li [ngClass]="{ hightlight: isExpanded }">
-      <a style="display: flex; align-items: center" (click)="setSummary()"
-        >{{ latestItem.reportId }}
+    <li>
+      <span class="state-link">
         <span
           [ngClass]="{
             'clio-state-0': latestItem.score === 0,
@@ -20,14 +18,19 @@
             'clio-state-4': latestItem.score === 4
           }"
           class="clio-state"
-        ></span
-      ></a>
-      <a (click)="setSummary()">{{ latestItem.batchId }}</a>
+        ></span>
+        {{ latestItem.reportId }}
+      </span>
+      <a (click)="setSummaryBatchId(latestItem.batchId)">{{
+        latestItem.batchId
+      }}</a>
       <span class="centre">
         <a class="csv-download" target="_blank" [href]="latestItem.url">CSV</a>
       </span>
       <span class="centre">
-        <a class="browse"></a>
+        <a (click)="setSummaryDatasetId(latestItem.reportId)">
+          {{ latestItem.datasetId }}
+        </a>
       </span>
 
       <span style="display: flex; align-items: center">
@@ -43,18 +46,5 @@
         ></app-checkbox>
       </span>
     </li>
-
-    @if (isExpanded) {
-      <li
-        class="expanded-item"
-        libClickAware
-        (clickOutside)="clickOutside()"
-        [ignoreClasses]="['browse', 'nav']"
-      >
-        <!--
-        TODO: remove expanded
-        -->
-      </li>
-    }
   }
 </ul>

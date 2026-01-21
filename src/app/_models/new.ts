@@ -65,6 +65,8 @@ export interface Link {
 }
 
 export interface ClioInfo {
+  title: string;
+  filterOps: { [key: string]: Array<string> };
   list: Array<Run>;
   listLength: number;
   listAverageScore: number;

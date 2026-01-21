@@ -1,5 +1,6 @@
 <div class="filters">
-  <ng-container *ngFor="let field of filteringOptions | keyvalue">
+  @let ops = modelClioInfo().filterOps;
+  <ng-container *ngFor="let field of ops | keyvalue">
     <span class="filter-label">{{ field.key }}</span>
     <div class="filter">
       <ng-container *ngFor="let option of field.value">

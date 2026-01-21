@@ -2,6 +2,7 @@
 @use '../../scss/variables';
 @use '../../scss/functions/icon_urls';
 
+/*
 @keyframes blurIn {
   0% {
     backdrop-filter: blur(0px);
@@ -10,9 +11,11 @@
     backdrop-filter: blur(2.5px);
   }
 }
+*/
 
-.report {
-  grid-column: 1 / -1;
+.clio-state {
+  margin-right: 0.5rem;
+  transform: scale(0.75);
 }
 
 .listing {
@@ -35,47 +38,14 @@
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: subgrid;
-  }
-  & > li:not(.expanded-item) {
     padding: 2px 0.5em;
   }
 
-  &:has(.expanded-item) {
-    li:not(.expanded-item, :has(+ .expanded-item)) {
-      background-color: colours.$offwhite;
-      transition: background-color 0.3s linear;
-    }
-    :has(+ .expanded-item) {
-      z-index: 1;
-    }
+  border-color: variables.$clio-colour;
 
-    &::after {
-      content: '';
-      width: 100%;
-      display: block;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      top: -100vh;
-      position: absolute;
-    }
-    &::after {
-      animation: blurIn 0.3s linear;
-      animation-fill-mode: forwards;
-    }
-  }
-
-  &:not(:has(.expanded-item)) {
-    border-color: variables.$clio-colour;
-
-    .list-header {
-      position: sticky;
-    }
-
-    .list-header,
-    .expanded-item {
-      background-color: #fff;
-    }
+  .list-header {
+    position: sticky;
+    background-color: #fff;
   }
 }
 
@@ -85,43 +55,13 @@
   text-align: center;
 }
 
-.browse {
-  display: flex;
-  align-items: center;
-}
-
-.browse {
-  position: relative;
-  &::after {
-    content: '';
-    width: 1em;
-    height: 1em;
-    display: block;
-    background-image: icon_urls.svg-url-icon-eye(variables.$clio-colour);
-    background-position: center;
-    position: absolute;
-    left: 50%;
-    bottom: -1.25em;
-
-    transform: translateX(-50%);
-  }
-  &:hover::after {
-    background-image: icon_urls.svg-url-icon-eye(
-      variables.$clio-highlight-colour
-    );
-  }
-}
-
-.expanded-item {
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  z-index: 1;
-}
-
 .list-header {
   padding: 0.4em 0;
   //top: 4em;
   z-index: 1;
+}
+
+.state-link {
+  align-items: center;
+  display: flex;
 }

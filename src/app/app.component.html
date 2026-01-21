@@ -25,7 +25,7 @@
             class="clio-state"
           ></span>
 
-          <span>TODO - generate title</span>
+          <span class="title">{{ clioInfo.title }}</span>
 
           @let totalNumber = clioInfo.listLength;
           @let count = listing.listSelectionCount;
@@ -39,7 +39,12 @@
           <a class="csv-download-block" [attr.label]="text" href=""></a>
         </div>
       }
-      <app-listing #listing [clioInfo]="filters.modelClioInfo"></app-listing>
+      <app-listing
+        #listing
+        (requestSummaryBatchId)="filters.summariseBatchId($event)"
+        (requestSummaryDatasetId)="filters.summariseDatasetId($event)"
+        [clioInfo]="filters.modelClioInfo"
+      ></app-listing>
     </div>
   </div>
 

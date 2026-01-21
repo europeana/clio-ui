@@ -72,6 +72,8 @@ export class AppComponent {
     this.clickService.documentClickedTarget.next(event.target);
   }
 
+  // legacy logic
+
   loadReportByBatchId(download = false): void {
     this.error = undefined;
     const param = this.batchId.nativeElement.value;

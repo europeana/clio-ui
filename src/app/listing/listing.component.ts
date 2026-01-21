@@ -1,5 +1,12 @@
 import { DatePipe, NgClass } from '@angular/common';
-import { Component, effect, inject, Input, ModelSignal } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  Input,
+  ModelSignal,
+  output
+} from '@angular/core';
 import {
   FormControl,
   UntypedFormBuilder,
@@ -8,22 +15,22 @@ import {
 
 import { DATE_VERBOSE_FMT } from '../_data/static/date-formats';
 import { ClioInfo, Run } from '../_models';
-
-import { ClickAwareDirective } from '../_directives';
 import { CheckboxComponent } from '../checkbox';
 
 @Component({
   selector: 'app-listing',
   templateUrl: './listing.component.html',
   styleUrls: ['./listing.component.scss'],
-  imports: [CheckboxComponent, ClickAwareDirective, DatePipe, NgClass]
+  imports: [CheckboxComponent, DatePipe, NgClass]
 })
 export class ListingComponent {
   public DATE_VERBOSE_FMT = DATE_VERBOSE_FMT;
   private readonly fb = inject(UntypedFormBuilder);
 
   listSelectionCount = 0;
-  summary = true;
+  requestSummaryBatchId = output<number>();
+  requestSummaryDatasetId = output<number>();
+
   previewedId?: number;
 
   form = new UntypedFormGroup({
@@ -84,7 +91,11 @@ export class ListingComponent {
     }).length;
   }
 
-  setSummary(): void {
-    this.summary = !this.summary;
+  setSummaryBatchId(id: number): void {
+    this.requestSummaryBatchId.emit(id);
+  }
+
+  setSummaryDatasetId(id: number): void {
+    this.requestSummaryDatasetId.emit(id);
   }
 }

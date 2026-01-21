@@ -41,10 +41,11 @@ body {
 }
 
 $header-height: 4.3rem;
-//$summary-height: 10rem;
+$summary-height: 3rem;
 
 .summary-bar {
   //height: $summary-height;
+  min-height: $summary-height;
   position: sticky;
   top: $header-height;
 
@@ -60,6 +61,6 @@ $header-height: 4.3rem;
 }
 
 .summary-bar + * > .listing .list-header {
-  //top: $summary-height + $header-height;
-  top: $header-height;
+  top: $summary-height + $header-height;
+  //top: $header-height;
 }

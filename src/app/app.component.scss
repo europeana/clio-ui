@@ -68,6 +68,7 @@
 
 .csv-download-block {
   margin-left: auto;
+  white-space: nowrap;
 }
 
 .desc {
@@ -99,4 +100,14 @@
   border-top: 1px solid variables.$clio-colour;
   border-bottom: 1px solid variables.$clio-colour;
   padding: 0.5rem 0;
+
+  .clio-state {
+    margin-left: 0.5em;
+    min-width: 2em;
+  }
+
+  .title {
+    margin-left: 1rem;
+    text-transform: capitalize;
+  }
 }

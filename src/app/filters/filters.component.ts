@@ -52,13 +52,12 @@ export class FiltersComponent implements OnInit {
 
   queryParams: Params = {};
 
-  // TODO: move into modelClioInfo
-  filteringOptions: { [key: string]: Array<string> } = {};
-
   modelClioInfo: ModelSignal<ClioInfo> = model({
+    title: '',
     list: [],
     listLength: -1,
-    listAverageScore: -1
+    listAverageScore: -1,
+    filterOps: {}
   } as ClioInfo);
 
   form: UntypedFormGroup;
@@ -82,7 +81,6 @@ export class FiltersComponent implements OnInit {
     this.route.queryParams
       .pipe(
         map((qp) => {
-          console.log('raw qp = ' + JSON.stringify(qp, null, 4));
           const qpValArrays: Params = {};
           Object.keys(qp).forEach((paramName: string) => {
             qpValArrays[paramName] = (
@@ -118,12 +116,57 @@ export class FiltersComponent implements OnInit {
         const paramTo = this.queryParams['date-to'];
         this.form.controls.dateFrom.setValue(paramFrom ? paramFrom[0] : '');
         this.form.controls.dateTo.setValue(paramTo ? paramTo[0] : '');
-
         this.form.controls.datasetId.setValue(datasetId ? datasetId[0] : '');
         this.form.controls.batchId.setValue(batchId ? batchId[0] : '');
-
         this.loadData();
       });
+  }
+
+  summariseBatchId(id: number): void {
+    console.log('filter summary batch (' + id + ')');
+    this.form.controls.batchId.setValue(id);
+    this.updatePageUrl();
+  }
+
+  summariseDatasetId(id: number): void {
+    console.log('filter summary dataset (' + id + ')');
+    this.form.controls.datasetId.setValue(id);
+    this.updatePageUrl();
+  }
+
+  generateTitle(): string {
+    const queryKeys = Object.keys(this.queryParams);
+    if (!queryKeys || queryKeys.length === 0) {
+      return 'Most recent';
+    }
+
+    const titleOr = 'or';
+    const titleAnd = 'and';
+
+    return Object.keys(this.queryParams)
+      .map((key: string) => {
+        const values = this.queryParams[key];
+        if (values.length === 0) {
+          return '';
+        } else if (key === 'date-from') {
+          return `from ${values[0]}`;
+        } else if (key === 'date-to') {
+          return `until ${values[0]}`;
+        } else if (key === 'dataset-id') {
+          const label = 'Dataset Id';
+          return `${label} (${values[0]})`;
+        } else {
+          const innerRes: Array<string> = [];
+          this.queryParams[key].forEach((valPart: string) => {
+            innerRes.push(valPart);
+          });
+          const friendlyKey = key; //portalNamesFriendly[key];
+          const joinedVals = innerRes.join(` ${titleOr} `);
+          return `${friendlyKey} (${joinedVals})`;
+        }
+      })
+      .filter((x) => x.length > 0)
+      .join(` ${titleAnd} `);
   }
 
   getDataServerDataRequest(): BreakdownRequest {
@@ -176,12 +219,14 @@ export class FiltersComponent implements OnInit {
       .subscribe((breakdownResults: BreakdownResults) => {
         const list = breakdownResults.results;
         const ops = breakdownResults.filteringOptions;
-        this.filteringOptions = ops;
+
         Object.keys(ops).forEach((key: string) => {
           this.addOrUpdateFilterControls(key, ops[key]);
         });
 
         this.modelClioInfo.set({
+          filterOps: ops,
+          title: this.generateTitle(),
           list: list,
           listLength: list.length,
           listAverageScore: Math.floor(
@@ -210,7 +255,6 @@ export class FiltersComponent implements OnInit {
   /** getFormattedDatasetIdParam
   /* @returns { string } - concatenated datasetId value(s) if present
   /* @returns { string } - empty string not present
-  */
   getFormattedDatasetIdParam(): string {
     const filterDatasetIdParam = this.form.value.datasetId;
     if (filterDatasetIdParam && filterDatasetIdParam.length > 0) {
@@ -223,6 +267,7 @@ export class FiltersComponent implements OnInit {
     }
     return '*';
   }
+  */
 
   getSetCheckboxValues(filterName: string): Array<string> {
     const vals = this.form.value[filterName];
@@ -241,12 +286,14 @@ export class FiltersComponent implements OnInit {
   updatePageUrl(): void {
     const qp: Params = {};
 
-    Object.keys(this.filteringOptions).forEach((filterName: string) => {
-      const filterVals = this.getSetCheckboxValues(filterName);
-      if (filterVals.length > 0) {
-        qp[filterName] = filterVals;
+    Object.keys(this.modelClioInfo().filterOps).forEach(
+      (filterName: string) => {
+        const filterVals = this.getSetCheckboxValues(filterName);
+        if (filterVals.length > 0) {
+          qp[filterName] = filterVals;
+        }
       }
-    });
+    );
 
     const dataset = this.form.value.datasetId;
     const batch = this.form.value.batchId;
