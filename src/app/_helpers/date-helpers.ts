@@ -97,9 +97,11 @@ export function validateDateGeneric(
   return Object.keys(res).length > 0 ? res : null;
 }
 
+/*
 export function fromInputSafeName(s: string): string {
   return s.replace(/_____/g, '.');
 }
+*/
 
 export function toInputSafeName(s: string): string {
   return s.replace(/\./g, '_____');

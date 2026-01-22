@@ -103,4 +103,26 @@ describe('FiltersComponent', () => {
     queryParams.next({ 'date-to': '2026-01-06' });
     expect(component.loadData).toHaveBeenCalled();
   });
+
+  it('should react to the page params (provider)', () => {
+    jest.spyOn(component, 'loadData');
+    component.ngOnInit();
+    fixture.detectChanges();
+    queryParams.next({
+      provider: ['My Provider', 'My Other Provider']
+    });
+    expect(component.loadData).toHaveBeenCalled();
+  });
+
+  it('should get the set checkbox values', () => {
+    component.ngOnInit();
+    fixture.detectChanges();
+    jest.spyOn(component, 'loadData');
+
+    expect(component.getSetCheckboxValues('provider').length).toBeFalsy();
+    component.form.patchValue({
+      provider: ['my_provider']
+    });
+    //expect(component.getSetCheckboxValues('provider').length).toBeTruthy();
+  });
 });

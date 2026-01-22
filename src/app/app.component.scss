@@ -109,5 +109,17 @@
   .title {
     margin-left: 1rem;
     text-transform: capitalize;
+    a {
+      color: variables.$text-colour;
+      &:hover {
+        color: variables.$clio-highlight-colour;
+      }
+      & + span {
+        padding: 0 0.4em;
+      }
+    }
+    :first-child {
+      padding-right: 0.4em;
+    }
   }
 }

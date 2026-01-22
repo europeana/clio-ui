@@ -25,7 +25,18 @@
             class="clio-state"
           ></span>
 
-          <span class="title">{{ clioInfo.title }}</span>
+          @let titleMarkup = clioInfo.titleMarkup;
+          @if (titleMarkup) {
+            <span class="title">
+              <ng-container *ngFor="let x of titleMarkup">
+                @if (x.fn) {
+                  <a (click)="x.fn()" title="remove">{{ x.label }}</a>
+                } @else {
+                  <span>{{ x.label }}</span>
+                }
+              </ng-container>
+            </span>
+          }
 
           @let totalNumber = clioInfo.listLength;
           @let count = listing.listSelectionCount;

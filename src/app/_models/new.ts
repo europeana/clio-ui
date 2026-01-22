@@ -42,4 +42,5 @@ export interface ClioInfo {
   list: Array<Run>;
   listLength: number;
   listAverageScore: number;
+  titleMarkup: Array<{ label: string; fn?: () => void }>;
 }

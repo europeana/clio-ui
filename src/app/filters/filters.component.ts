@@ -1,6 +1,5 @@
 import { KeyValuePipe, NgFor } from '@angular/common';
 import {
-  ChangeDetectorRef,
   Component,
   inject,
   model,
@@ -22,9 +21,7 @@ import { APIService } from '../_services';
 import { getDateAsISOString } from '../_helpers/date-helpers';
 import {
   fromCSL,
-  fromInputSafeName,
-  toInputSafeName,
-  validateDateGeneric
+  toInputSafeName
 } from '../_helpers/date-helpers';
 
 import { BreakdownRequest, BreakdownResults, ClioInfo } from '../_models';
@@ -48,16 +45,16 @@ export class FiltersComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly api = inject(APIService);
 
-  changeDetector = inject(ChangeDetectorRef);
-
   queryParams: Params = {};
+  titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
   modelClioInfo: ModelSignal<ClioInfo> = model({
     title: '',
     list: [],
     listLength: -1,
     listAverageScore: -1,
-    filterOps: {}
+    filterOps: {},
+    titleMarkup: []
   } as ClioInfo);
 
   form: UntypedFormGroup;
@@ -169,6 +166,87 @@ export class FiltersComponent implements OnInit {
       .join(` ${titleAnd} `);
   }
 
+  generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
+    const res: Array<{ label: string; fn?: () => void }> = [];
+
+    const queryKeys = Object.keys(this.queryParams);
+
+    if (!queryKeys || queryKeys.length === 0) {
+      res.push({ label: 'Most recent' });
+    }
+
+    queryKeys.forEach((key: string, index: number) => {
+      const values = this.queryParams[key];
+
+      if (key === 'date-from') {
+        res.push({
+          label: `from ${values[0]}`,
+          fn: () => {
+            this.form.patchValue({ dateFrom: '' });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'date-to') {
+        res.push({
+          label: `until ${values[0]}`,
+          fn: () => {
+            this.form.patchValue({ dateTo: '' });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'batch-id') {
+        const label = 'Batch Id';
+        res.push({
+          label: `${label} (${values[0]})`,
+          fn: () => {
+            this.form.patchValue({ batchId: '' });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'dataset-id') {
+        const label = 'Dataset Id';
+        res.push({
+          label: `${label} (${values[0]})`,
+          fn: () => {
+            this.form.patchValue({ datasetId: '' });
+            this.updatePageUrl();
+          }
+        });
+      } else {
+        this.queryParams[key].forEach((valPart: string, indexInner: number) => {
+          if (indexInner === 0) {
+            if (index > 0) {
+              res.push({
+                label: ' and ' + key
+              });
+            } else {
+              res.push({
+                label: key
+              });
+            }
+          }
+
+          res.push({
+            label: `${values[indexInner]}`,
+            fn: () => {
+              const currVal = this.form.value[key];
+              delete currVal[toInputSafeName(values[indexInner])];
+              this.form.patchValue({ key: currVal });
+              this.updatePageUrl();
+            }
+          });
+
+          if (indexInner !== this.queryParams[key].length - 1) {
+            res.push({
+              label: 'or'
+            });
+          }
+        });
+      }
+    });
+    return res;
+  }
+
   getDataServerDataRequest(): BreakdownRequest {
     const breakdownRequest: BreakdownRequest = { filters: {} };
 
@@ -231,7 +309,8 @@ export class FiltersComponent implements OnInit {
           listLength: list.length,
           listAverageScore: Math.floor(
             list.reduce((sum, obj) => sum + obj.score, 0) / list.length
-          )
+          ),
+          titleMarkup: this.generateTitleMarkup()
         });
       });
   }
@@ -239,33 +318,16 @@ export class FiltersComponent implements OnInit {
   /** validateDateFrom
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
-  */
   validateDateFrom(control: FormControl): { [key: string]: boolean } | null {
     return validateDateGeneric(control, 'dateFrom');
   }
+  */
 
   /** validateDateTo
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
-  */
   validateDateTo(control: FormControl): { [key: string]: boolean } | null {
     return validateDateGeneric(control, 'dateTo');
-  }
-
-  /** getFormattedDatasetIdParam
-  /* @returns { string } - concatenated datasetId value(s) if present
-  /* @returns { string } - empty string not present
-  getFormattedDatasetIdParam(): string {
-    const filterDatasetIdParam = this.form.value.datasetId;
-    if (filterDatasetIdParam && filterDatasetIdParam.length > 0) {
-      const values = fromCSL(filterDatasetIdParam)
-        .map((id: string) => {
-          return `${id}_*`;
-        })
-        .join(' OR ');
-      return `edm_datasetName:(${values})`;
-    }
-    return '*';
   }
   */
 
@@ -321,7 +383,6 @@ export class FiltersComponent implements OnInit {
   /** getFormattedDateParam
   /* get an empty string or the formatted date range
   /* @returns string
-  */
   getFormattedDateParam(): string {
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
@@ -338,4 +399,5 @@ export class FiltersComponent implements OnInit {
     }
     return '';
   }
+  */
 }

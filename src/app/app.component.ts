@@ -2,6 +2,7 @@ import {
   DatePipe,
   JsonPipe,
   NgClass,
+  NgFor,
   NgIf,
   NgTemplateOutlet
 } from '@angular/common';
@@ -31,6 +32,7 @@ import { ListingComponent } from './listing';
     JsonPipe,
     ListingComponent,
     NgClass,
+    NgFor,
     NgIf,
     NgTemplateOutlet
   ]

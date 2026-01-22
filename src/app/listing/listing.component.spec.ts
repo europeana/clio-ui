@@ -26,7 +26,8 @@ describe('ListingComponent', () => {
         list: [],
         listLength: -1,
         listAverageScore: -1,
-        filterOps: {}
+        filterOps: {},
+        titleMarkup: []
       } as ClioInfo);
     });
 
