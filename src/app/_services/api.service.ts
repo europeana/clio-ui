@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
 import {
   AvailableReport,
   BatchItem,
@@ -45,16 +46,17 @@ export class APIService {
   }
 
   getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
-    if (location.port === '4280') {
-      console.log('go to server');
-      return this.http.post<BreakdownResults>(
-        `${apiSettings.serverAPI}`,
-        request
+    return this.http
+      .post<BreakdownResults>(`${apiSettings.serverAPI}`, request)
+      .pipe(
+        catchError(() => {
+          const fakeResult = dataServerRequest(request);
+          console.log(
+            'Server Failed: send static data = ' +
+              JSON.stringify(fakeResult, null, 4)
+          );
+          return of(fakeResult);
+        })
       );
-
-      return of(dataServerRequest(request));
-    } else {
-      return of(dataServerRequest(request));
-    }
   }
 }
