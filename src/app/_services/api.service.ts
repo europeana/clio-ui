@@ -8,7 +8,7 @@ import {
   BreakdownRequest,
   BreakdownResults
 } from '../_models';
-import { dataServerRequest } from '../_data/static/available-report-json';
+import { dataServerRequest } from '../_data/static/data-server';
 import { apiSettings } from '../../environments/apisettings';
 
 @Injectable({ providedIn: 'root' })
@@ -44,11 +44,17 @@ export class APIService {
     );
   }
 
-  //replaceDoubleSlashes(s: string): string {
-  //  return s.replace(/([^:]\/)\/+/g, '$1');
-  //}
-
   getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
-    return of(dataServerRequest(request));
+    if (location.port === '4280') {
+      console.log('go to server');
+      return this.http.post<BreakdownResults>(
+        `${apiSettings.serverAPI}`,
+        request
+      );
+
+      return of(dataServerRequest(request));
+    } else {
+      return of(dataServerRequest(request));
+    }
   }
 }

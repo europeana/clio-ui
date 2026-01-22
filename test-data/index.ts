@@ -1,20 +1,10 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { AvailableReport } from '../src/app/_models';
-
-const fakeData: Array<AvailableReport> = [
-  {
-    "reportId": 1281,
-    "batchId": 1291,
-    "creationTime": "2025-12-04T04:47:48.616Z",
-    "url": "https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1291"
-  },
-  {
-    "reportId": 1280,
-    "batchId": 1290,
-    "creationTime": "2025-11-27T04:48:32.112Z",
-    "url": "https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1290"
-  }
-];
+import {
+  BreakdownRequest,
+  BreakdownResults
+} from '../src/app/_models';
+import { dataServerRequest } from '../src/app/_data/static/data-server';
 
 new (class {
   serverName = 'Clio';
@@ -45,7 +35,45 @@ new (class {
     response.setHeader('Content-Type', 'text/html;charset=UTF-8');
   }
 
+  handleOptions(response: ServerResponse){
+    response.setHeader(
+      'Access-Control-Allow-Headers',
+      'authorization,X-Requested-With,content-type'
+    );
+    response.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET,HEAD,POST,PUT,DELETE,OPTIONS'
+    );
+    response.setHeader('Access-Control-Max-Age', '1800');
+    response.setHeader(
+      'Allow',
+      'GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH'
+    );
+    response.setHeader('Connection', 'Keep-Alive');
+    response.end();
+  }
+
   handleRequest(request: IncomingMessage, response: ServerResponse): void {
+
+    //response.setHeader('Access-Control-Allow-Origin', '*');
+
+    if (request.method === 'OPTIONS') {
+      this.handleOptions(response);
+      return;
+    }
+
+    if (request.method === 'POST') {
+      let body = '';
+      request.on('data', (chunk) => {
+        body += chunk;
+      });
+      request.on('end', () => {
+        this.handleBreakdownRequest(response, JSON.parse(body) as BreakdownRequest);
+      });
+      return;
+    }
+
+    // legacy /swagger endpoints
     const route = (request.url as string).split('?')[0];
     const defResult:Array<AvailableReport> = [];
 
@@ -56,7 +84,20 @@ new (class {
       return;
     }
     if(route.match(/\/batches/)) {
-      response.end(JSON.stringify(fakeData));
+      response.end(JSON.stringify([
+        {
+          "reportId": 1281,
+          "batchId": 1291,
+          "creationTime": "2025-12-04T04:47:48.616Z",
+          "url": "https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1291"
+        },
+        {
+          "reportId": 1280,
+          "batchId": 1290,
+          "creationTime": "2025-11-27T04:48:32.112Z",
+          "url": "https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1290"
+        }
+      ]));
       return;
     }
     if(route.match(/\/latest-report/)) {
@@ -67,7 +108,16 @@ new (class {
       response.end(JSON.stringify({ data: 'report-by-batch-id' }));
       return;
     }
-
     response.end(JSON.stringify(defResult));
+  }
+
+  /** handleBreakdownRequest
+  */
+  handleBreakdownRequest(
+    response: ServerResponse,
+    breakdownRequest: BreakdownRequest
+  ): void {
+    this.headerJSON(response);
+    response.end(JSON.stringify(dataServerRequest(breakdownRequest)));
   }
 });

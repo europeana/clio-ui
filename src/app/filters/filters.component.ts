@@ -1,11 +1,5 @@
 import { KeyValuePipe, NgFor } from '@angular/common';
-import {
-  Component,
-  inject,
-  model,
-  ModelSignal,
-  OnInit
-} from '@angular/core';
+import { Component, inject, model, ModelSignal, OnInit } from '@angular/core';
 import {
   FormControl,
   FormsModule,
@@ -19,10 +13,7 @@ import { map } from 'rxjs/operators';
 
 import { APIService } from '../_services';
 import { getDateAsISOString } from '../_helpers/date-helpers';
-import {
-  fromCSL,
-  toInputSafeName
-} from '../_helpers/date-helpers';
+import { fromCSL, toInputSafeName } from '../_helpers/date-helpers';
 
 import { BreakdownRequest, BreakdownResults, ClioInfo } from '../_models';
 import { CheckboxComponent } from '../checkbox';
@@ -49,7 +40,6 @@ export class FiltersComponent implements OnInit {
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
   modelClioInfo: ModelSignal<ClioInfo> = model({
-    title: '',
     list: [],
     listLength: -1,
     listAverageScore: -1,
@@ -129,41 +119,6 @@ export class FiltersComponent implements OnInit {
     console.log('filter summary dataset (' + id + ')');
     this.form.controls.datasetId.setValue(id);
     this.updatePageUrl();
-  }
-
-  generateTitle(): string {
-    const queryKeys = Object.keys(this.queryParams);
-    if (!queryKeys || queryKeys.length === 0) {
-      return 'Most recent';
-    }
-
-    const titleOr = 'or';
-    const titleAnd = 'and';
-
-    return Object.keys(this.queryParams)
-      .map((key: string) => {
-        const values = this.queryParams[key];
-        if (values.length === 0) {
-          return '';
-        } else if (key === 'date-from') {
-          return `from ${values[0]}`;
-        } else if (key === 'date-to') {
-          return `until ${values[0]}`;
-        } else if (key === 'dataset-id') {
-          const label = 'Dataset Id';
-          return `${label} (${values[0]})`;
-        } else {
-          const innerRes: Array<string> = [];
-          this.queryParams[key].forEach((valPart: string) => {
-            innerRes.push(valPart);
-          });
-          const friendlyKey = key; //portalNamesFriendly[key];
-          const joinedVals = innerRes.join(` ${titleOr} `);
-          return `${friendlyKey} (${joinedVals})`;
-        }
-      })
-      .filter((x) => x.length > 0)
-      .join(` ${titleAnd} `);
   }
 
   generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
@@ -304,7 +259,6 @@ export class FiltersComponent implements OnInit {
 
         this.modelClioInfo.set({
           filterOps: ops,
-          title: this.generateTitle(),
           list: list,
           listLength: list.length,
           listAverageScore: Math.floor(

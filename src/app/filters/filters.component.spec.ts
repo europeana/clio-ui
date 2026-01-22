@@ -46,8 +46,9 @@ describe('FiltersComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should generate the title', () => {
-    expect(component.generateTitle()).toBeTruthy();
+  it('should generate the title markup', () => {
+    component.ngOnInit();
+    expect(component.generateTitleMarkup().length).toBeTruthy();
   });
 
   it('should summarise by batchId', () => {
