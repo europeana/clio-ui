@@ -2,17 +2,6 @@
 @use '../../scss/variables';
 @use '../../scss/functions/icon_urls';
 
-/*
-@keyframes blurIn {
-  0% {
-    backdrop-filter: blur(0px);
-  }
-  100% {
-    backdrop-filter: blur(2.5px);
-  }
-}
-*/
-
 .clio-state {
   margin-right: 0.5rem;
   transform: scale(0.75);

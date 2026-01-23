@@ -1,9 +1,24 @@
 <div class="filters">
-  @let ops = modelClioInfo().filterOps;
-  <ng-container *ngFor="let field of ops | keyvalue">
-    <span class="filter-label">{{ field.key }}</span>
+  @let filter = modelClioInfo().filterOps;
+
+  <ng-container *ngFor="let field of filter | keyvalue">
+    @let entryPluralised = field.value.length === 1 ? 'entry' : 'entries';
+
+    <span class="checkbox-filter">
+      <span class="filter-label">{{ field.key }}</span>
+      <span class="search-icon"></span>
+      <input
+        class="checkbox-filter-input"
+        #filterEntries
+        placeholder="Search ({{ field.value.length }} {{ entryPluralised }})"
+        [(ngModel)]="optionFilters[field.key]"
+      />
+    </span>
+
     <div class="filter">
-      <ng-container *ngFor="let option of field.value">
+      <ng-container
+        *ngFor="let option of filterList(optionFilters[field.key], field.value)"
+      >
         <app-checkbox
           [form]="form"
           [controlName]="option"
@@ -17,7 +32,7 @@
   </ng-container>
 
   <div [formGroup]="form">
-    <span class="filter-label">Batch Id</span>
+    <span class="filter-label">Batch Id(s)</span>
     <input
       data-e2e="batch-id"
       placeholder="batch id"
@@ -25,7 +40,7 @@
       (keyUp.enter)="updatePageUrl()"
     />
 
-    <span class="filter-label">Dataset Id</span>
+    <span class="filter-label">Dataset Id(s)</span>
     <input
       data-e2e="dataset-id"
       placeholder="dataset id"

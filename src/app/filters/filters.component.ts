@@ -14,6 +14,7 @@ import { map } from 'rxjs/operators';
 import { APIService } from '../_services';
 import { getDateAsISOString } from '../_helpers/date-helpers';
 import { fromCSL, toInputSafeName } from '../_helpers/date-helpers';
+import { filterList } from '../_helpers/string-helpers';
 
 import { BreakdownRequest, BreakdownResults, ClioInfo } from '../_models';
 import { CheckboxComponent } from '../checkbox';
@@ -36,6 +37,8 @@ export class FiltersComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly api = inject(APIService);
 
+  public filterList = filterList;
+
   queryParams: Params = {};
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
@@ -46,6 +49,11 @@ export class FiltersComponent implements OnInit {
     filterOps: {},
     titleMarkup: []
   } as ClioInfo);
+
+  optionFilters: { [key: string]: string } = {
+    provider: '',
+    dataProvider: ''
+  };
 
   form: UntypedFormGroup;
 
