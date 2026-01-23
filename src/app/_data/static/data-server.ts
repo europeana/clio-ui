@@ -24,7 +24,10 @@ const providers: Array<string> = [
   'Bulgariana',
   'CultureGrid',
   'Daguerreobase',
-  'Europeana 280'
+  'Europeana 280',
+
+  'Foundation Virtual Library Miguel de Cervantes',
+  'Galileo Museum'
 ];
 
 const dataProviders: Array<DataProvider> = [
@@ -72,6 +75,26 @@ const dataProviders: Array<DataProvider> = [
     id: 8,
     name: 'Institute of Balkan Studies with Center for Thracology',
     providers: [0, 1]
+  },
+  {
+    id: 9,
+    name: 'Virginia Academy of Science',
+    providers: [1, 6]
+  },
+  {
+    id: 10,
+    name: 'Vienna Museum of Science and Technology',
+    providers: [5, 6]
+  },
+  {
+    id: 11,
+    name: 'Institute of Ethnology, Czech Academy of Sciences',
+    providers: [3, 5]
+  },
+  {
+    id: 12,
+    name: '"Alexandru Ioan Cuza" University',
+    providers: [0, 5]
   }
 ];
 

@@ -2,17 +2,17 @@
   @let filter = modelClioInfo().filterOps;
 
   <ng-container *ngFor="let field of filter | keyvalue">
-    @let entryPluralised = field.value.length === 1 ? 'entry' : 'entries';
-
     <span class="checkbox-filter">
       <span class="filter-label">{{ field.key }}</span>
-      <span class="search-icon"></span>
-      <input
-        class="checkbox-filter-input"
-        #filterEntries
-        placeholder="Search ({{ field.value.length }} {{ entryPluralised }})"
-        [(ngModel)]="optionFilters[field.key]"
-      />
+      @if (field.value.length > 5) {
+        <span class="search-icon"></span>
+        <input
+          class="checkbox-filter-input"
+          #filterEntries
+          placeholder="Search ({{ field.value.length }} entries)"
+          [(ngModel)]="optionFilters[field.key]"
+        />
+      }
     </span>
 
     <div class="filter">

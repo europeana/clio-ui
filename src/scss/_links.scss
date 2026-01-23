@@ -52,7 +52,7 @@ a {
   &::before {
     content: attr(label);
     font-weight: bold;
-    margin-right: 0.4rem;
+    margin: 0 0.5em 0 1em;
   }
 
   &::after {

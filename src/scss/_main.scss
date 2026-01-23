@@ -3,7 +3,7 @@
 @use 'variables';
 
 body {
-  background: #fff; // lemonchiffon;//colours.$offwhite;
+  background: #fff;
   color: variables.$text-colour;
   font: 16px / 1.6 variables.$font-primary;
   -webkit-text-size-adjust: 100%;
@@ -37,6 +37,52 @@ body {
 
     max-width: variables.$max-width;
     width: 80%;
+  }
+}
+
+.columns {
+  $col-w: 20em;
+  max-width: 100%;
+
+  .right-col {
+    margin-left: auto;
+    width: calc(100% - $col-w);
+    min-width: calc(100% - $col-w);
+    max-width: calc(100% - $col-w);
+    min-height: calc(100vh - 30em);
+  }
+
+  .left-col {
+    position: absolute;
+    min-width: $col-w;
+
+    &:hover {
+      z-index: 3;
+      .filter:has(:hover) {
+        border-bottom-color: variables.$clio-colour;
+        border-right-color: variables.$clio-colour;
+        background-color: #fff;
+
+        & > * {
+          background-color: #fff;
+        }
+      }
+    }
+
+    .filter {
+      border-bottom: 1px solid transparent;
+      border-right: 1px solid transparent;
+
+      &:not(:has(:hover)) {
+        max-width: calc($col-w - 0.5em);
+        overflow: hidden;
+        padding-right: 1.5em;
+      }
+    }
+
+    .checkbox-filter:not(:hover, :has(+ :hover)) .checkbox-filter-input {
+      opacity: 0;
+    }
   }
 }
 

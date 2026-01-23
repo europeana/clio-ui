@@ -10,8 +10,13 @@ input {
   display: block;
   padding: 0.25em 0.4em;
   margin: 0.5em 0 1.5em 0.5em;
+  outline: none;
   width: 10rem;
   border: 1px solid variables.$text-colour;
+
+  &:focus-visible {
+    border-color: variables.$clio-colour;
+  }
 }
 
 select {
@@ -28,8 +33,13 @@ select {
   }
 }
 
+.filters {
+  padding-top: 0.75em;
+  border-top: 1px solid variables.$clio-colour;
+}
+
 .filter {
-  margin: 0.5em 0 1.25em 0.5em;
+  margin: 0 0 1.25em 0.5em;
 }
 
 .filter-label {
@@ -40,10 +50,16 @@ select {
 .checkbox-filter {
   align-items: center;
   display: flex;
+  padding-bottom: 0.5em;
 
   .checkbox-filter-input {
     border-radius: 9px;
+    color: variables.$text-colour;
     margin: 0 0.5em;
+
+    &:focus::placeholder {
+      color: transparent;
+    }
   }
   .search-icon {
     background-image: icon_urls.svg-url-icon-search(variables.$text-colour);
@@ -52,5 +68,9 @@ select {
     height: 1em;
     margin-left: 1em;
     width: 1em;
+
+    &:has(+ input:focus-visible) {
+      background-image: icon_urls.svg-url-icon-search(variables.$clio-colour);
+    }
   }
 }

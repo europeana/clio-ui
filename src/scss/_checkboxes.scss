@@ -25,6 +25,7 @@ $width-icon-filter: 18px;
   display: flex;
   flex-direction: row;
   margin: 0;
+  max-width: 100%;
   padding: 0;
   position: relative;
 
@@ -35,6 +36,9 @@ $width-icon-filter: 18px;
   .checkbox-label {
     cursor: pointer;
     width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

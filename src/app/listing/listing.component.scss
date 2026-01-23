@@ -17,6 +17,10 @@
   padding: 0;
   position: relative;
 
+  a {
+    line-height: 2em;
+  }
+
   a,
   .list-header {
     font-weight: bold;
@@ -35,6 +39,7 @@
   .list-header {
     position: sticky;
     background-color: #fff;
+    white-space: nowrap;
   }
 }
 
