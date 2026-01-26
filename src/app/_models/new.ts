@@ -1,8 +1,3 @@
-export interface InputDescription {
-  controlName: string;
-  group: string;
-}
-
 export interface Dataset {
   id: number;
   name: string;
@@ -20,20 +15,6 @@ export interface Run {
   reportId: number;
   score: number;
   url: string;
-}
-
-export interface Link {
-  id: string;
-  runId: number;
-  recordId: string;
-  recordEdmType: string;
-  recordContentTier: string;
-  recordMetadataTier: string;
-  linkType: string;
-  linkServer: string;
-  linkUrl: string;
-  error?: string;
-  checkTime: string;
 }
 
 export interface ClioInfo {

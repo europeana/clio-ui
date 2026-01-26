@@ -16,7 +16,10 @@ import {
 } from '@angular/forms';
 import { NgClass, NgIf } from '@angular/common';
 
-import { InputDescription } from '../_models';
+interface InputDescription {
+  controlName: string;
+  group: string;
+}
 
 @Component({
   selector: 'app-checkbox',

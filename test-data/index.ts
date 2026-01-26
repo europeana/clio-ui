@@ -1,5 +1,4 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { AvailableReport } from '../src/app/_models';
 import {
   BreakdownRequest,
   BreakdownResults
@@ -89,42 +88,7 @@ new (class {
       });
       return;
     }
-
-    // legacy /swagger endpoints
-    const defResult: Array<AvailableReport> = [];
-
-    this.headerJSON(response);
-
-    if(route.match(/\/available-reports/)) {
-      response.end(JSON.stringify({ data: 'available-reports' }));
-      return;
-    }
-    if(route.match(/\/batches/)) {
-      response.end(JSON.stringify([
-        {
-          "reportId": 1281,
-          "batchId": 1291,
-          "creationTime": "2025-12-04T04:47:48.616Z",
-          "url": "https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1291"
-        },
-        {
-          "reportId": 1280,
-          "batchId": 1290,
-          "creationTime": "2025-11-27T04:48:32.112Z",
-          "url": "https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=1290"
-        }
-      ]));
-      return;
-    }
-    if(route.match(/\/latest-report/)) {
-      response.end(JSON.stringify({ data: 'latest-report' }));
-      return;
-    }
-    if(route === '/report-by-batch-id') {
-      response.end(JSON.stringify({ data: 'report-by-batch-id' }));
-      return;
-    }
-    response.end(JSON.stringify(defResult));
+    response.end({});
   }
 
   /** handleBreakdownRequest
