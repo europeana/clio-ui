@@ -19,7 +19,7 @@ a:focus {
 
 .header {
   align-items: center;
-  background: lemonchiffon; //colours.$white;
+  background: colours.$offwhite;
   border-top: 1px solid variables.$clio-colour;
   border-bottom: 1px solid variables.$clio-colour;
   padding: 4px 0;
@@ -37,8 +37,10 @@ a:focus {
 
   .icon {
     align-self: center;
-    background: icon_urls.svg-url-icon-europeana(variables.$clio-colour) center
-      no-repeat;
+    background: icon_urls.svg-url-icon-europeana(
+        variables.$clio-highlight-colour
+      )
+      center no-repeat;
     height: 48px;
     transform: translateX(4px);
     width: 39px;

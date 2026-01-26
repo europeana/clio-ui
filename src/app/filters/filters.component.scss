@@ -7,15 +7,46 @@ h4 {
 }
 
 input {
-  display: block;
   padding: 0.25em 0.4em;
-  margin: 0.5em 0 1.5em 0.5em;
-  outline: none;
-  width: 10rem;
-  border: 1px solid variables.$text-colour;
+  width: 9em;
+}
 
-  &:focus-visible {
-    border-color: variables.$clio-colour;
+.input-wrapper {
+  align-items: center;
+  display: flex;
+  margin: 0.5em 0 1.5em 0.5em;
+
+  input {
+    display: block;
+    margin-left: 4px;
+    outline: 1px solid transparent;
+    width: 10em;
+
+    &:focus-visible {
+      border-color: transparent;
+      outline-color: variables.$clio-highlight-colour;
+    }
+  }
+
+  .search-icon-solid {
+    background-image: icon_urls.svg-url-icon-search(colours.$white);
+    background-repeat: no-repeat;
+    background-color: variables.$text-colour;
+    background-position: 3px 3px;
+    background-size: 80%;
+    border: 1px solid colours.$white;
+    border-radius: 50%;
+    display: block;
+    height: 1.125em;
+    margin-left: 8px;
+    width: 1.125em;
+    outline: 0.5px solid variables.$text-colour;
+
+    &:focus-visible,
+    &:hover {
+      background-color: variables.$clio-highlight-colour;
+      outline-color: variables.$clio-highlight-colour;
+    }
   }
 }
 
@@ -36,10 +67,55 @@ select {
 .filters {
   padding-top: 0.75em;
   border-top: 1px solid variables.$clio-colour;
+  margin-bottom: 4em;
 }
 
 .filter {
-  margin: 0 0 1.25em 0.5em;
+  background-color: colours.$white;
+  border-bottom: 1px solid transparent;
+  border-right: 1px solid transparent;
+
+  &:not(:hover) {
+    max-width: 100%;
+    overflow: hidden;
+    padding-right: 1.5em;
+  }
+
+  &:empty {
+    min-height: 4em;
+
+    &:after {
+      content: 'no entries available';
+      color: #777;
+      font-style: italic;
+      position: relative;
+      left: 1.7em;
+      top: 0.5em;
+    }
+  }
+}
+
+.filter-wrapper {
+  $filter-max-height: 11em;
+
+  background: colours.$white;
+  max-height: $filter-max-height;
+  margin: 0 0 1.5em 0.5em;
+  position: relative;
+
+  .filter-height-maintainer {
+    border-bottom: 1px solid transparent;
+    display: none;
+    font-size: 14px;
+  }
+
+  &:not(:hover) {
+    overflow: hidden;
+  }
+
+  &:hover .filter-height-maintainer {
+    display: block;
+  }
 }
 
 .filter-label {
@@ -68,6 +144,7 @@ select {
     height: 1em;
     margin-left: 1em;
     width: 1em;
+    min-width: 1em;
 
     &:has(+ input:focus-visible) {
       background-image: icon_urls.svg-url-icon-search(variables.$clio-colour);

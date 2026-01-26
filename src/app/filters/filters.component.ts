@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
-import { map } from 'rxjs/operators';
+import { debounceTime, map } from 'rxjs/operators';
 
 import { APIService } from '../_services';
 import { getDateAsISOString } from '../_helpers/date-helpers';
@@ -55,26 +55,25 @@ export class FiltersComponent implements OnInit {
     dataProvider: ''
   };
 
-  form: UntypedFormGroup;
+  form = new UntypedFormGroup({
+    dataProvider: new UntypedFormGroup({}),
+    provider: new UntypedFormGroup({}),
+
+    dateFrom: new FormControl(),
+    dateTo: new FormControl(),
+
+    datasetId: new FormControl(),
+    datasetIds: new UntypedFormGroup({}),
+
+    batchId: new FormControl(),
+    batchIds: new UntypedFormGroup({})
+  });
 
   ngOnInit(): void {
-    this.form = new UntypedFormGroup({
-      dataProvider: new UntypedFormGroup({}),
-      provider: new UntypedFormGroup({}),
-
-      dateFrom: new FormControl(),
-      dateTo: new FormControl(),
-
-      datasetId: new FormControl(),
-      datasetIds: new UntypedFormGroup({}),
-
-      batchId: new FormControl(),
-      batchIds: new UntypedFormGroup({})
-    });
-
     // parse the url param values into the form
     this.route.queryParams
       .pipe(
+        debounceTime(0),
         map((qp) => {
           const qpValArrays: Params = {};
           Object.keys(qp).forEach((paramName: string) => {
@@ -94,7 +93,7 @@ export class FiltersComponent implements OnInit {
         if (datasetId) {
           const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
           `${datasetId}`.split(',').forEach((part: string) => {
-            datasetIds.addControl(part.trim(), new FormControl(''));
+            datasetIds.addControl(part.trim(), new FormControl(part));
           });
         }
 
@@ -107,12 +106,14 @@ export class FiltersComponent implements OnInit {
 
         this.queryParams = queryParams;
 
-        const paramFrom = this.queryParams['date-from'];
-        const paramTo = this.queryParams['date-to'];
-        this.form.controls.dateFrom.setValue(paramFrom ? paramFrom[0] : '');
-        this.form.controls.dateTo.setValue(paramTo ? paramTo[0] : '');
+        const dateFrom = this.queryParams['date-from'];
+        const dateTo = this.queryParams['date-to'];
+
+        this.form.controls.dateFrom.setValue(dateFrom ? dateFrom[0] : '');
+        this.form.controls.dateTo.setValue(dateTo ? dateTo[0] : '');
         this.form.controls.datasetId.setValue(datasetId ? datasetId[0] : '');
         this.form.controls.batchId.setValue(batchId ? batchId[0] : '');
+
         this.loadData();
       });
   }
@@ -135,7 +136,7 @@ export class FiltersComponent implements OnInit {
     const queryKeys = Object.keys(this.queryParams);
 
     if (!queryKeys || queryKeys.length === 0) {
-      res.push({ label: 'Most recent' });
+      res.push({ label: 'All reports' });
     }
 
     queryKeys.forEach((key: string, index: number) => {
@@ -256,7 +257,7 @@ export class FiltersComponent implements OnInit {
    **/
   loadData(): void {
     this.api
-      .getBreakdowns(this.getDataServerDataRequest())
+      .getFilteredReports(this.getDataServerDataRequest())
       .subscribe((breakdownResults: BreakdownResults) => {
         const list = breakdownResults.results;
         const ops = breakdownResults.filteringOptions;
@@ -276,22 +277,6 @@ export class FiltersComponent implements OnInit {
         });
       });
   }
-
-  /** validateDateFrom
-  /* @param {FormControl} control - the field to validate
-  /* - returns an errors object map
-  validateDateFrom(control: FormControl): { [key: string]: boolean } | null {
-    return validateDateGeneric(control, 'dateFrom');
-  }
-  */
-
-  /** validateDateTo
-  /* @param {FormControl} control - the field to validate
-  /* - returns an errors object map
-  validateDateTo(control: FormControl): { [key: string]: boolean } | null {
-    return validateDateGeneric(control, 'dateTo');
-  }
-  */
 
   getSetCheckboxValues(filterName: string): Array<string> {
     const vals = this.form.value[filterName];

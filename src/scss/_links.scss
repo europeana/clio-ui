@@ -3,12 +3,12 @@
 @use './variables';
 
 a {
-  color: colours.$eu-purple;
+  color: variables.$clio-colour;
   cursor: pointer;
   text-decoration: none;
 
   &:hover {
-    color: colours.$eu-raspberry;
+    color: variables.$clio-highlight-colour;
   }
 
   &.external-link {
@@ -20,7 +20,7 @@ a {
       width: 1em;
       padding: 0 0.2em;
       height: 1em;
-      background-image: icon_urls.svg-url-icon-external(colours.$eu-purple);
+      background-image: icon_urls.svg-url-icon-external(variables.$clio-colour);
       background-repeat: no-repeat;
       background-position: center 0.1em;
     }
@@ -28,17 +28,13 @@ a {
 }
 
 .csv-download {
-  align-items: center;
-  display: flex;
+  background-image: icon_urls.svg-url-icon-download(variables.$clio-colour);
+  display: block;
+  height: 1.25em;
+  margin: 0.5em auto 0 auto;
+  width: 1.25em;
 
-  &::after {
-    content: '';
-    width: 1em;
-    height: 1em;
-    display: block;
-    background-image: icon_urls.svg-url-icon-download(variables.$clio-colour);
-  }
-  &:hover::after {
+  &:hover {
     background-image: icon_urls.svg-url-icon-download(
       variables.$clio-highlight-colour
     );
@@ -52,7 +48,7 @@ a {
   &::before {
     content: attr(label);
     font-weight: bold;
-    margin: 0 0.5em 0 1em;
+    margin: 0 0.75em 0 1em;
   }
 
   &::after {
@@ -62,7 +58,7 @@ a {
     height: 1.5rem;
     display: block;
     background-color: variables.$clio-colour;
-    background-image: icon_urls.svg-url-icon-download(#fff);
+    background-image: icon_urls.svg-url-icon-download(colours.$white);
   }
   &:hover::after {
     background-color: variables.$clio-highlight-colour;

@@ -1,9 +1,9 @@
 @use 'colours';
 
-$clio-colour: colours.$eu-purple;
-$clio-highlight-colour: colours.$eu-raspberry;
-$focus-highlight-colour: colours.$eu-raspberry;
 $text-colour: colours.$eu-grey-dark;
+$clio-colour: $text-colour;
+$clio-highlight-colour: colours.$eu-raspberry;
+$focus-highlight-colour: $clio-highlight-colour;
 
 $font-primary: 'Open Sans', 'Arial', sans-serif;
 

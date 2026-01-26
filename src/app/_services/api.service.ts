@@ -3,12 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import {
-  AvailableReport,
-  BatchItem,
-  BreakdownRequest,
-  BreakdownResults
-} from '../_models';
+import { BreakdownRequest, BreakdownResults } from '../_models';
 import { dataServerRequest } from '../_data/static/data-server';
 import { apiSettings } from '../../environments/apisettings';
 
@@ -16,38 +11,9 @@ import { apiSettings } from '../../environments/apisettings';
 export class APIService {
   constructor(private readonly http: HttpClient) {}
 
-  loadCSV(url: string): Observable<string> {
-    const headers = new HttpHeaders().set('accept', 'text/csv');
-    return this.http.get<string>(url, {
-      headers: headers,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseType: 'text' as any
-    });
-  }
-
-  availableReports(): Observable<Array<AvailableReport>> {
-    const url = `${apiSettings.serverAPI}/available-reports`;
-    return this.http.get<Array<AvailableReport>>(url);
-  }
-
-  batches(maxResults = 1): Observable<Array<BatchItem>> {
-    const url = `${apiSettings.serverAPI}/batches?maxResults=${maxResults}`;
-    return this.http.get<Array<BatchItem>>(url);
-  }
-
-  latestReport(): Observable<string> {
-    return this.loadCSV(`${apiSettings.serverAPI}/latest-report`);
-  }
-
-  reportByBatchId(id: string): Observable<string> {
-    return this.loadCSV(
-      `${apiSettings.serverAPI}/report-by-batch-id?batchId=${id}`
-    );
-  }
-
-  getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
+  getFilteredReports(request: BreakdownRequest): Observable<BreakdownResults> {
     return this.http
-      .post<BreakdownResults>(`${apiSettings.serverAPI}`, request)
+      .post<BreakdownResults>(`${apiSettings.serverAPI}/reports`, request)
       .pipe(
         catchError(() => {
           const fakeResult = dataServerRequest(request);
@@ -58,5 +24,28 @@ export class APIService {
           return of(fakeResult);
         })
       );
+  }
+
+  async download(data: string, downloadName: string): Promise<void> {
+    const anchor = document.createElement('a');
+    anchor.href = window.URL.createObjectURL(
+      new Blob([data], { type: 'text/csv;charset=utf-8' })
+    );
+    anchor.target = '_blank';
+    anchor.download = downloadName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  }
+
+  getDownload(request: BreakdownRequest): void {
+    const headers = new HttpHeaders().set('accept', 'text/csv');
+    this.http
+      .post<string>(`${apiSettings.serverAPI}/download`, request, {
+        headers: headers
+      })
+      .subscribe((data: string) => {
+        this.download(data, 'my_download');
+      });
   }
 }

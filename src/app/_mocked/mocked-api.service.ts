@@ -1,12 +1,6 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-
-import {
-  AvailableReport,
-  BatchItem,
-  BreakdownRequest,
-  BreakdownResults
-} from '../_models';
+import { BreakdownRequest, BreakdownResults } from '../_models';
 
 export class MockAPIService {
   errorMode = false;
@@ -19,42 +13,22 @@ export class MockAPIService {
     );
   }
 
-  getBreakdowns(_: BreakdownRequest): Observable<BreakdownResults> {
+  async download(_: string, __: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    return new Promise((_) => {});
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  getDownload(_: BreakdownRequest): void {}
+
+  getFilteredReports(_: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
-      return this.getError('mock getBreakdowns throws error');
+      return this.getError('mock getFilteredReports throws error');
     }
     return of({
       filteringOptions: {},
       results: []
     } as BreakdownResults);
-  }
-
-  reportByBatchId(_: string): Observable<string> {
-    if (this.errorMode) {
-      return this.getError('mock getDebiasReport throws error');
-    }
-    return of('');
-  }
-
-  latestReport(): Observable<string> {
-    if (this.errorMode) {
-      return this.getError('mock getDebiasReport throws error');
-    }
-    return of('');
-  }
-
-  batches(): Observable<Array<BatchItem>> {
-    if (this.errorMode) {
-      return this.getError('mock getDebiasReport throws error');
-    }
-    return of([{} as unknown as BatchItem]);
-  }
-
-  availableReports(): Observable<Array<AvailableReport>> {
-    if (this.errorMode) {
-      return this.getError('mock getDebiasReport throws error');
-    }
-    return of([{} as unknown as AvailableReport]);
   }
 }
 

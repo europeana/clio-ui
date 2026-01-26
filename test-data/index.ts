@@ -55,12 +55,12 @@ new (class {
 
   handleRequest(request: IncomingMessage, response: ServerResponse): void {
 
-    //response.setHeader('Access-Control-Allow-Origin', '*');
-
     if (request.method === 'OPTIONS') {
       this.handleOptions(response);
       return;
     }
+
+    const route = (request.url as string).split('?')[0];
 
     if (request.method === 'POST') {
       let body = '';
@@ -68,14 +68,30 @@ new (class {
         body += chunk;
       });
       request.on('end', () => {
-        this.handleBreakdownRequest(response, JSON.parse(body) as BreakdownRequest);
+
+        const br = JSON.parse(body) as BreakdownRequest;
+
+        if(route.match(/\/download/)) {
+
+          this.headerText(response);
+
+          const data = dataServerRequest(br);
+          const csvData = JSON.stringify(data);
+
+          // TODO transform to csv
+
+          response.end(csvData);
+          return;
+        }
+        if(route.match(/\/reports/)) {
+          this.handleBreakdownRequest(response, br);
+        }
       });
       return;
     }
 
     // legacy /swagger endpoints
-    const route = (request.url as string).split('?')[0];
-    const defResult:Array<AvailableReport> = [];
+    const defResult: Array<AvailableReport> = [];
 
     this.headerJSON(response);
 

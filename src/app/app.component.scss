@@ -1,96 +1,9 @@
 @use '../scss/colours';
 @use '../scss/variables';
 
-.error,
-:invalid,
-:placeholder-shown {
-  border: 1px solid colours.$eu-red;
-  color: colours.$eu-red;
-}
-
-.batch-item {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-
-  li {
-    display: contents;
-  }
-
-  span {
-    text-align: right;
-  }
-}
-
-.batch-list {
-  ul {
-    margin-bottom: 1em;
-  }
-}
-
-.end-points {
-  display: grid;
-  grid-template-columns: auto 1fr 1fr 1fr auto;
-  grid-column-gap: 1em;
-  grid-row-gap: 1em;
-}
-
-.columns {
-  display: flex;
-  margin-top: 1em;
-  .left-col {
-    margin-right: 2em;
-  }
-  .right-col {
-    width: 100%;
-  }
-}
-
-.path {
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-.path,
-.go {
-  cursor: pointer;
-}
-
-.go {
-  background-color: variables.$clio-colour;
-  border: 1px solid #333;
-  color: #fff;
-  font-weight: bold;
-  padding: 0.4em;
-  &:hover {
-    background-color: variables.$clio-highlight-colour;
-  }
-}
-
 .csv-download-block {
-  margin-left: auto;
+  margin: 0 0.5em 0 auto;
   white-space: nowrap;
-}
-
-.desc {
-  font-style: italic;
-}
-
-.opener {
-  display: flex;
-  &::after {
-    content: '>';
-    font-weight: bold;
-    position: relative;
-    transform: rotate(0deg) translateX(0.4em);
-  }
-  &.expanded::after {
-    transform: rotate(90deg) translateY(-0.4em);
-  }
-}
-
-.indent-left {
-  left: 12.75rem;
-  position: absolute;
 }
 
 .summary-bar {
@@ -109,15 +22,17 @@
   .title {
     margin-left: 1rem;
     text-transform: capitalize;
+
     a {
-      color: variables.$text-colour;
+      color: variables.$clio-highlight-colour;
       &:hover {
-        color: variables.$clio-highlight-colour;
+        color: variables.$text-colour;
       }
       & + span {
         padding: 0 0.4em;
       }
     }
+
     :first-child {
       padding-right: 0.4em;
     }

@@ -12,11 +12,13 @@ $view-box: '0 0 #{$icon-width} #{$icon-height}';
 $view-box-up-6: '0 6 #{$icon-width} #{$icon-height}';
 $view-box-down-12: '0 -12 #{$icon-width} #{$icon-height}';
 
+$state-width: 2;
+$state-height: #{($icon-height / $icon-width) * $state-width}em;
+
 .clio-state {
-  $state-width: 2;
   background-repeat: no-repeat;
   cursor: pointer;
-  height: #{($icon-height / $icon-width) * $state-width}em;
+  height: $state-height;
   display: block;
   width: #{$state-width}em;
 }

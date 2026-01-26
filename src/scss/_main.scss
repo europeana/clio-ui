@@ -3,12 +3,16 @@
 @use 'variables';
 
 body {
-  background: #fff;
+  background: colours.$white;
   color: variables.$text-colour;
   font: 16px / 1.6 variables.$font-primary;
   -webkit-text-size-adjust: 100%;
   word-break: normal;
   word-wrap: break-word;
+}
+
+input {
+  border: 1px solid variables.$text-colour;
 }
 
 .bold {
@@ -42,7 +46,10 @@ body {
 
 .columns {
   $col-w: 20em;
+  display: flex;
+  margin-top: 2em;
   max-width: 100%;
+  min-height: calc(100vh - 12em);
 
   .right-col {
     margin-left: auto;
@@ -53,30 +60,19 @@ body {
   }
 
   .left-col {
-    position: absolute;
     min-width: $col-w;
+    max-width: calc($col-w - 0.5em);
 
     &:hover {
       z-index: 3;
-      .filter:has(:hover) {
-        border-bottom-color: variables.$clio-colour;
-        border-right-color: variables.$clio-colour;
-        background-color: #fff;
-
-        & > * {
-          background-color: #fff;
+      .filter-wrapper:hover {
+        z-index: 1;
+        .filter:not(:empty) {
+          border-bottom-color: variables.$clio-colour;
+          border-right-color: variables.$clio-colour;
+          position: absolute;
+          top: 0;
         }
-      }
-    }
-
-    .filter {
-      border-bottom: 1px solid transparent;
-      border-right: 1px solid transparent;
-
-      &:not(:has(:hover)) {
-        max-width: calc($col-w - 0.5em);
-        overflow: hidden;
-        padding-right: 1.5em;
       }
     }
 
@@ -86,27 +82,14 @@ body {
   }
 }
 
-$header-height: 4.3rem;
-$summary-height: 3rem;
-
 .summary-bar {
-  //height: $summary-height;
-  min-height: $summary-height;
+  min-height: 3rem;
   position: sticky;
-  top: $header-height;
+  top: 4.3rem;
 
   border-top: 1px solid variables.$clio-colour;
   border-bottom: 1px solid variables.$clio-colour;
 
   z-index: 2;
-  background: #fff;
-}
-
-.listing .list-header {
-  top: 4em;
-}
-
-.summary-bar + * > .listing .list-header {
-  top: $summary-height + $header-height;
-  //top: $header-height;
+  background: colours.$white;
 }

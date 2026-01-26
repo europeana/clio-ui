@@ -15,53 +15,99 @@
       }
     </span>
 
-    <div class="filter">
-      <ng-container
-        *ngFor="let option of filterList(optionFilters[field.key], field.value)"
-      >
-        <app-checkbox
-          [form]="form"
-          [controlName]="option"
-          [labelText]="option"
-          [group]="field.key"
-          (valueChanged)="updatePageUrl()"
-          title="Test"
-        ></app-checkbox>
-      </ng-container>
+    <div class="filter-wrapper">
+      <ul class="filter-height-maintainer">
+        <li
+          *ngFor="
+            let option of filterList(optionFilters[field.key], field.value)
+          "
+        >
+          &nbsp;
+        </li>
+      </ul>
+
+      <ul class="filter">
+        <li
+          *ngFor="
+            let option of filterList(optionFilters[field.key], field.value)
+          "
+        >
+          <app-checkbox
+            [form]="form"
+            [controlName]="option"
+            [labelText]="option"
+            [group]="field.key"
+            (valueChanged)="updatePageUrl()"
+            title="Test"
+          ></app-checkbox>
+        </li>
+      </ul>
     </div>
   </ng-container>
 
   <div [formGroup]="form">
     <span class="filter-label">Batch Id(s)</span>
-    <input
-      data-e2e="batch-id"
-      placeholder="batch id"
-      formControlName="batchId"
-      (keyUp.enter)="updatePageUrl()"
-    />
+    <span class="input-wrapper">
+      <input
+        data-e2e="batch-id"
+        placeholder="batch id"
+        formControlName="batchId"
+        (keyUp.enter)="updatePageUrl()"
+      />
+      <a
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl()"
+        (keyUp.enter)="updatePageUrl()"
+      ></a>
+    </span>
 
     <span class="filter-label">Dataset Id(s)</span>
-    <input
-      data-e2e="dataset-id"
-      placeholder="dataset id"
-      formControlName="datasetId"
-      (keyUp.enter)="updatePageUrl()"
-    />
+    <span class="input-wrapper">
+      <input
+        data-e2e="dataset-id"
+        placeholder="dataset id"
+        formControlName="datasetId"
+        (keyUp.enter)="updatePageUrl()"
+      />
+      <a
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl()"
+        (keyUp.enter)="updatePageUrl()"
+      ></a>
+    </span>
 
     <span class="filter-label">From</span>
-    <input
-      type="date"
-      data-e2e="date-from"
-      formControlName="dateFrom"
-      (change)="updatePageUrl()"
-    />
+    <span class="input-wrapper">
+      <input
+        type="date"
+        data-e2e="date-from"
+        formControlName="dateFrom"
+        (change)="updatePageUrl()"
+      />
+      <a
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl()"
+        (keyUp.enter)="updatePageUrl()"
+      ></a>
+    </span>
 
     <span class="filter-label">To</span>
-    <input
-      type="date"
-      data-e2e="date-to"
-      formControlName="dateTo"
-      (change)="updatePageUrl()"
-    />
+    <span class="input-wrapper">
+      <input
+        type="date"
+        data-e2e="date-to"
+        formControlName="dateTo"
+        (change)="updatePageUrl()"
+      />
+      <a
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl()"
+        (keyUp.enter)="updatePageUrl()"
+      ></a>
+    </span>
   </div>
 </div>

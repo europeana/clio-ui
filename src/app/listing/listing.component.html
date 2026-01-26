@@ -1,10 +1,10 @@
-<ul class="listing">
+<ul class="align-right listing">
   <li>
     <span class="list-header">Report Id</span>
     <span class="list-header">Batch Id</span>
-    <span class="list-header centre">Download</span>
-    <span class="list-header centre">Dataset Id</span>
-    <span class="list-header">Creation Time</span>
+    <span class="list-header">Dataset Id</span>
+    <span class="list-header align-centre">Download</span>
+    <span class="list-header align-left">Creation Time</span>
   </li>
   @for (latestItem of clioInfo().list; track latestItem) {
     <li>
@@ -24,16 +24,16 @@
       <a (click)="setSummaryBatchId(latestItem.batchId)">{{
         latestItem.batchId
       }}</a>
-      <span class="centre">
-        <a class="csv-download" target="_blank" [href]="latestItem.url">CSV</a>
-      </span>
-      <span class="centre">
-        <a (click)="setSummaryDatasetId(latestItem.reportId)">
+      <span>
+        <a (click)="setSummaryDatasetId(latestItem.datasetId)">
           {{ latestItem.datasetId }}
         </a>
       </span>
+      <span class="centre">
+        <a class="csv-download" target="_blank" [href]="latestItem.url"></a>
+      </span>
 
-      <span style="display: flex; align-items: center">
+      <span class="last-cell">
         <span>
           {{ latestItem.creationTime | date: DATE_VERBOSE_FMT }}
         </span>
