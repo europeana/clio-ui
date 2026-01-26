@@ -81,6 +81,11 @@ select {
     padding-right: 1.5em;
   }
 
+  &:has(:hover) {
+    max-height: 270px;
+    overflow-y: auto;
+  }
+
   &:empty {
     min-height: 4em;
 

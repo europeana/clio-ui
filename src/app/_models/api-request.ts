@@ -13,6 +13,10 @@ export interface RequestFilterRange {
 }
 */
 
+export interface DownloadRequest extends BreakdownRequest {
+  excluded_report_ids: Array<string>;
+}
+
 export interface RequestFilter {
   breakdown?: number;
   values?: Array<string>;

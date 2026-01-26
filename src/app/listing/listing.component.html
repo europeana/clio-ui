@@ -21,11 +21,11 @@
         ></span>
         {{ latestItem.reportId }}
       </span>
-      <a (click)="setSummaryBatchId(latestItem.batchId)">{{
+      <a (click)="requestSummaryBatchId.emit(latestItem.batchId)">{{
         latestItem.batchId
       }}</a>
       <span>
-        <a (click)="setSummaryDatasetId(latestItem.datasetId)">
+        <a (click)="requestSummaryDatasetId.emit(latestItem.datasetId)">
           {{ latestItem.datasetId }}
         </a>
       </span>
@@ -41,7 +41,7 @@
           [form]="form"
           [controlName]="latestItem.reportId + ''"
           [title]="'include in top-level download'"
-          [group]="'record_ids'"
+          [group]="'report_ids'"
           (valueChanged)="updateIds()"
         ></app-checkbox>
       </span>

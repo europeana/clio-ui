@@ -34,7 +34,7 @@ export class ListingComponent {
   previewedId?: number;
 
   form = new UntypedFormGroup({
-    record_ids: new UntypedFormGroup({})
+    report_ids: new UntypedFormGroup({})
   });
 
   @Input() clioInfo: ModelSignal<ClioInfo>;
@@ -44,7 +44,7 @@ export class ListingComponent {
       if (this.clioInfo().list) {
         this.setCheckboxes(false);
         const list = this.clioInfo().list;
-        const formGroup = this.form.get('record_ids') as UntypedFormGroup;
+        const formGroup = this.form.get('report_ids') as UntypedFormGroup;
 
         list.forEach((report: Run) => {
           const fName = `${report.reportId}`;
@@ -80,22 +80,10 @@ export class ListingComponent {
     });
   }
 
-  clickOutside(): void {
-    console.log('clickOutside... TODO: DELETE?');
-  }
-
   updateIds(): void {
-    const vals = this.form.value['record_ids'];
+    const vals = this.form.value['report_ids'];
     this.listSelectionCount = Object.keys(vals).filter((key: string) => {
       return vals[key];
     }).length;
-  }
-
-  setSummaryBatchId(id: number): void {
-    this.requestSummaryBatchId.emit(id);
-  }
-
-  setSummaryDatasetId(id: number): void {
-    this.requestSummaryDatasetId.emit(id);
   }
 }

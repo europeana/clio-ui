@@ -280,13 +280,11 @@ export class FiltersComponent implements OnInit {
 
   getSetCheckboxValues(filterName: string): Array<string> {
     const vals = this.form.value[filterName];
-    const res = vals
+    return vals
       ? Object.keys(vals).filter((key: string) => {
           return vals[key];
         })
       : [];
-
-    return res;
   }
 
   /** updatePageUrl

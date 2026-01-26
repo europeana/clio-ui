@@ -3,7 +3,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { BreakdownRequest, BreakdownResults } from '../_models';
+import {
+  BreakdownRequest,
+  BreakdownResults,
+  DownloadRequest
+} from '../_models';
 import { dataServerRequest } from '../_data/static/data-server';
 import { apiSettings } from '../../environments/apisettings';
 
@@ -38,7 +42,7 @@ export class APIService {
     document.body.removeChild(anchor);
   }
 
-  getDownload(request: BreakdownRequest): void {
+  getDownload(request: DownloadRequest): void {
     const headers = new HttpHeaders().set('accept', 'text/csv');
     this.http
       .post<string>(`${apiSettings.serverAPI}/download`, request, {

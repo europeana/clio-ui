@@ -1,11 +1,20 @@
 import { CUSTOM_ELEMENTS_SCHEMA, model } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormGroup } from '@angular/forms';
 import { ListingComponent } from '.';
-import { ClioInfo } from '../_models';
+import { ClioInfo, Run } from '../_models';
 
 describe('ListingComponent', () => {
   let component: ListingComponent;
   let fixture: ComponentFixture<ListingComponent>;
+
+  const clioInfo = {
+    filterOps: {},
+    list: [],
+    listLength: -1,
+    listAverageScore: -1,
+    titleMarkup: []
+  } as ClioInfo;
 
   const configureTestbed = (): void => {
     TestBed.configureTestingModule({
@@ -21,14 +30,7 @@ describe('ListingComponent', () => {
     component = fixture.componentInstance;
 
     TestBed.runInInjectionContext(() => {
-      component.clioInfo = model({
-        title: '',
-        list: [],
-        listLength: -1,
-        listAverageScore: -1,
-        filterOps: {},
-        titleMarkup: []
-      } as ClioInfo);
+      component.clioInfo = model(structuredClone(clioInfo));
     });
 
     fixture.detectChanges();
@@ -39,5 +41,51 @@ describe('ListingComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should set the checkboxes', () => {
+    component.clioInfo.set({
+      ...structuredClone(clioInfo),
+      list: [
+        {
+          reportId: '1'
+        } as unknown as Run
+      ]
+    });
+    TestBed.flushEffects();
+    fixture.detectChanges();
+
+    const cmp = component.form.controls.report_ids as FormGroup;
+
+    expect(cmp.value['1']).toBeTruthy();
+    component.setCheckboxes(false);
+    expect(cmp.value['1']).toBeFalsy();
+    component.setCheckboxes(true);
+    expect(cmp.value['1']).toBeTruthy();
+  });
+
+  it('should update the list selection count', () => {
+    expect(component.listSelectionCount).toEqual(0);
+
+    component.clioInfo.set({
+      ...structuredClone(clioInfo),
+      list: [
+        {
+          reportId: '1'
+        } as unknown as Run
+      ]
+    });
+
+    TestBed.flushEffects();
+    fixture.detectChanges();
+
+    component.form.setValue({ report_ids: { '1': true } });
+    expect(component.listSelectionCount).toEqual(1);
+
+    component.form.setValue({ report_ids: { '1': false } });
+    expect(component.listSelectionCount).toEqual(1);
+
+    component.updateIds();
+    expect(component.listSelectionCount).toEqual(0);
   });
 });

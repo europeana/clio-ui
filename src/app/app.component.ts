@@ -31,6 +31,13 @@ export class AppComponent {
   }
 
   downloadAll(): void {
-    this.api.getDownload(this.filters.getDataServerDataRequest());
+    const exclusionMap = this.listing.form.value['report_ids'];
+    const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
+      return !exclusionMap[key];
+    });
+    this.api.getDownload({
+      ...this.filters.getDataServerDataRequest(),
+      excluded_report_ids: exclusionList
+    });
   }
 }
