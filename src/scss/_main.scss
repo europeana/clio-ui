@@ -81,15 +81,3 @@ input {
     }
   }
 }
-
-.summary-bar {
-  min-height: 3rem;
-  position: sticky;
-  top: 4.3rem;
-
-  border-top: 1px solid variables.$clio-colour;
-  border-bottom: 1px solid variables.$clio-colour;
-
-  z-index: 2;
-  background: colours.$white;
-}

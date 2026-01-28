@@ -1,4 +1,3 @@
-import { NgClass, NgFor } from '@angular/common';
 import { Component, HostListener, inject, ViewChild } from '@angular/core';
 import { APIService, ClickService } from './_services';
 import { HeaderComponent } from './header';
@@ -8,8 +7,7 @@ import { ListingComponent } from './listing';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  imports: [FiltersComponent, HeaderComponent, ListingComponent, NgClass, NgFor]
+  imports: [FiltersComponent, HeaderComponent, ListingComponent]
 })
 export class AppComponent {
   title = 'Clio UI';

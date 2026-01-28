@@ -1,66 +1,20 @@
 <app-header></app-header>
 
-<a #downloadAnchor tabindex="-1"></a>
-
 <div class="fit-to-page">
   <div class="columns">
     <div class="left-col">
       <app-filters #filters> </app-filters>
     </div>
     <div class="right-col">
-      @let clioInfo = filters.modelClioInfo();
-      @if (listing && clioInfo && clioInfo.listLength) {
-        <div class="summary-bar">
-          <span
-            title="score: {{ clioInfo.listAverageScore }}"
-            [ngClass]="{
-              'clio-state-0': clioInfo.listAverageScore === 0,
-              'clio-state-1': clioInfo.listAverageScore === 1,
-              'clio-state-2': clioInfo.listAverageScore === 2,
-              'clio-state-3': clioInfo.listAverageScore === 3,
-              'clio-state-4': clioInfo.listAverageScore === 4
-            }"
-            class="clio-state"
-          ></span>
-
-          @let titleMarkup = clioInfo.titleMarkup;
-          @if (titleMarkup) {
-            <span class="title">
-              <ng-container *ngFor="let x of titleMarkup">
-                @if (x.fn) {
-                  <a (click)="x.fn()" title="remove">{{ x.label }}</a>
-                } @else {
-                  <span>{{ x.label }}</span>
-                }
-              </ng-container>
-            </span>
-          }
-
-          @let totalNumber = clioInfo.listLength;
-          @let count = listing.listSelectionCount;
-          @let textAll = count > 1 && count === totalNumber ? ' all ' : '';
-          @let text =
-            'download ' +
-            textAll +
-            count +
-            ' report' +
-            (count !== 1 ? 's' : '');
-          <a
-            class="csv-download-block"
-            [attr.label]="text"
-            (click)="downloadAll()"
-          ></a>
-        </div>
-      }
       <app-listing
         #listing
         (requestSummaryBatchId)="filters.summariseBatchId($event)"
         (requestSummaryDatasetId)="filters.summariseDatasetId($event)"
+        (requestDownload)="downloadAll()"
         [clioInfo]="filters.modelClioInfo"
       ></app-listing>
     </div>
   </div>
-
   <hr />
   <a>Footer link</a>
   <hr />

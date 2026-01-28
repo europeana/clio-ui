@@ -1,11 +1,55 @@
+<a #downloadAnchor tabindex="-1"></a>
+
 <ul class="align-right listing">
-  <li>
-    <span class="list-header">Report Id</span>
-    <span class="list-header">Batch Id</span>
-    <span class="list-header">Dataset Id</span>
-    <span class="list-header align-centre">Download</span>
-    <span class="list-header align-left">Creation Time</span>
+  <li class="header-section">
+    @let clioInfoValue = clioInfo();
+    @if (clioInfoValue && clioInfoValue.listLength) {
+      <div class="summary-bar">
+        <span
+          title="score: {{ clioInfoValue.listAverageScore }}"
+          [ngClass]="{
+            'clio-state-0': clioInfoValue.listAverageScore === 0,
+            'clio-state-1': clioInfoValue.listAverageScore === 1,
+            'clio-state-2': clioInfoValue.listAverageScore === 2,
+            'clio-state-3': clioInfoValue.listAverageScore === 3,
+            'clio-state-4': clioInfoValue.listAverageScore === 4
+          }"
+          class="clio-state"
+        ></span>
+
+        @if (clioInfo().titleMarkup) {
+          @let titleMarkup = clioInfo().titleMarkup;
+          <span class="title">
+            @for (x of titleMarkup; track x) {
+              @if (x.fn) {
+                <a (click)="x.fn()" title="remove">{{ x.label }}</a>
+              } @else {
+                <span>{{ x.label }}</span>
+              }
+            }
+            <ng-container *ngFor="let x of titleMarkup"> </ng-container>
+          </span>
+        }
+
+        @let totalNumber = clioInfoValue.listLength;
+        @let count = listSelectionCount;
+        @let textAll = count > 1 && count === totalNumber ? ' all ' : '';
+        @let text =
+          'download ' + textAll + count + ' report' + (count !== 1 ? 's' : '');
+        <a
+          class="csv-download-block"
+          (click)="requestDownload.emit()"
+          [attr.label]="text"
+        ></a>
+      </div>
+      <span class="list-header">Report Idx</span>
+      <span class="list-header">Batch Id</span>
+      <span class="list-header">Dataset Id</span>
+      <span class="list-header align-centre">Download</span>
+      <span class="list-header align-left">Creation Time</span>
+    }
   </li>
+
   @for (latestItem of clioInfo().list; track latestItem) {
     <li>
       <span class="state-link">

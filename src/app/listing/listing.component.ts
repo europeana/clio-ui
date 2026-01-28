@@ -1,4 +1,4 @@
-import { DatePipe, NgClass } from '@angular/common';
+import { DatePipe, NgClass, NgFor } from '@angular/common';
 import {
   Component,
   effect,
@@ -21,13 +21,15 @@ import { CheckboxComponent } from '../checkbox';
   selector: 'app-listing',
   templateUrl: './listing.component.html',
   styleUrls: ['./listing.component.scss'],
-  imports: [CheckboxComponent, DatePipe, NgClass]
+  imports: [CheckboxComponent, DatePipe, NgClass, NgFor]
 })
 export class ListingComponent {
   public DATE_VERBOSE_FMT = DATE_VERBOSE_FMT;
   private readonly fb = inject(UntypedFormBuilder);
 
   listSelectionCount = 0;
+
+  requestDownload = output<void>();
   requestSummaryBatchId = output<number>();
   requestSummaryDatasetId = output<number>();
 
