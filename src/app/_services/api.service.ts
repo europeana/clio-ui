@@ -43,13 +43,17 @@ export class APIService {
   }
 
   getDownload(request: DownloadRequest): void {
-    const headers = new HttpHeaders().set('accept', 'text/csv');
+    const headers = new HttpHeaders().set(
+      'Content-Type',
+      'text/plain; charset=utf-8'
+    );
     this.http
-      .post<string>(`${apiSettings.serverAPI}/download`, request, {
-        headers: headers
+      .post(`${apiSettings.serverAPI}/download`, request, {
+        headers: headers,
+        responseType: 'text'
       })
-      .subscribe((data: string) => {
-        this.download(data, 'my_download');
+      .subscribe((data: unknown) => {
+        this.download(data as string, 'clio_report');
       });
   }
 }
