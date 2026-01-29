@@ -3,6 +3,8 @@ import {
   BreakdownRequest,
   BreakdownResults
 } from '../src/app/_models';
+
+import { ExportCSVService } from '../src/app/_helpers/export-csv';
 import { dataServerRequest } from '../src/app/_data/static/data-server';
 
 new (class {
@@ -67,22 +69,15 @@ new (class {
         body += chunk;
       });
       request.on('end', () => {
-
         const br = JSON.parse(body) as BreakdownRequest;
-
         if(route.match(/\/download/)) {
-
           this.headerText(response);
-
-          const data = dataServerRequest(br);
-          const csvData = JSON.stringify(data);
-
-          // TODO transform to csv
-
+          const data = dataServerRequest(br).results;
+          const srv = new ExportCSVService();
+          const csvData = srv.csvFromRuns(data);
           response.end(csvData);
-          return;
         }
-        if(route.match(/\/reports/)) {
+        else if(route.match(/\/reports/)) {
           this.handleBreakdownRequest(response, br);
         }
       });
