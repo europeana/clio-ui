@@ -125,9 +125,10 @@ const runs: Array<Run_DATA> = new Array(numRuns)
     const datasetId = dataset.id;
     const dataProvider = dataset.dataProvider;
     const provider = dataset.provider;
-    const url = `https://clio-reporting-rest.test.eanadev.org/report-by-batch-id?batchId=${index}`;
-    const score = 4 - Math.floor((index * 17.6) % 5);
+    const url = `http://localhost:3000/report?id=${id}`;
+    const score = 100 - Math.floor((index * 17.6) % 100);
     const creationTime = new Date(today);
+
     creationTime.setDate(yearZero.getDate() - index);
 
     return {

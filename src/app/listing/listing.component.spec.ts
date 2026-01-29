@@ -43,6 +43,16 @@ describe('ListingComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should get the clio class', () => {
+    expect(component.getClioClass(100)).toEqual('clio-state-4');
+    expect(component.getClioClass(99)).toEqual('clio-state-4');
+    expect(component.getClioClass(80)).toEqual('clio-state-4');
+    expect(component.getClioClass(79)).toEqual('clio-state-3');
+    expect(component.getClioClass(59)).toEqual('clio-state-2');
+    expect(component.getClioClass(39)).toEqual('clio-state-1');
+    expect(component.getClioClass(19)).toEqual('clio-state-0');
+  });
+
   it('should set the checkboxes', () => {
     component.clioInfo.set({
       ...structuredClone(clioInfo),

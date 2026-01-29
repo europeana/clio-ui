@@ -6,17 +6,9 @@
     @if (clioInfoValue) {
       <div class="summary-bar">
         <span
-          title="score: {{ clioInfoValue.listAverageScore }}"
-          [ngClass]="{
-            'clio-state-0': clioInfoValue.listAverageScore === 0,
-            'clio-state-1': clioInfoValue.listAverageScore === 1,
-            'clio-state-2': clioInfoValue.listAverageScore === 2,
-            'clio-state-3': clioInfoValue.listAverageScore === 3,
-            'clio-state-4': clioInfoValue.listAverageScore === 4
-          }"
-          class="clio-state"
+          title="average score: {{ clioInfoValue.listAverageScore }}"
+          class="clio-state clio-state-{{ clioInfoValue.listAverageScore }}"
         ></span>
-
         @if (clioInfo().titleMarkup) {
           @let titleMarkup = clioInfo().titleMarkup;
           <span class="title">
@@ -58,14 +50,9 @@
     <li>
       <span class="state-link">
         <span
-          [ngClass]="{
-            'clio-state-0': latestItem.score === 0,
-            'clio-state-1': latestItem.score === 1,
-            'clio-state-2': latestItem.score === 2,
-            'clio-state-3': latestItem.score === 3,
-            'clio-state-4': latestItem.score === 4
-          }"
+          [ngClass]="getClioClass(latestItem.score)"
           class="clio-state"
+          title="score: {{ latestItem.score }}"
         ></span>
         {{ latestItem.reportId }}
       </span>

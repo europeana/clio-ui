@@ -283,13 +283,16 @@ export class FiltersComponent implements OnInit {
           this.addOrUpdateFilterControls(key, ops[key]);
         });
 
+        const averageScore = Math.floor(
+          list.reduce((sum, obj) => sum + obj.score, 0) / list.length
+        );
+        const listAverageScore = Math.floor(averageScore / 20);
+
         this.modelClioInfo.set({
           filterOps: ops,
-          list: list,
+          list,
           listLength: list.length,
-          listAverageScore: Math.floor(
-            list.reduce((sum, obj) => sum + obj.score, 0) / list.length
-          ),
+          listAverageScore,
           titleMarkup: this.generateTitleMarkup()
         });
       });

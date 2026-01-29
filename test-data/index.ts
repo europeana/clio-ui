@@ -82,6 +82,10 @@ new (class {
         }
       });
       return;
+    } else if(route.match(/\/report/)) {
+      this.headerText(response);
+      response.end('csv-for-individual-report');
+      return;
     }
     response.end({});
   }

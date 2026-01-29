@@ -82,6 +82,11 @@ export class ListingComponent {
     });
   }
 
+  getClioClass(score: number): string {
+    let rounded = score === 100 ? 4 : Math.floor(score / 20);
+    return `clio-state-${rounded}`;
+  }
+
   updateIds(): void {
     const vals = this.form.value['report_ids'];
     this.listSelectionCount = Object.keys(vals).filter((key: string) => {
