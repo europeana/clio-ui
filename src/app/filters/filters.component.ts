@@ -130,9 +130,10 @@ export class FiltersComponent implements OnInit {
     this.updatePageUrl();
   }
 
+  /**/
+
   generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
     const res: Array<{ label: string; fn?: () => void }> = [];
-
     const queryKeys = Object.keys(this.queryParams);
 
     if (!queryKeys || queryKeys.length === 0) {
@@ -144,7 +145,10 @@ export class FiltersComponent implements OnInit {
 
       if (key === 'date-from') {
         res.push({
-          label: `from ${values[0]}`,
+          label: `from`
+        });
+        res.push({
+          label: `${values[0]}`,
           fn: () => {
             this.form.patchValue({ dateFrom: '' });
             this.updatePageUrl();
@@ -152,7 +156,10 @@ export class FiltersComponent implements OnInit {
         });
       } else if (key === 'date-to') {
         res.push({
-          label: `until ${values[0]}`,
+          label: `until`
+        });
+        res.push({
+          label: `${values[0]}`,
           fn: () => {
             this.form.patchValue({ dateTo: '' });
             this.updatePageUrl();
@@ -160,6 +167,11 @@ export class FiltersComponent implements OnInit {
         });
       } else if (key === 'batch-id') {
         const label = 'Batch Id';
+        if (index > 0) {
+          res.push({
+            label: 'and'
+          });
+        }
         res.push({
           label: `${label} (${values[0]})`,
           fn: () => {
@@ -169,6 +181,11 @@ export class FiltersComponent implements OnInit {
         });
       } else if (key === 'dataset-id') {
         const label = 'Dataset Id';
+        if (index > 0) {
+          res.push({
+            label: 'and'
+          });
+        }
         res.push({
           label: `${label} (${values[0]})`,
           fn: () => {
@@ -181,7 +198,7 @@ export class FiltersComponent implements OnInit {
           if (indexInner === 0) {
             if (index > 0) {
               res.push({
-                label: ' and ' + key
+                label: 'and ' + key
               });
             } else {
               res.push({

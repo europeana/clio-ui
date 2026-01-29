@@ -74,6 +74,10 @@
   position: sticky;
   top: 4rem;
   z-index: 1;
+
+  a {
+    line-height: 1.7em;
+  }
 }
 
 .summary-bar {
@@ -92,6 +96,7 @@
   }
 
   .title {
+    word-break: break-word;
     margin-left: 1rem;
     text-transform: capitalize;
 

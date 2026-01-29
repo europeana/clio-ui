@@ -87,16 +87,4 @@ describe('AppComponent', () => {
       expect(api.getDownload).toHaveBeenCalled();
     });
   });
-
-  /*
-  describe('Errors', () => {
-    beforeEach((): void => {
-      configureTestbed(true);
-      fixture = TestBed.createComponent(AppComponent);
-      component = fixture.componentInstance;
-      component.showSwaggerEndpoints = true;
-      fixture.detectChanges();
-    });
-  });
-  */
 });

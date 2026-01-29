@@ -203,7 +203,7 @@ describe('FiltersComponent', () => {
     };
     markup = component.generateTitleMarkup();
     expect(markup.map((m) => m.label).join(' ')).toEqual(
-      `${clause1}  and ${clause2} ${clause3} ${clause4} ${clause5} ${clause6}`
+      `${clause1} and ${clause2} and ${clause3} and ${clause4} ${clause5} ${clause6}`
     );
     jest.spyOn(component.form, 'patchValue');
     markup.forEach((m: { fn?: () => void }) => {
