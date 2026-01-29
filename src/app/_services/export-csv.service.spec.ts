@@ -4,19 +4,31 @@ import { ExportCSVService } from './';
 describe('ExportCSVService', () => {
   let service: ExportCSVService;
   const timestamp = new Date().toISOString();
+  const dataProvider =
+    'Institute for Bulgarian Language of the Bulgarian Academy of Science';
 
-  const testAvailableReports = [
+  const testRuns = [
     {
-      reportId: 1,
+      id: 2,
+      reportId: 4,
+      datasetId: 11,
       batchId: 2,
       creationTime: timestamp,
-      url: 'https://clio-reporting/1?batchId=2'
+      dataProvider: dataProvider,
+      provider: 'Daguerreobase',
+      score: 14,
+      url: 'http://123'
     },
     {
-      reportId: 1,
+      id: 1,
+      reportId: 5,
+      datasetId: 12,
       batchId: 2,
       creationTime: timestamp,
-      url: 'https://clio-reporting/2?batchId=2'
+      dataProvider: dataProvider,
+      provider: 'Daguerreobase',
+      score: 81,
+      url: 'http://456'
     }
   ];
 
@@ -32,38 +44,26 @@ describe('ExportCSVService', () => {
   });
 
   it('should convert', () => {
-    const res = service.csvFromAvailableReport(testAvailableReports);
+    const res = service.csvFromRuns(testRuns);
     expect(res).toBeTruthy();
 
-    const line1 = 'report-id,batch-id,creation-time,url';
-
-    const line2 = `1,2,"${timestamp}","https://clio-reporting/1?batchId=2"`;
-    const line3 = `1,2,"${timestamp}","https://clio-reporting/2?batchId=2"`;
+    const line1 =
+      'id,dataset-id,batch-id,report-id,creation-time,data-provider,provider,score,url';
+    const line2 = `2,11,2,4,"${timestamp}","${dataProvider}","Daguerreobase",14,"http://123"`;
+    const line3 = `1,12,2,5,"${timestamp}","${dataProvider}","Daguerreobase",81,"http://456"`;
 
     expect(res).toEqual(`${line1}\n\r${line2}\n${line3}`);
-    expect(
-      service.csvFromBatchItem([
-        {
-          creationTime: '',
-          lastUpdateTimeInSolr: '',
-          lastUpdateTimeInMetisCore: '',
-          datasetsExcludedAlreadyRunning: 1,
-          datasetsExcludedNotIndexed: 1,
-          datasetsExcludedWithoutLinks: 1,
-          datasetsProcessed: 1,
-          datasetsPending: 1
-        }
-      ])
-    ).toBeTruthy();
   });
 
   it('should get the tuple', () => {
     expect(service.getTuple(3).length).toEqual(3);
   });
 
+  /*
   it('should download', () => {
     jest.spyOn(window.URL, 'createObjectURL');
     expect(service.download('', '')).toBeTruthy();
     expect(window.URL.createObjectURL).toHaveBeenCalled();
   });
+  */
 });

@@ -22,8 +22,8 @@ export class APIService {
         catchError(() => {
           const fakeResult = dataServerRequest(request);
           console.log(
-            'Server Failed: send static data = ' +
-              JSON.stringify(fakeResult, null, 4)
+            'Server Failed: send static data = ',
+            JSON.stringify(fakeResult, null, 4)
           );
           return of(fakeResult);
         })

@@ -1,53 +1,28 @@
-import { Injectable } from '@angular/core';
+import { Run } from '../_models';
 
-export interface AvailableReport {
-  reportId: number;
-  batchId: number;
-  creationTime: string;
-  url: string;
-}
-
-export interface BatchItem {
-  creationTime: string;
-  lastUpdateTimeInSolr: string;
-  lastUpdateTimeInMetisCore: string;
-  datasetsExcludedAlreadyRunning: number;
-  datasetsExcludedNotIndexed: number;
-  datasetsExcludedWithoutLinks: number;
-  datasetsProcessed: number;
-  datasetsPending: number;
-}
-
-@Injectable({ providedIn: 'root' })
 export class ExportCSVService {
-  headersAvailableReport: Array<string> = [
-    'report-id',
+  headersRun: Array<string> = [
+    'id',
+    'dataset-id',
     'batch-id',
+    'report-id',
     'creation-time',
+    'data-provider',
+    'provider',
+    'score',
     'url'
   ];
 
-  fieldNamesAvailableReport = ['reportId', 'batchId', 'creationTime', 'url'];
-
-  headersBatchItem: Array<string> = [
-    'creation-time',
-    'last-update-time-in-solr',
-    'datasets-excluded-already-running',
-    'datasets-excluded-not-indexed',
-    'datasets-excluded-without-links',
-    'datasets-processed',
-    'datasets-pending'
-  ];
-
-  fieldNamesBatchItem = [
+  fieldNamesRun = [
+    'id',
+    'datasetId',
+    'batchId',
+    'reportId',
     'creationTime',
-    'lastUpdateTimeInSolr',
-    'lastUpdateTimeInMetisCore',
-    'datasetsExcludedAlreadyRunning',
-    'datasetsExcludedNotIndexed',
-    'datasetsExcludedWithoutLinks',
-    'datasetsProcessed',
-    'datasetsPending'
+    'dataProvider',
+    'provider',
+    'score',
+    'url'
   ];
 
   sanitiseVal(str: string): string {
@@ -71,33 +46,19 @@ export class ExportCSVService {
     return res;
   }
 
-  csvFromBatchItem(items: Array<BatchItem>): string {
+  csvFromRuns(items: Array<Run>): string {
     const tuples: Array<Array<string | number | undefined>> = [];
     let tuple: Array<string | number | undefined> = [];
 
-    items.forEach((item: BatchItem) => {
-      this.fieldNamesBatchItem.forEach((fieldName: string) => {
-        this.pushToTuple(tuple, item[fieldName as keyof BatchItem]);
+    items.forEach((item: Run) => {
+      this.fieldNamesRun.forEach((fieldName: string) => {
+        this.pushToTuple(tuple, item[fieldName as keyof Run]);
       });
       tuples.push(tuple);
       tuple = this.getTuple(0);
     });
 
-    return this.joinCSV(this.headersBatchItem, tuples);
-  }
-
-  csvFromAvailableReport(items: Array<AvailableReport>): string {
-    const tuples: Array<Array<string | number | undefined>> = [];
-    let tuple: Array<string | number | undefined> = [];
-
-    items.forEach((item: AvailableReport) => {
-      this.fieldNamesAvailableReport.forEach((fieldName: string) => {
-        this.pushToTuple(tuple, item[fieldName as keyof AvailableReport]);
-      });
-      tuples.push(tuple);
-      tuple = this.getTuple(0);
-    });
-    return this.joinCSV(this.headersAvailableReport, tuples);
+    return this.joinCSV(this.headersRun, tuples);
   }
 
   joinCSV(
@@ -113,17 +74,5 @@ export class ExportCSVService {
         })
         .join('\n')
     );
-  }
-
-  async download(data: string, downloadName: string): Promise<void> {
-    const anchor = document.createElement('a');
-    anchor.href = window.URL.createObjectURL(
-      new Blob([data], { type: 'text/csv;charset=utf-8' })
-    );
-    anchor.target = '_blank';
-    anchor.download = downloadName;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
   }
 }
