@@ -1,0 +1,9 @@
+@use '../colours';
+
+@mixin empty-list {
+  color: colours.$mid-grey;
+  font-style: italic;
+  left: 1.7em;
+  position: relative;
+  top: 0.5em;
+}

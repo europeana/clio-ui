@@ -41,6 +41,7 @@ $width-icon-filter: 18px;
     text-overflow: ellipsis;
   }
 
+  &:has(:focus-visible),
   &:hover {
     .checkmarked-checkbox {
       &::before {
@@ -78,10 +79,6 @@ $width-icon-filter: 18px;
     background-image: icon_urls.svg-url-icon-checkbox-checked(
       variables.$clio-colour
     );
-  }
-
-  &:has(:focus-visible)::before {
-    outline: 2px solid variables.$clio-highlight-colour;
   }
 }
 

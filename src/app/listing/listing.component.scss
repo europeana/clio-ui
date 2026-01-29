@@ -1,5 +1,6 @@
 @use '../../scss/colours';
 @use '../../scss/variables';
+@use '../../scss/functions/mixins';
 @use '../../scss/functions/icon_urls';
 
 .align-centre {
@@ -21,6 +22,10 @@
 .csv-download-block {
   margin: 0 0 0 auto;
   white-space: nowrap;
+}
+
+.list-empty {
+  @include mixins.empty-list();
 }
 
 .listing {

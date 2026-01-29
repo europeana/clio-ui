@@ -52,6 +52,12 @@ export class APIService {
         headers: headers,
         responseType: 'text'
       })
+      .pipe(
+        catchError(() => {
+          console.log('download request:' + JSON.stringify(request, null, 4));
+          return of('CSV_DOWNLOAD');
+        })
+      )
       .subscribe((data: unknown) => {
         this.download(data as string, 'clio_report');
       });

@@ -3,7 +3,7 @@
 <ul class="align-right listing">
   <li class="header-section">
     @let clioInfoValue = clioInfo();
-    @if (clioInfoValue && clioInfoValue.listLength) {
+    @if (clioInfoValue) {
       <div class="summary-bar">
         <span
           title="score: {{ clioInfoValue.listAverageScore }}"
@@ -42,11 +42,15 @@
           [attr.label]="text"
         ></a>
       </div>
-      <span class="list-header">Report Id</span>
-      <span class="list-header">Batch Id</span>
-      <span class="list-header">Dataset Id</span>
-      <span class="list-header align-centre">Download</span>
-      <span class="list-header align-left">Creation Time</span>
+      @if (clioInfoValue.listLength) {
+        <span class="list-header">Report Id</span>
+        <span class="list-header">Batch Id</span>
+        <span class="list-header">Dataset Id</span>
+        <span class="list-header align-centre">Download</span>
+        <span class="list-header align-left">Creation Time</span>
+      } @else {
+        <span class="list-empty">no reports available</span>
+      }
     }
   </li>
 
