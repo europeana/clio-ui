@@ -1,5 +1,5 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { ExportCSVService } from './';
+import { ExportCSVService } from './export-csv';
 
 describe('ExportCSVService', () => {
   let service: ExportCSVService;
