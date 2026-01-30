@@ -17,9 +17,9 @@ $state-height: #{($icon-height / $icon-width) * $state-width}em;
 
 .clio-state {
   background-repeat: no-repeat;
-  cursor: pointer;
-  height: $state-height;
+  background-position: center center;
   display: block;
+  height: $state-height;
   width: #{$state-width}em;
 }
 

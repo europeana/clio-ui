@@ -1,14 +1,20 @@
 <a #downloadAnchor tabindex="-1"></a>
 
-<ul class="align-right listing">
+<ul
+  class="align-right listing"
+  [ngClass]="{
+    'extra-col': graphMode
+  }"
+>
   <li class="header-section">
     @let clioInfoValue = clioInfo();
     @if (clioInfoValue) {
       <div class="summary-bar">
-        <span
-          title="average score: {{ clioInfoValue.listAverageScore }}"
+        <a
+          (click)="graphMode = !graphMode"
+          title="average: {{ clioInfoValue.listAverageScore }}"
           class="clio-state clio-state-{{ clioInfoValue.listAverageScore }}"
-        ></span>
+        ></a>
         @if (clioInfo().titleMarkup) {
           @let titleMarkup = clioInfo().titleMarkup;
           <span class="title">
@@ -48,13 +54,34 @@
 
   @for (latestItem of clioInfo().list; track latestItem) {
     <li>
-      <span class="state-link">
-        <span
+      @if (graphMode) {
+        <span class="state-display">
+          <a (click)="graphMode = false" class="bar-label">
+            {{ latestItem.score }}%
+          </a>
+          <a class="bar-outer" (click)="graphMode = false">
+            <span
+              class="bar-inner"
+              title="score: {{ latestItem.score }}%"
+              [ngStyle]="{
+                width: latestItem.score + '%'
+              }"
+            >
+            </span>
+          </a>
+        </span>
+      }
+
+      <span class="state-display">
+        <a
+          (click)="graphMode = !graphMode"
           [ngClass]="getClioClass(latestItem.score)"
           class="clio-state"
-          title="score: {{ latestItem.score }}"
-        ></span>
-        {{ latestItem.reportId }}
+          title="score: {{ latestItem.score }}%"
+        ></a>
+        <span>
+          {{ latestItem.reportId }}
+        </span>
       </span>
       <a (click)="requestSummaryBatchId.emit(latestItem.batchId)">{{
         latestItem.batchId

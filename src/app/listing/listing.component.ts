@@ -1,4 +1,4 @@
-import { DatePipe, NgClass, NgFor } from '@angular/common';
+import { DatePipe, NgClass, NgFor, NgStyle } from '@angular/common';
 import {
   Component,
   effect,
@@ -21,13 +21,14 @@ import { CheckboxComponent } from '../checkbox';
   selector: 'app-listing',
   templateUrl: './listing.component.html',
   styleUrls: ['./listing.component.scss'],
-  imports: [CheckboxComponent, DatePipe, NgClass, NgFor]
+  imports: [CheckboxComponent, DatePipe, NgClass, NgFor, NgStyle]
 })
 export class ListingComponent {
   public DATE_VERBOSE_FMT = DATE_VERBOSE_FMT;
   private readonly fb = inject(UntypedFormBuilder);
 
   listSelectionCount = 0;
+  graphMode = false;
 
   requestDownload = output<void>();
   requestSummaryBatchId = output<number>();
@@ -83,7 +84,7 @@ export class ListingComponent {
   }
 
   getClioClass(score: number): string {
-    let rounded = score === 100 ? 4 : Math.floor(score / 20);
+    const rounded = score === 100 ? 4 : Math.floor(score / 20);
     return `clio-state-${rounded}`;
   }
 

@@ -30,9 +30,6 @@ describe('API Service', () => {
   });
 
   it('should get the filtered reports', () => {
-    const url = `${apiSettings.serverAPI}/reports`;
-    //const req = httpTesting.expectOne(url, 'load...');
-    expect(httpTesting).toBeTruthy();
     service
       .getFilteredReports({
         filters: {}
@@ -40,8 +37,6 @@ describe('API Service', () => {
       .subscribe((data: unknown) => {
         expect(data).toBeTruthy();
       });
-    //req.flush({filteringOptions: {}, results: []});
-    //httpTesting.verify();
   });
 
   it('should get the download', () => {
