@@ -11,7 +11,9 @@
     @if (clioInfoValue) {
       <div class="summary-bar">
         <a
+          tabindex="0"
           (click)="graphMode = !graphMode"
+          (keyUp.enter)="graphMode = !graphMode"
           title="average: {{ clioInfoValue.listAverageScore }}"
           class="clio-state clio-state-{{ clioInfoValue.listAverageScore }}"
         ></a>
@@ -20,9 +22,15 @@
           <span class="title">
             @for (x of titleMarkup; track x) {
               @if (x.fn) {
-                <a (click)="x.fn()" title="remove">{{ x.label }}</a>
+                <a
+                  (click)="x.fn()"
+                  (keyUp.enter)="x.fn()"
+                  tabindex="0"
+                  title="remove"
+                  >{{ x.label }}</a
+                >
               } @else {
-                <span>{{ x.label }}</span>
+                <span>{{ x.label | renameFilter }}</span>
               }
             }
             <ng-container *ngFor="let x of titleMarkup"> </ng-container>
@@ -36,7 +44,9 @@
           'download ' + textAll + count + ' report' + (count !== 1 ? 's' : '');
         <a
           class="csv-download-block"
+          tabindex="0"
           (click)="requestDownload.emit()"
+          (keyUp.enter)="requestDownload.emit()"
           [attr.label]="text"
         ></a>
       </div>
@@ -75,6 +85,8 @@
       <span class="state-display">
         <a
           (click)="graphMode = !graphMode"
+          (keyUp.enter)="graphMode = !graphMode"
+          tabindex="0"
           [ngClass]="getClioClass(latestItem.score)"
           class="clio-state"
           title="score: {{ latestItem.score }}%"
@@ -83,11 +95,20 @@
           {{ latestItem.reportId }}
         </span>
       </span>
-      <a (click)="requestSummaryBatchId.emit(latestItem.batchId)">{{
-        latestItem.batchId
-      }}</a>
       <span>
-        <a (click)="requestSummaryDatasetId.emit(latestItem.datasetId)">
+        <a
+          tabindex="0"
+          (keyUp.enter)="requestSummaryBatchId.emit(latestItem.batchId)"
+          (click)="requestSummaryBatchId.emit(latestItem.batchId)"
+          >{{ latestItem.batchId }}</a
+        >
+      </span>
+      <span>
+        <a
+          tabindex="0"
+          (keyUp.enter)="requestSummaryDatasetId.emit(latestItem.datasetId)"
+          (click)="requestSummaryDatasetId.emit(latestItem.datasetId)"
+        >
           {{ latestItem.datasetId }}
         </a>
       </span>

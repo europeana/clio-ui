@@ -13,11 +13,6 @@ export class MockAPIService {
     );
   }
 
-  async download(_: string, __: string): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    return new Promise((_) => {});
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   getDownload(_: BreakdownRequest): void {}
 

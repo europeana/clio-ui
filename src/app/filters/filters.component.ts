@@ -1,4 +1,5 @@
-import { KeyValuePipe, NgFor } from '@angular/common';
+import { JsonPipe, KeyValuePipe, NgFor } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, model, ModelSignal, OnInit } from '@angular/core';
 import {
   FormControl,
@@ -9,8 +10,10 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
-import { debounceTime, map } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, debounceTime, map } from 'rxjs/operators';
 
+import { RenameFilterPipe } from '../_translate';
 import { APIService } from '../_services';
 import { getDateAsISOString } from '../_helpers/date-helpers';
 import { fromCSL, toInputSafeName } from '../_helpers/date-helpers';
@@ -26,9 +29,11 @@ import { CheckboxComponent } from '../checkbox';
   imports: [
     NgFor,
     CheckboxComponent,
+    JsonPipe,
     KeyValuePipe,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RenameFilterPipe
   ]
 })
 export class FiltersComponent implements OnInit {
@@ -68,6 +73,8 @@ export class FiltersComponent implements OnInit {
     batchId: new FormControl(),
     batchIds: new UntypedFormGroup({})
   });
+
+  error?: HttpErrorResponse;
 
   ngOnInit(): void {
     // parse the url param values into the form
@@ -273,8 +280,18 @@ export class FiltersComponent implements OnInit {
   /** loadData
    **/
   loadData(): void {
+    this.error = undefined;
     this.api
       .getFilteredReports(this.getDataServerDataRequest())
+      .pipe(
+        catchError((err: HttpErrorResponse) => {
+          this.error = err;
+          return of({
+            results: [],
+            filteringOptions: {}
+          });
+        })
+      )
       .subscribe((breakdownResults: BreakdownResults) => {
         const list = breakdownResults.results;
         const ops = breakdownResults.filteringOptions;

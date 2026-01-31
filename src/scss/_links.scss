@@ -60,7 +60,15 @@ a {
     background-color: variables.$clio-colour;
     background-image: icon_urls.svg-url-icon-download(colours.$white);
   }
-  &:hover::after {
-    background-color: variables.$clio-highlight-colour;
+
+  &:focus-visible,
+  &:hover {
+    &::after {
+      background-color: variables.$clio-highlight-colour;
+    }
+  }
+  &:focus-visible {
+    color: variables.$clio-highlight-colour;
+    outline: none;
   }
 }

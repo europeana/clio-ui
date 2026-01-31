@@ -25,13 +25,14 @@
   }
 
   .bar-label {
-    color: variables.$clio-highlight-colour;
-    //width: 3em;
     min-width: 3em;
+    &:not(:hover) {
+      font-weight: normal;
+    }
   }
 
   .bar-outer {
-    border: 1px solid variables.$clio-highlight-colour;
+    border: 1px solid colours.$offwhite;
     margin: 0 0.5em;
     min-width: 5em;
   }
@@ -43,6 +44,10 @@
 
   .clio-state {
     transform: scale(0.75);
+  }
+
+  &:has(+ .state-display :focus-visible) .bar-label {
+    color: variables.$clio-highlight-colour;
   }
 }
 
@@ -140,6 +145,7 @@
 
     a {
       color: variables.$clio-highlight-colour;
+      &:focus-visible,
       &:hover {
         color: variables.$text-colour;
       }

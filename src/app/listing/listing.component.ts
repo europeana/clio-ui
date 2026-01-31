@@ -15,13 +15,21 @@ import {
 
 import { DATE_VERBOSE_FMT } from '../_data/static/date-formats';
 import { ClioInfo, Run } from '../_models';
+import { RenameFilterPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
 
 @Component({
   selector: 'app-listing',
   templateUrl: './listing.component.html',
   styleUrls: ['./listing.component.scss'],
-  imports: [CheckboxComponent, DatePipe, NgClass, NgFor, NgStyle]
+  imports: [
+    CheckboxComponent,
+    DatePipe,
+    NgClass,
+    NgFor,
+    NgStyle,
+    RenameFilterPipe
+  ]
 })
 export class ListingComponent {
   public DATE_VERBOSE_FMT = DATE_VERBOSE_FMT;
