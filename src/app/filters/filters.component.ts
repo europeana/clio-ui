@@ -1,6 +1,13 @@
 import { JsonPipe, KeyValuePipe, NgFor } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, model, ModelSignal, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  model,
+  ModelSignal,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
 import {
   FormControl,
   FormsModule,
@@ -10,7 +17,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { catchError, debounceTime, map } from 'rxjs/operators';
 
 import { RenameFilterPipe } from '../_translate';
@@ -36,7 +43,7 @@ import { CheckboxComponent } from '../checkbox';
     RenameFilterPipe
   ]
 })
-export class FiltersComponent implements OnInit {
+export class FiltersComponent implements OnInit, OnDestroy {
   private readonly fb = inject(UntypedFormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -44,6 +51,7 @@ export class FiltersComponent implements OnInit {
 
   public filterList = filterList;
 
+  subs: Array<Subscription> = [];
   queryParams: Params = {};
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
@@ -110,6 +118,15 @@ export class FiltersComponent implements OnInit {
 
         this.loadData();
       });
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach((sub: Subscription | undefined) => {
+      if (sub) {
+        sub.unsubscribe();
+      }
+    });
+    this.subs = [];
   }
 
   summariseDatasetId(id: string): void {
@@ -240,38 +257,40 @@ export class FiltersComponent implements OnInit {
    **/
   loadData(): void {
     this.error = undefined;
-    this.api
-      .getFilteredReports(this.getDataServerDataRequest())
-      .pipe(
-        catchError((err: HttpErrorResponse) => {
-          this.error = err;
-          return of({
-            results: [],
-            filteringOptions: {}
+    this.subs.push(
+      this.api
+        .getFilteredReports(this.getDataServerDataRequest())
+        .pipe(
+          catchError((err: HttpErrorResponse) => {
+            this.error = err;
+            return of({
+              results: [],
+              filteringOptions: {}
+            });
+          })
+        )
+        .subscribe((breakdownResults: BreakdownResults) => {
+          const list = breakdownResults.results;
+          const ops = breakdownResults.filteringOptions;
+
+          Object.keys(ops).forEach((key: string) => {
+            this.addOrUpdateFilterControls(key, ops[key]);
+          });
+
+          const averageScore = Math.floor(
+            list.reduce((sum, obj) => sum + obj.score, 0) / list.length
+          );
+          const listAverageScore = Math.floor(averageScore / 20);
+
+          this.modelClioInfo.set({
+            filterOps: ops,
+            list,
+            listLength: list.length,
+            listAverageScore,
+            titleMarkup: this.generateTitleMarkup()
           });
         })
-      )
-      .subscribe((breakdownResults: BreakdownResults) => {
-        const list = breakdownResults.results;
-        const ops = breakdownResults.filteringOptions;
-
-        Object.keys(ops).forEach((key: string) => {
-          this.addOrUpdateFilterControls(key, ops[key]);
-        });
-
-        const averageScore = Math.floor(
-          list.reduce((sum, obj) => sum + obj.score, 0) / list.length
-        );
-        const listAverageScore = Math.floor(averageScore / 20);
-
-        this.modelClioInfo.set({
-          filterOps: ops,
-          list,
-          listLength: list.length,
-          listAverageScore,
-          titleMarkup: this.generateTitleMarkup()
-        });
-      });
+    );
   }
 
   getSetCheckboxValues(filterName: string): Array<string> {
