@@ -73,7 +73,7 @@ describe('AppComponent', () => {
       app.listing = {
         form: {
           value: {
-            report_ids: ['1']
+            run_ids: ['1']
           }
         } as unknown as FormGroup
       } as unknown as ListingComponent;

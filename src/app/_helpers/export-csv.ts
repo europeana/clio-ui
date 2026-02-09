@@ -4,8 +4,7 @@ export class ExportCSVService {
   headersRun: Array<string> = [
     'id',
     'dataset-id',
-    'batch-id',
-    'report-id',
+    'dataset-name',
     'creation-time',
     'data-provider',
     'provider',
@@ -14,10 +13,9 @@ export class ExportCSVService {
   ];
 
   fieldNamesRun = [
-    'id',
+    'runId',
     'datasetId',
-    'batchId',
-    'reportId',
+    'datasetName',
     'creationTime',
     'dataProvider',
     'provider',

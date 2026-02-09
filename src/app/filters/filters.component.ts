@@ -68,10 +68,7 @@ export class FiltersComponent implements OnInit {
     dateTo: new FormControl(),
 
     datasetId: new FormControl(),
-    datasetIds: new UntypedFormGroup({}),
-
-    batchId: new FormControl(),
-    batchIds: new UntypedFormGroup({})
+    datasetIds: new UntypedFormGroup({})
   });
 
   error?: HttpErrorResponse;
@@ -95,7 +92,6 @@ export class FiltersComponent implements OnInit {
       )
       .subscribe((queryParams) => {
         const datasetId = queryParams['dataset-id'];
-        const batchId = queryParams['batch-id'];
 
         if (datasetId) {
           const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
@@ -103,14 +99,6 @@ export class FiltersComponent implements OnInit {
             datasetIds.addControl(part.trim(), new FormControl(part));
           });
         }
-
-        if (batchId) {
-          const batchIds = this.form.get('batchIds') as UntypedFormGroup;
-          `${batchId}`.split(',').forEach((part: string) => {
-            batchIds.addControl(part.trim(), new FormControl(''));
-          });
-        }
-
         this.queryParams = queryParams;
 
         const dateFrom = this.queryParams['date-from'];
@@ -119,16 +107,9 @@ export class FiltersComponent implements OnInit {
         this.form.controls.dateFrom.setValue(dateFrom ? dateFrom[0] : '');
         this.form.controls.dateTo.setValue(dateTo ? dateTo[0] : '');
         this.form.controls.datasetId.setValue(datasetId ? datasetId[0] : '');
-        this.form.controls.batchId.setValue(batchId ? batchId[0] : '');
 
         this.loadData();
       });
-  }
-
-  summariseBatchId(id: number): void {
-    console.log('filter summary batch (' + id + ')');
-    this.form.controls.batchId.setValue(id);
-    this.updatePageUrl();
   }
 
   summariseDatasetId(id: number): void {
@@ -136,8 +117,6 @@ export class FiltersComponent implements OnInit {
     this.form.controls.datasetId.setValue(id);
     this.updatePageUrl();
   }
-
-  /**/
 
   generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
     const res: Array<{ label: string; fn?: () => void }> = [];
@@ -169,20 +148,6 @@ export class FiltersComponent implements OnInit {
           label: `${values[0]}`,
           fn: () => {
             this.form.patchValue({ dateTo: '' });
-            this.updatePageUrl();
-          }
-        });
-      } else if (key === 'batch-id') {
-        const label = 'Batch Id';
-        if (index > 0) {
-          res.push({
-            label: 'and'
-          });
-        }
-        res.push({
-          label: `${label} (${values[0]})`,
-          fn: () => {
-            this.form.patchValue({ batchId: '' });
             this.updatePageUrl();
           }
         });
@@ -249,15 +214,6 @@ export class FiltersComponent implements OnInit {
         values: fromCSL(valDatasetId)
       };
     }
-
-    const valBatchId = this.form.value.batchId;
-
-    if (valBatchId) {
-      breakdownRequest.filters['batch-id'] = {
-        values: fromCSL(valBatchId)
-      };
-    }
-
     return breakdownRequest;
   }
 
@@ -340,7 +296,6 @@ export class FiltersComponent implements OnInit {
     );
 
     const dataset = this.form.value.datasetId;
-    const batch = this.form.value.batchId;
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
 
@@ -353,33 +308,9 @@ export class FiltersComponent implements OnInit {
     if (dataset) {
       qp['dataset-id'] = dataset;
     }
-    if (batch) {
-      qp['batch-id'] = batch;
-    }
 
     this.router.navigate([''], {
       queryParams: qp
     });
   }
-
-  /** getFormattedDateParam
-  /* get an empty string or the formatted date range
-  /* @returns string
-  getFormattedDateParam(): string {
-    const valFrom = this.form.value.dateFrom;
-    const valTo = this.form.value.dateTo;
-
-    if (valFrom && valTo) {
-      const valToDate = new Date(valTo);
-      valToDate.setDate(valToDate.getDate() + 1);
-      const range = `${new Date(valFrom).toISOString()}+TO+${new Date(
-        valToDate.getTime() - 1
-      ).toISOString()}`;
-      return `&qf=timestamp_update:${encodeURIComponent(
-        '['
-      )}${range}${encodeURIComponent(']')}`;
-    }
-    return '';
-  }
-  */
 }

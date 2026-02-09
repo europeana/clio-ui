@@ -13,7 +13,7 @@ import {
   UntypedFormGroup
 } from '@angular/forms';
 
-import { DATE_VERBOSE_FMT } from '../_data/static/date-formats';
+import { DATE_CONCISE_FMT } from '../_data/static/date-formats';
 import { ClioInfo, Run } from '../_models';
 import { RenameFilterPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
@@ -32,7 +32,7 @@ import { CheckboxComponent } from '../checkbox';
   ]
 })
 export class ListingComponent {
-  public DATE_VERBOSE_FMT = DATE_VERBOSE_FMT;
+  public DATE_CONCISE_FMT = DATE_CONCISE_FMT;
   private readonly fb = inject(UntypedFormBuilder);
 
   listSelectionCount = 0;
@@ -45,7 +45,7 @@ export class ListingComponent {
   previewedId?: number;
 
   form = new UntypedFormGroup({
-    report_ids: new UntypedFormGroup({})
+    run_ids: new UntypedFormGroup({})
   });
 
   @Input() clioInfo: ModelSignal<ClioInfo>;
@@ -55,10 +55,10 @@ export class ListingComponent {
       if (this.clioInfo().list) {
         this.setCheckboxes(false);
         const list = this.clioInfo().list;
-        const formGroup = this.form.get('report_ids') as UntypedFormGroup;
+        const formGroup = this.form.get('run_ids') as UntypedFormGroup;
 
         list.forEach((report: Run) => {
-          const fName = `${report.reportId}`;
+          const fName = `${report.runId}`;
           const ctrl = this.form.get(fName);
           if (!ctrl) {
             formGroup.addControl(fName, new FormControl(true, []));
@@ -78,7 +78,7 @@ export class ListingComponent {
           const ctrl = this.form.get(group + '.' + key) as FormControl;
           if (val) {
             const arrVisible = this.clioInfo().list.map((item: Run) => {
-              return `${item.reportId}`;
+              return `${item.runId}`;
             });
             if (arrVisible.includes(key)) {
               ctrl.setValue(val);
@@ -97,7 +97,7 @@ export class ListingComponent {
   }
 
   updateIds(): void {
-    const vals = this.form.value['report_ids'];
+    const vals = this.form.value['run_ids'];
     this.listSelectionCount = Object.keys(vals).filter((key: string) => {
       return vals[key];
     }).length;

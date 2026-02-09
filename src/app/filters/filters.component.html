@@ -52,22 +52,6 @@
   </ng-container>
 
   <div [formGroup]="form">
-    <span class="filter-label">Batch Id(s)</span>
-    <span class="input-wrapper">
-      <input
-        data-e2e="batch-id"
-        placeholder="batch id"
-        formControlName="batchId"
-        (keyUp.enter)="updatePageUrl()"
-      />
-      <a
-        class="search-icon-solid"
-        tabindex="0"
-        (click)="updatePageUrl()"
-        (keyUp.enter)="updatePageUrl()"
-      ></a>
-    </span>
-
     <span class="filter-label">Dataset Id(s)</span>
     <span class="input-wrapper">
       <input

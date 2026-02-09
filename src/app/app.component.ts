@@ -29,13 +29,13 @@ export class AppComponent {
   }
 
   downloadAll(): void {
-    const exclusionMap = this.listing.form.value['report_ids'];
+    const exclusionMap = this.listing.form.value['run_ids'];
     const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
       return !exclusionMap[key];
     });
     this.api.getDownload({
       ...this.filters.getDataServerDataRequest(),
-      excluded_report_ids: exclusionList
+      excluded_run_ids: exclusionList
     });
   }
 }

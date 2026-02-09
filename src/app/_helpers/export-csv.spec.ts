@@ -9,10 +9,9 @@ describe('ExportCSVService', () => {
 
   const testRuns = [
     {
-      id: 2,
-      reportId: 4,
+      runId: 2,
       datasetId: 11,
-      batchId: 2,
+      datasetName: 'dataset_11',
       creationTime: timestamp,
       dataProvider: dataProvider,
       provider: 'Daguerreobase',
@@ -20,10 +19,9 @@ describe('ExportCSVService', () => {
       url: 'http://123'
     },
     {
-      id: 1,
-      reportId: 5,
+      runId: 1,
       datasetId: 12,
-      batchId: 2,
+      datasetName: 'dataset_12',
       creationTime: timestamp,
       dataProvider: dataProvider,
       provider: 'Daguerreobase',
@@ -48,9 +46,9 @@ describe('ExportCSVService', () => {
     expect(res).toBeTruthy();
 
     const line1 =
-      'id,dataset-id,batch-id,report-id,creation-time,data-provider,provider,score,url';
-    const line2 = `2,11,2,4,"${timestamp}","${dataProvider}","Daguerreobase",14,"http://123"`;
-    const line3 = `1,12,2,5,"${timestamp}","${dataProvider}","Daguerreobase",81,"http://456"`;
+      'id,dataset-id,dataset-name,creation-time,data-provider,provider,score,url';
+    const line2 = `2,11,"dataset_11","${timestamp}","${dataProvider}","Daguerreobase",14,"http://123"`;
+    const line3 = `1,12,"dataset_12","${timestamp}","${dataProvider}","Daguerreobase",81,"http://456"`;
 
     expect(res).toEqual(`${line1}\n\r${line2}\n${line3}`);
   });

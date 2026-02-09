@@ -37,11 +37,8 @@
           </span>
         }
 
-        @let totalNumber = clioInfoValue.listLength;
         @let count = listSelectionCount;
-        @let textAll = count > 1 && count === totalNumber ? ' all ' : '';
-        @let text =
-          'download ' + textAll + count + ' report' + (count !== 1 ? 's' : '');
+        @let text = 'export ' + count + ' check' + (count !== 1 ? 's' : '');
         <a
           class="csv-download-block"
           tabindex="0"
@@ -51,11 +48,11 @@
         ></a>
       </div>
       @if (clioInfoValue.listLength) {
-        <span class="list-header">Report Id</span>
-        <span class="list-header">Batch Id</span>
         <span class="list-header">Dataset Id</span>
+        <span class="list-header">Dataset Name</span>
+        <span class="list-header">Provider</span>
         <span class="list-header align-centre">Download</span>
-        <span class="list-header align-left">Creation Time</span>
+        <span class="list-header align-left">Check Date</span>
       } @else {
         <span class="list-empty">no reports available</span>
       }
@@ -92,16 +89,11 @@
           title="score: {{ latestItem.score }}%"
         ></a>
         <span>
-          {{ latestItem.reportId }}
+          {{ latestItem.datasetId }}
         </span>
       </span>
       <span>
-        <a
-          tabindex="0"
-          (keyUp.enter)="requestSummaryBatchId.emit(latestItem.batchId)"
-          (click)="requestSummaryBatchId.emit(latestItem.batchId)"
-          >{{ latestItem.batchId }}</a
-        >
+        {{ latestItem.datasetName }}
       </span>
       <span>
         <a
@@ -109,7 +101,7 @@
           (keyUp.enter)="requestSummaryDatasetId.emit(latestItem.datasetId)"
           (click)="requestSummaryDatasetId.emit(latestItem.datasetId)"
         >
-          {{ latestItem.datasetId }}
+          {{ latestItem.provider }}
         </a>
       </span>
       <span class="centre">
@@ -118,13 +110,13 @@
 
       <span class="last-cell">
         <span>
-          {{ latestItem.creationTime | date: DATE_VERBOSE_FMT }}
+          {{ latestItem.creationTime | date: DATE_CONCISE_FMT }}
         </span>
         <app-checkbox
           [form]="form"
-          [controlName]="latestItem.reportId + ''"
+          [controlName]="latestItem.runId + ''"
           [title]="'include in top-level download'"
-          [group]="'report_ids'"
+          [group]="'run_ids'"
           (valueChanged)="updateIds()"
         ></app-checkbox>
       </span>

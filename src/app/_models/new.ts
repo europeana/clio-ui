@@ -1,6 +1,6 @@
 export interface Dataset {
   id: number;
-  name: string;
+  datasetName: string;
   size: number;
   dataProvider: string;
   provider: string;
@@ -8,11 +8,11 @@ export interface Dataset {
 }
 
 export interface Run {
-  id: number;
+  runId: number;
   creationTime: string;
   datasetId: number;
-  batchId: number;
-  reportId: number;
+  datasetName: string;
+  provider: string;
   score: number;
   url: string;
 }

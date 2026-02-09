@@ -43,7 +43,7 @@ describe('API Service', () => {
     const url = `${apiSettings.serverAPI}/download`;
     service.getDownload({
       filters: {},
-      excluded_report_ids: []
+      excluded_run_ids: []
     });
     const req = httpTesting.expectOne(url, 'post...');
     req.flush('csv');

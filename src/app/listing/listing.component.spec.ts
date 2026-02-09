@@ -58,14 +58,14 @@ describe('ListingComponent', () => {
       ...structuredClone(clioInfo),
       list: [
         {
-          reportId: '1'
+          runId: '1'
         } as unknown as Run
       ]
     });
     TestBed.flushEffects();
     fixture.detectChanges();
 
-    const cmp = component.form.controls.report_ids as FormGroup;
+    const cmp = component.form.controls.run_ids as FormGroup;
 
     expect(cmp.value['1']).toBeTruthy();
     component.setCheckboxes(false);
@@ -81,7 +81,7 @@ describe('ListingComponent', () => {
       ...structuredClone(clioInfo),
       list: [
         {
-          reportId: '1'
+          runId: '1'
         } as unknown as Run
       ]
     });
@@ -89,10 +89,10 @@ describe('ListingComponent', () => {
     TestBed.flushEffects();
     fixture.detectChanges();
 
-    component.form.setValue({ report_ids: { '1': true } });
+    component.form.setValue({ run_ids: { '1': true } });
     expect(component.listSelectionCount).toEqual(1);
 
-    component.form.setValue({ report_ids: { '1': false } });
+    component.form.setValue({ run_ids: { '1': false } });
     expect(component.listSelectionCount).toEqual(1);
 
     component.updateIds();

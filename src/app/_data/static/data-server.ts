@@ -25,7 +25,6 @@ const providers: Array<string> = [
   'CultureGrid',
   'Daguerreobase',
   'Europeana 280',
-
   'Foundation Virtual Library Miguel de Cervantes',
   'Galileo Museum'
 ];
@@ -107,7 +106,7 @@ export const dataSets: Array<Dataset> = new Array(25)
 
     return {
       id: index,
-      name: `my_dataset_${index}`,
+      datasetName: `my_dataset_${index}`,
       size: (index * 13) % 7,
       dataProvider: dataProvider.name,
       provider,
@@ -120,23 +119,23 @@ const numRuns = 100;
 const runs: Array<Run_DATA> = new Array(numRuns)
   .fill(null)
   .map((_: unknown, index: number) => {
-    const id = index;
+    const runId = index;
     const dataset = dataSets[index % dataSets.length];
     const datasetId = dataset.id;
+    const datasetName = dataset.datasetName;
     const dataProvider = dataset.dataProvider;
     const provider = dataset.provider;
-    const url = `http://localhost:3000/report?id=${id}`;
+    const url = `http://localhost:3000/report?id=${runId}`;
     const score = 100 - Math.floor((index * 17.6) % 100);
     const creationTime = new Date(today);
 
     creationTime.setDate(yearZero.getDate() - index);
 
     return {
-      id,
-      reportId: id,
+      runId,
       creationTime: creationTime.toISOString(),
       datasetId,
-      batchId: Math.floor((numRuns - index) / 8),
+      datasetName,
       url,
       dataProvider,
       provider,
@@ -182,10 +181,6 @@ export function dataServerRequest(
         if (filter.values) {
           if (fName === 'dataset-id') {
             if (!filter.values.includes(`${run.datasetId}`)) {
-              res = false;
-            }
-          } else if (fName === 'batch-id') {
-            if (!filter.values.includes(`${run.batchId}`)) {
               res = false;
             }
           } else if (fName === 'date-from') {
