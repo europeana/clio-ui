@@ -7,6 +7,11 @@ a {
   cursor: pointer;
   text-decoration: none;
 
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible,
   &:hover {
     color: variables.$clio-highlight-colour;
   }
@@ -34,6 +39,7 @@ a {
   margin: 0.5em auto 0 auto;
   width: 1.25em;
 
+  &:focus-visible,
   &:hover {
     background-image: icon_urls.svg-url-icon-download(
       variables.$clio-highlight-colour

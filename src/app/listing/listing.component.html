@@ -102,13 +102,7 @@
         {{ latestItem.datasetName }}
       </span>
       <span>
-        <a
-          tabindex="0"
-          (keyUp.enter)="requestSummaryDatasetId.emit(latestItem.datasetId)"
-          (click)="requestSummaryDatasetId.emit(latestItem.datasetId)"
-        >
-          {{ latestItem.provider }}
-        </a>
+        {{ latestItem.provider }}
       </span>
       <span class="centre">
         <a class="csv-download" target="_blank" [href]="latestItem.url"></a>

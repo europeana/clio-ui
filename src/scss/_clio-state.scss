@@ -17,6 +17,7 @@ $view-box-down-12: '0 -12 #{$icon-width} #{$icon-height}';
 
 $state-width: 2;
 $state-height: #{($icon-height / $icon-width) * $state-width}em;
+$white: #fff;
 
 .clio-state {
   background-repeat: no-repeat;
@@ -40,7 +41,7 @@ $state-height: #{($icon-height / $icon-width) * $state-width}em;
   );
   &:focus {
     background-image: svg-url-icon-storm-cloud(
-      variables.$clio-highlight-colour,
+      $white,
       variables.$clio-highlight-colour
     );
   }
@@ -57,7 +58,7 @@ $state-height: #{($icon-height / $icon-width) * $state-width}em;
   );
   &:focus {
     background-image: svg-url-icon-rain-cloud(
-      variables.$clio-highlight-colour,
+      $white,
       variables.$clio-highlight-colour
     );
   }
@@ -74,7 +75,7 @@ $state-height: #{($icon-height / $icon-width) * $state-width}em;
   );
   &:focus {
     background-image: svg-url-icon-rain-cloud(
-      variables.$clio-highlight-colour,
+      $white,
       variables.$clio-highlight-colour
     );
   }
@@ -88,7 +89,7 @@ $state-height: #{($icon-height / $icon-width) * $state-width}em;
   background-image: svg-url-icon-overcast($colour-sun, $colour-stroke);
   &:focus {
     background-image: svg-url-icon-overcast(
-      variables.$clio-highlight-colour,
+      $white,
       variables.$clio-highlight-colour
     );
   }
@@ -102,7 +103,7 @@ $state-height: #{($icon-height / $icon-width) * $state-width}em;
   background-image: svg-url-icon-sun($colour-sun-bright, $colour-stroke);
   &:focus {
     background-image: svg-url-icon-sun(
-      variables.$clio-highlight-colour,
+      $white,
       variables.$clio-highlight-colour
     );
   }
