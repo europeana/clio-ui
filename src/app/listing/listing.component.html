@@ -64,14 +64,14 @@
       @if (graphMode) {
         <span class="state-display">
           <a (click)="graphMode = false" class="bar-label">
-            {{ latestItem.score }}%
+            {{ latestItem.percentInOperation }}%
           </a>
           <a class="bar-outer" (click)="graphMode = false">
             <span
               class="bar-inner"
-              title="score: {{ latestItem.score }}%"
+              title="links in operation: {{ latestItem.percentInOperation }}%"
               [ngStyle]="{
-                width: latestItem.score + '%'
+                width: latestItem.percentInOperation + '%'
               }"
             >
             </span>
@@ -84,9 +84,9 @@
           (click)="graphMode = !graphMode"
           (keyUp.enter)="graphMode = !graphMode"
           tabindex="0"
-          [ngClass]="getClioClass(latestItem.score)"
+          [ngClass]="getClioClass(latestItem.percentInOperation)"
           class="clio-state"
-          title="score: {{ latestItem.score }}%"
+          title="links in operation: {{ latestItem.percentInOperation }}%"
         ></a>
         <span>
           <a

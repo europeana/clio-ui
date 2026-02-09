@@ -278,7 +278,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
           });
 
           const averageScore = Math.floor(
-            list.reduce((sum, obj) => sum + obj.score, 0) / list.length
+            list.reduce((sum, obj) => sum + obj.percentInOperation, 0) /
+              list.length
           );
           const listAverageScore = Math.floor(averageScore / 20);
 

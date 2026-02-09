@@ -8,7 +8,7 @@ export class ExportCSVService {
     'creation-time',
     'data-provider',
     'provider',
-    'score',
+    'percent-in-operation',
     'url'
   ];
 
@@ -19,7 +19,7 @@ export class ExportCSVService {
     'creationTime',
     'dataProvider',
     'provider',
-    'score',
+    'percentInOperation',
     'url'
   ];
 

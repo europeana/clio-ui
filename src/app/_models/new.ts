@@ -13,7 +13,7 @@ export interface Run {
   datasetId: string;
   datasetName: string;
   provider: string;
-  score: number;
+  percentInOperation: number;
   url: string;
 }
 

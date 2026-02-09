@@ -126,7 +126,7 @@ const runs: Array<Run_DATA> = new Array(numRuns)
     const dataProvider = dataset.dataProvider;
     const provider = dataset.provider;
     const url = `http://localhost:3000/report?id=${runId}`;
-    const score = 100 - Math.floor((index * 17.6) % 100);
+    const percentInOperation = 100 - Math.floor((index * 17.6) % 100);
     const creationTime = new Date(today);
 
     creationTime.setDate(yearZero.getDate() - index);
@@ -139,7 +139,7 @@ const runs: Array<Run_DATA> = new Array(numRuns)
       url,
       dataProvider,
       provider,
-      score
+      percentInOperation
     };
   });
 
