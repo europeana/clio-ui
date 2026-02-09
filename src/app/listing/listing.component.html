@@ -89,7 +89,13 @@
           title="score: {{ latestItem.score }}%"
         ></a>
         <span>
-          {{ latestItem.datasetId }}
+          <a
+            tabindex="0"
+            (keyUp.enter)="requestSummaryDatasetId.emit(latestItem.datasetId)"
+            (click)="requestSummaryDatasetId.emit(latestItem.datasetId)"
+          >
+            {{ latestItem.datasetId }}
+          </a>
         </span>
       </span>
       <span>

@@ -10,7 +10,7 @@ export interface Dataset {
 export interface Run {
   runId: number;
   creationTime: string;
-  datasetId: number;
+  datasetId: string;
   datasetName: string;
   provider: string;
   score: number;

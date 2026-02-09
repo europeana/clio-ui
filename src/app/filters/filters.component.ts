@@ -112,9 +112,12 @@ export class FiltersComponent implements OnInit {
       });
   }
 
-  summariseDatasetId(id: number): void {
-    console.log('filter summary dataset (' + id + ')');
-    this.form.controls.datasetId.setValue(id);
+  summariseDatasetId(id: string): void {
+    if (this.form.value['datasetId'] === id) {
+      this.form.controls.datasetId.setValue(undefined);
+    } else {
+      this.form.controls.datasetId.setValue(id);
+    }
     this.updatePageUrl();
   }
 

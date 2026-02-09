@@ -39,8 +39,7 @@ export class ListingComponent {
   graphMode = false;
 
   requestDownload = output<void>();
-  requestSummaryBatchId = output<number>();
-  requestSummaryDatasetId = output<number>();
+  requestSummaryDatasetId = output<string>();
 
   previewedId?: number;
 

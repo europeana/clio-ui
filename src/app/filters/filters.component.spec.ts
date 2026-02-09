@@ -56,7 +56,7 @@ describe('FiltersComponent', () => {
     it('should summarise by datasetId', () => {
       jest.spyOn(component, 'updatePageUrl');
       component.ngOnInit();
-      component.summariseDatasetId(1);
+      component.summariseDatasetId('1');
       expect(component.updatePageUrl).toHaveBeenCalled();
     });
 

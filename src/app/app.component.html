@@ -8,7 +8,6 @@
     <div class="right-col">
       <app-listing
         #listing
-        (requestSummaryBatchId)="filters.summariseBatchId($event)"
         (requestSummaryDatasetId)="filters.summariseDatasetId($event)"
         (requestDownload)="downloadAll()"
         [clioInfo]="filters.modelClioInfo"

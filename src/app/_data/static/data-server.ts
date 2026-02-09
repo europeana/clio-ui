@@ -121,7 +121,7 @@ const runs: Array<Run_DATA> = new Array(numRuns)
   .map((_: unknown, index: number) => {
     const runId = index;
     const dataset = dataSets[index % dataSets.length];
-    const datasetId = dataset.id;
+    const datasetId = `${dataset.id}`;
     const datasetName = dataset.datasetName;
     const dataProvider = dataset.dataProvider;
     const provider = dataset.provider;
@@ -180,7 +180,7 @@ export function dataServerRequest(
 
         if (filter.values) {
           if (fName === 'dataset-id') {
-            if (!filter.values.includes(`${run.datasetId}`)) {
+            if (!filter.values.includes(run.datasetId)) {
               res = false;
             }
           } else if (fName === 'date-from') {
