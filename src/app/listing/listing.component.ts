@@ -1,4 +1,10 @@
-import { DatePipe, NgClass, NgFor, NgStyle } from '@angular/common';
+import {
+  DatePipe,
+  NgClass,
+  NgFor,
+  NgStyle,
+  NgTemplateOutlet
+} from '@angular/common';
 import {
   Component,
   effect,
@@ -28,6 +34,7 @@ import { CheckboxComponent } from '../checkbox';
     NgClass,
     NgFor,
     NgStyle,
+    NgTemplateOutlet,
     RenameFilterPipe
   ]
 })

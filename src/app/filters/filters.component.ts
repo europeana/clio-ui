@@ -56,6 +56,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
   modelClioInfo: ModelSignal<ClioInfo> = model({
+    groupedRuns: [],
     list: [],
     listLength: -1,
     listAverageScore: -1,
@@ -285,6 +286,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
           this.modelClioInfo.set({
             filterOps: ops,
+            groupedRuns: this.api.groupRuns(list),
             list,
             listLength: list.length,
             listAverageScore,

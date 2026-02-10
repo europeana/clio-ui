@@ -11,6 +11,7 @@ describe('ListingComponent', () => {
   const clioInfo = {
     filterOps: {},
     list: [],
+    groupedRuns: [],
     listLength: -1,
     listAverageScore: -1,
     titleMarkup: []

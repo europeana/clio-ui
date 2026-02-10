@@ -1,6 +1,6 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { BreakdownRequest, BreakdownResults } from '../_models';
+import { BreakdownRequest, BreakdownResults, Run, RunGroup } from '../_models';
 
 export class MockAPIService {
   errorMode = false;
@@ -11,6 +11,10 @@ export class MockAPIService {
         return throwError(new Error(msg));
       })
     );
+  }
+
+  groupRuns(_: Array<Run>): Array<RunGroup> {
+    return [] as Array<RunGroup>;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function

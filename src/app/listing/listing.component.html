@@ -1,5 +1,31 @@
 <a #downloadAnchor tabindex="-1"></a>
 
+<ng-template #dateCheckbox let-time="time" let-runId="runId">
+  <span class="last-cell">
+    <span>
+      {{ time | date: DATE_CONCISE_FMT }}
+    </span>
+    <app-checkbox
+      [form]="form"
+      [controlName]="runId + ''"
+      [title]="'include in top-level download'"
+      [group]="'run_ids'"
+      (valueChanged)="updateIds()"
+    ></app-checkbox>
+  </span>
+</ng-template>
+
+<ng-template #stateLink let-score="score">
+  <a
+    (click)="graphMode = !graphMode"
+    (keyUp.enter)="graphMode = !graphMode"
+    tabindex="0"
+    [ngClass]="getClioClass(score)"
+    class="clio-state"
+    title="links in operation: {{ score }}%"
+  ></a>
+</ng-template>
+
 <ul
   class="align-right listing"
   [ngClass]="{
@@ -9,7 +35,7 @@
   <li class="header-section">
     @let clioInfoValue = clioInfo();
     @if (clioInfoValue) {
-      <div class="summary-bar">
+      <span class="summary-bar">
         <a
           tabindex="0"
           (click)="graphMode = !graphMode"
@@ -46,18 +72,127 @@
           (keyUp.enter)="requestDownload.emit()"
           [attr.label]="text"
         ></a>
-      </div>
+      </span>
+
       @if (clioInfoValue.listLength) {
         <span class="list-header">Dataset Id</span>
         <span class="list-header">Dataset Name</span>
         <span class="list-header">Provider</span>
-        <span class="list-header align-centre">Download</span>
+        <span class="list-header align-centre">Export</span>
         <span class="list-header align-left">Check Date</span>
       } @else {
         <span class="list-empty">no reports available</span>
       }
     }
   </li>
+
+  @for (group of clioInfo().groupedRuns; track group) {
+    <li class="group-header" [ngClass]="{ 'header-section': group.opened }">
+      <ul class="sublisting" style="position: relative">
+        <li>
+          @if (graphMode) {
+            <span class="state-display">
+              <a (click)="graphMode = false" class="bar-label">
+                {{ group.percentInOperation }}%
+              </a>
+              <a class="bar-outer" (click)="graphMode = false">
+                <span
+                  class="bar-inner"
+                  title="links in operation: {{ group.percentInOperation }}%"
+                  [ngStyle]="{
+                    width: group.percentInOperation + '%'
+                  }"
+                >
+                </span>
+              </a>
+            </span>
+          }
+
+          <span class="state-display">
+            <ng-container
+              [ngTemplateOutlet]="stateLink"
+              [ngTemplateOutletContext]="{ score: group.percentInOperation }"
+            >
+            </ng-container>
+
+            <a
+              tabindex="0"
+              class="opener"
+              [ngClass]="{ opened: group.opened }"
+              (click)="group.opened = !group.opened"
+              (keyUp.enter)="group.opened = !group.opened"
+            >
+              {{ group.list[0].datasetId }}
+            </a>
+          </span>
+
+          <span>
+            {{ group.list[0].datasetName }}
+          </span>
+          <span>
+            {{ group.list[0].provider }}
+          </span>
+
+          <!-- TODO: url endpoint for dataset (historic) -->
+
+          <span class="centre">
+            <a
+              class="csv-download"
+              target="_blank"
+              [href]="group.list[0].url"
+            ></a>
+          </span>
+
+          <ng-container
+            [ngTemplateOutlet]="dateCheckbox"
+            [ngTemplateOutletContext]="{
+              time: group.list[0].creationTime,
+              runId: group.list[0].runId + ''
+            }"
+          >
+          </ng-container>
+        </li>
+
+        @if (group.opened) {
+          <li>
+            <ul class="sublisting">
+              @for (entry of group.list; track entry) {
+                <li>
+                  <ng-container
+                    [ngTemplateOutlet]="stateLink"
+                    [ngTemplateOutletContext]="{
+                      score: entry.percentInOperation
+                    }"
+                  >
+                  </ng-container>
+
+                  <span></span>
+                  <span></span>
+
+                  <span class="centre">
+                    <a
+                      class="csv-download"
+                      target="_blank"
+                      [href]="group.list[0].url"
+                    ></a>
+                  </span>
+
+                  <ng-container
+                    [ngTemplateOutlet]="dateCheckbox"
+                    [ngTemplateOutletContext]="{
+                      time: entry.creationTime,
+                      runId: entry.runId + ''
+                    }"
+                  >
+                  </ng-container>
+                </li>
+              }
+            </ul>
+          </li>
+        }
+      </ul>
+    </li>
+  }
 
   @for (latestItem of clioInfo().list; track latestItem) {
     <li>
@@ -80,14 +215,12 @@
       }
 
       <span class="state-display">
-        <a
-          (click)="graphMode = !graphMode"
-          (keyUp.enter)="graphMode = !graphMode"
-          tabindex="0"
-          [ngClass]="getClioClass(latestItem.percentInOperation)"
-          class="clio-state"
-          title="links in operation: {{ latestItem.percentInOperation }}%"
-        ></a>
+        <ng-container
+          [ngTemplateOutlet]="stateLink"
+          [ngTemplateOutletContext]="{ score: latestItem.percentInOperation }"
+        >
+        </ng-container>
+
         <span>
           <a
             tabindex="0"
@@ -108,18 +241,14 @@
         <a class="csv-download" target="_blank" [href]="latestItem.url"></a>
       </span>
 
-      <span class="last-cell">
-        <span>
-          {{ latestItem.creationTime | date: DATE_CONCISE_FMT }}
-        </span>
-        <app-checkbox
-          [form]="form"
-          [controlName]="latestItem.runId + ''"
-          [title]="'include in top-level download'"
-          [group]="'run_ids'"
-          (valueChanged)="updateIds()"
-        ></app-checkbox>
-      </span>
+      <ng-container
+        [ngTemplateOutlet]="dateCheckbox"
+        [ngTemplateOutletContext]="{
+          time: latestItem.creationTime,
+          runId: latestItem.runId + ''
+        }"
+      >
+      </ng-container>
     </li>
   }
 </ul>
