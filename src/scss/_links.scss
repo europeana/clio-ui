@@ -4,16 +4,18 @@
 
 a {
   color: variables.$clio-colour;
-  cursor: pointer;
   text-decoration: none;
+
+  &:not([disabled]) {
+    cursor: pointer;
+    &:focus-visible,
+    &:hover {
+      color: variables.$clio-highlight-colour;
+    }
+  }
 
   &:focus-visible {
     outline: none;
-  }
-
-  &:focus-visible,
-  &:hover {
-    color: variables.$clio-highlight-colour;
   }
 
   &.external-link {

@@ -17,8 +17,9 @@
 
 <ng-template #stateLink let-score="score" let-fnToggle="fnToggle">
   <a
-    (click)="fnToggle()"
-    (keyUp.enter)="fnToggle()"
+    [attr.disabled]="!!fnToggle ? null : 'disabled'"
+    (click)="fnToggle ? fnToggle() : undefined"
+    (keyUp.enter)="fnToggle ? fnToggle() : undefined"
     tabindex="0"
     [ngClass]="getClioClass(score)"
     class="clio-state"
@@ -27,9 +28,19 @@
 </ng-template>
 
 <ng-template #bar let-score="score" let-fnCancel="fnCancel">
-  <span class="state-display">
-    <a (click)="fnCancel()" class="bar-label"> {{ score }}% </a>
-    <a class="bar-outer" (click)="fnCancel()">
+  <span class="score-display">
+    <a
+      class="bar-label"
+      [attr.disabled]="!!fnCancel ? null : 'disabled'"
+      (click)="fnCancel ? fnCancel() : undefined"
+    >
+      {{ score }}%
+    </a>
+    <a
+      class="bar-outer"
+      [attr.disabled]="!!fnCancel ? null : 'disabled'"
+      (click)="fnCancel ? fnCancel() : undefined"
+    >
       <span
         class="bar-inner"
         title="links in operation: {{ score }}%"
@@ -167,32 +178,25 @@
 
         @if (group.opened) {
           <li>
-            <ul class="sublisting">
+            <ul class="sublisting run-list">
               @for (entry of group.list; track entry) {
                 <li>
-                  <ng-container
-                    [ngTemplateOutlet]="stateLink"
-                    [ngTemplateOutletContext]="{
-                      score: entry.percentInOperation,
-                      fnToggle: toggleGraphModeInner.bind(this)
-                    }"
-                  >
-                  </ng-container>
-
-                  @if (graphModeInner) {
+                  <span>
                     <ng-container
-                      [ngTemplateOutlet]="bar"
+                      [ngTemplateOutlet]="stateLink"
                       [ngTemplateOutletContext]="{
-                        score: group.percentInOperation,
-                        fnCancel: cancelGraphModeInner.bind(this)
+                        score: entry.percentInOperation
                       }"
                     >
                     </ng-container>
-                  } @else {
-                    <span></span>
-                  }
-
-                  <span></span>
+                    <ng-container
+                      [ngTemplateOutlet]="bar"
+                      [ngTemplateOutletContext]="{
+                        score: entry.percentInOperation
+                      }"
+                    >
+                    </ng-container>
+                  </span>
 
                   <span class="centre">
                     <a
@@ -216,67 +220,6 @@
           </li>
         }
       </ul>
-    </li>
-  }
-
-  @for (latestItem of clioInfo().list; track latestItem) {
-    <li>
-      @if (graphMode) {
-        <span class="state-display">
-          <a (click)="graphMode = false" class="bar-label">
-            {{ latestItem.percentInOperation }}%
-          </a>
-          <a class="bar-outer" (click)="graphMode = false">
-            <span
-              class="bar-inner"
-              title="links in operation: {{ latestItem.percentInOperation }}%"
-              [ngStyle]="{
-                width: latestItem.percentInOperation + '%'
-              }"
-            >
-            </span>
-          </a>
-        </span>
-      }
-
-      <span class="state-display">
-        <ng-container
-          [ngTemplateOutlet]="stateLink"
-          [ngTemplateOutletContext]="{
-            score: latestItem.percentInOperation,
-            fnToggle: toggleGraphMode.bind(this)
-          }"
-        >
-        </ng-container>
-
-        <span>
-          <a
-            tabindex="0"
-            (keyUp.enter)="requestSummaryDatasetId.emit(latestItem.datasetId)"
-            (click)="requestSummaryDatasetId.emit(latestItem.datasetId)"
-          >
-            {{ latestItem.datasetId }}
-          </a>
-        </span>
-      </span>
-      <span>
-        {{ latestItem.datasetName }}
-      </span>
-      <span>
-        {{ latestItem.provider }}
-      </span>
-      <span class="centre">
-        <a class="csv-download" target="_blank" [href]="latestItem.url"></a>
-      </span>
-
-      <ng-container
-        [ngTemplateOutlet]="dateCheckbox"
-        [ngTemplateOutletContext]="{
-          time: latestItem.creationTime,
-          runId: latestItem.runId + ''
-        }"
-      >
-      </ng-container>
     </li>
   }
 </ul>

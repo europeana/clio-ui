@@ -15,7 +15,7 @@
   text-align: right;
 }
 
-.state-display {
+.score-display {
   .bar-inner,
   .bar-outer {
     align-self: center;
@@ -26,6 +26,7 @@
 
   .bar-label {
     min-width: 3em;
+    &[disabled],
     &:not(:hover) {
       font-weight: normal;
     }
@@ -41,13 +42,24 @@
     background: variables.$clio-highlight-colour;
     width: 60%;
   }
+}
 
+.run-list .score-display {
+  .bar-inner,
+  .bar-outer {
+    background: colours.$offwhite;
+  }
+  .bar-outer {
+    border: none;
+  }
+  .bar-inner {
+    border: 2px solid variables.$clio-highlight-colour;
+  }
+}
+
+.state-display {
   .clio-state {
     transform: scale(0.75);
-  }
-
-  &:has(+ .state-display :focus-visible) .bar-label {
-    color: variables.$clio-highlight-colour;
   }
 }
 
@@ -79,10 +91,27 @@
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
+
+    * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .clio-state {
       display: flex;
       justify-self: flex-end;
       align-self: center;
+    }
+
+    .run-list {
+      li > :first-child {
+        margin-right: auto;
+        margin-left: 2em;
+        grid-column: 1 / 4;
+        display: flex;
+        align-items: center;
+      }
     }
   }
 
@@ -94,9 +123,6 @@
 
     * {
       line-height: 2.25em;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
   }
 
@@ -144,6 +170,7 @@
   }
 }
 
+.score-display,
 .state-display {
   align-items: center;
   display: flex;
