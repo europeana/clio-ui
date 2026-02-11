@@ -57,11 +57,6 @@
   }
 }
 
-.csv-download-block {
-  margin: 0 0 0 auto;
-  white-space: nowrap;
-}
-
 .list-empty {
   @include mixins.empty-list();
 }
@@ -97,6 +92,12 @@
       display: flex;
       justify-self: flex-end;
       align-self: center;
+      transform: scale(0.75);
+    }
+
+    .csv-download-block {
+      height: 2.25em;
+      justify-content: center;
       transform: scale(0.75);
     }
 
@@ -208,6 +209,16 @@
 
   .clio-state {
     min-width: 2em;
+  }
+
+  .csv-download-block {
+    margin: 0 0 0 auto;
+    white-space: nowrap;
+    &::before {
+      content: attr(label);
+      font-weight: bold;
+      margin: 0 0.75em 0 1em;
+    }
   }
 
   .title {
