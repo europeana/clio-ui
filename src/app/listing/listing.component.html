@@ -102,8 +102,7 @@
       </span>
 
       @if (clioInfoValue.listLength) {
-        <span class="list-header">Dataset Id</span>
-        <span class="list-header">Dataset Name</span>
+        <span class="list-header align-left">Dataset Id / Name</span>
         <span class="list-header">Provider</span>
         <span class="list-header align-centre">Export</span>
         <span class="list-header align-left">Check Date</span>
@@ -137,21 +136,19 @@
               }"
             >
             </ng-container>
-
-            <a
-              tabindex="0"
-              class="opener"
-              [ngClass]="{ opened: group.opened }"
-              (click)="group.opened = !group.opened"
-              (keyUp.enter)="group.opened = !group.opened"
-            >
-              {{ group.list[0].datasetId }}
-            </a>
           </span>
 
-          <span>
+          <a
+            tabindex="0"
+            class="opener"
+            [ngClass]="{ opened: group.opened }"
+            (click)="group.opened = !group.opened"
+            (keyUp.enter)="group.opened = !group.opened"
+          >
+            {{ group.list[0].datasetId }}
             {{ group.list[0].datasetName }}
-          </span>
+          </a>
+
           <span>
             {{ group.list[0].provider }}
           </span>
