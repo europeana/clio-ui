@@ -103,6 +103,7 @@
 
       @if (clioInfoValue.listLength) {
         <span class="list-header align-left">Dataset Id / Name</span>
+        <span class="list-header">Data Provider</span>
         <span class="list-header">Provider</span>
         <span class="list-header align-centre">Export</span>
         <span class="list-header align-left">Check Date</span>
@@ -148,6 +149,10 @@
             {{ group.list[0].datasetId }}
             {{ group.list[0].datasetName }}
           </a>
+
+          <span>
+            {{ group.list[0].dataProvider }}
+          </span>
 
           <span>
             {{ group.list[0].provider }}

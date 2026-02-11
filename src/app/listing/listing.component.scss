@@ -68,7 +68,7 @@
 .listing {
   border-top: 1px solid variables.$clio-colour;
   display: grid;
-  grid-template-columns: repeat(5, auto);
+  grid-template-columns: repeat(6, auto);
   grid-column-gap: 1em;
   padding: 0;
   position: relative;
@@ -107,7 +107,7 @@
       li > :first-child {
         margin-right: auto;
         margin-left: 2em;
-        grid-column: 1 / 4;
+        grid-column: 1 / 5;
         display: flex;
         align-items: center;
       }
@@ -135,13 +135,14 @@
   }
 
   &.extra-col {
-    grid-template-columns: repeat(6, auto);
+    grid-template-columns: repeat(7, auto);
 
     .summary-bar + .list-header {
       grid-column: 1 / 4;
     }
+
     .sublisting .run-list li > :first-child {
-      grid-column: 1 / 5;
+      grid-column: 1 / 6;
     }
   }
 }

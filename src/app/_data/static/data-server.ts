@@ -14,11 +14,6 @@ interface DataProvider {
   providers: Array<number>;
 }
 
-interface Run_DATA extends Run {
-  provider: string;
-  dataProvider: string;
-}
-
 const providers: Array<string> = [
   'AthenaPlus',
   'Bulgariana',
@@ -116,7 +111,7 @@ export const dataSets: Array<Dataset> = new Array(25)
 
 // Factory of all runs
 const numRuns = 100;
-const runs: Array<Run_DATA> = new Array(numRuns)
+const runs: Array<Run> = new Array(numRuns)
   .fill(null)
   .map((_: unknown, index: number) => {
     const runId = index;
@@ -143,17 +138,17 @@ const runs: Array<Run_DATA> = new Array(numRuns)
     };
   });
 
-const allRunData: Array<Run_DATA> = runs;
+const allRunData: Array<Run> = runs;
 
 // MOCK STATS SERVER...
 
 function getDistinctValues(
-  runs: Array<Run_DATA>,
+  runs: Array<Run>,
   filterName: string,
   top?: number
 ): Array<string> {
   let res = Object.keys(
-    runs.reduce((map: { [key: string]: boolean }, run: Run_DATA) => {
+    runs.reduce((map: { [key: string]: boolean }, run: Run) => {
       const rVal = (run as unknown as { [key: string]: string })[filterName];
       map[rVal] = true;
       return map;
@@ -171,52 +166,50 @@ export function dataServerRequest(
 ): BreakdownResults {
   const filterproof: Array<string> = [];
   const specifiedFilterNames = Object.keys(breakdownRequest.filters);
-  const filteredReports = structuredClone(allRunData).filter(
-    (run: Run_DATA) => {
-      let res = true;
+  const filteredReports = structuredClone(allRunData).filter((run: Run) => {
+    let res = true;
 
-      specifiedFilterNames.forEach((fName: string) => {
-        const filter = breakdownRequest.filters[fName] as RequestFilter;
+    specifiedFilterNames.forEach((fName: string) => {
+      const filter = breakdownRequest.filters[fName] as RequestFilter;
 
-        if (filter.values) {
-          if (fName === 'dataset-id') {
-            if (!filter.values.includes(run.datasetId)) {
-              res = false;
-            }
-          }
-          if (fName === 'dataset-name') {
+      if (filter.values) {
+        if (fName === 'dataset-id') {
+          if (!filter.values.includes(run.datasetId)) {
             res = false;
-            filter.values.forEach((val: string) => {
-              if (run.datasetName.indexOf(val) > -1) {
-                res = true;
-              }
-            });
-          } else if (fName === 'date-from') {
-            const dateParam = Date.parse(filter.values[0]);
-            const runDate = Date.parse(run['creationTime']);
-            if (runDate < dateParam) {
-              res = false;
-            }
-          } else if (fName === 'date-to') {
-            const dateParam = Date.parse(filter.values[0]);
-            const runDate = Date.parse(run['creationTime']);
-            if (runDate > dateParam) {
-              res = false;
-            }
-          } else if (
-            !filter.values.includes(
-              (run as unknown as { [key: string]: string })[fName]
-            )
-          ) {
-            res = false;
-          } else {
-            filterproof.push(fName);
           }
         }
-      });
-      return res;
-    }
-  );
+        if (fName === 'dataset-name') {
+          res = false;
+          filter.values.forEach((val: string) => {
+            if (run.datasetName.indexOf(val) > -1) {
+              res = true;
+            }
+          });
+        } else if (fName === 'date-from') {
+          const dateParam = Date.parse(filter.values[0]);
+          const runDate = Date.parse(run['creationTime']);
+          if (runDate < dateParam) {
+            res = false;
+          }
+        } else if (fName === 'date-to') {
+          const dateParam = Date.parse(filter.values[0]);
+          const runDate = Date.parse(run['creationTime']);
+          if (runDate > dateParam) {
+            res = false;
+          }
+        } else if (
+          !filter.values.includes(
+            (run as unknown as { [key: string]: string })[fName]
+          )
+        ) {
+          res = false;
+        } else {
+          filterproof.push(fName);
+        }
+      }
+    });
+    return res;
+  });
 
   const facetNames = ['dataProvider', 'provider'];
 
