@@ -115,7 +115,7 @@
 
   @for (group of clioInfo().groupedRuns; track group) {
     <li class="group-header" [ngClass]="{ 'header-section': group.opened }">
-      <ul class="sublisting" style="position: relative">
+      <ul class="sublisting">
         <li>
           @if (graphMode) {
             <ng-container
