@@ -15,15 +15,31 @@
   </span>
 </ng-template>
 
-<ng-template #stateLink let-score="score">
+<ng-template #stateLink let-score="score" let-fnToggle="fnToggle">
   <a
-    (click)="graphMode = !graphMode"
-    (keyUp.enter)="graphMode = !graphMode"
+    (click)="fnToggle()"
+    (keyUp.enter)="fnToggle()"
     tabindex="0"
     [ngClass]="getClioClass(score)"
     class="clio-state"
     title="links in operation: {{ score }}%"
   ></a>
+</ng-template>
+
+<ng-template #bar let-score="score" let-fnCancel="fnCancel">
+  <span class="state-display">
+    <a (click)="fnCancel()" class="bar-label"> {{ score }}% </a>
+    <a class="bar-outer" (click)="fnCancel()">
+      <span
+        class="bar-inner"
+        title="links in operation: {{ score }}%"
+        [ngStyle]="{
+          width: score + '%'
+        }"
+      >
+      </span>
+    </a>
+  </span>
 </ng-template>
 
 <ul
@@ -91,27 +107,23 @@
       <ul class="sublisting" style="position: relative">
         <li>
           @if (graphMode) {
-            <span class="state-display">
-              <a (click)="graphMode = false" class="bar-label">
-                {{ group.percentInOperation }}%
-              </a>
-              <a class="bar-outer" (click)="graphMode = false">
-                <span
-                  class="bar-inner"
-                  title="links in operation: {{ group.percentInOperation }}%"
-                  [ngStyle]="{
-                    width: group.percentInOperation + '%'
-                  }"
-                >
-                </span>
-              </a>
-            </span>
+            <ng-container
+              [ngTemplateOutlet]="bar"
+              [ngTemplateOutletContext]="{
+                score: group.percentInOperation,
+                fnCancel: cancelGraphMode.bind(this)
+              }"
+            >
+            </ng-container>
           }
 
           <span class="state-display">
             <ng-container
               [ngTemplateOutlet]="stateLink"
-              [ngTemplateOutletContext]="{ score: group.percentInOperation }"
+              [ngTemplateOutletContext]="{
+                score: group.percentInOperation,
+                fnToggle: toggleGraphMode.bind(this)
+              }"
             >
             </ng-container>
 
@@ -161,12 +173,25 @@
                   <ng-container
                     [ngTemplateOutlet]="stateLink"
                     [ngTemplateOutletContext]="{
-                      score: entry.percentInOperation
+                      score: entry.percentInOperation,
+                      fnToggle: toggleGraphModeInner.bind(this)
                     }"
                   >
                   </ng-container>
 
-                  <span></span>
+                  @if (graphModeInner) {
+                    <ng-container
+                      [ngTemplateOutlet]="bar"
+                      [ngTemplateOutletContext]="{
+                        score: group.percentInOperation,
+                        fnCancel: cancelGraphModeInner.bind(this)
+                      }"
+                    >
+                    </ng-container>
+                  } @else {
+                    <span></span>
+                  }
+
                   <span></span>
 
                   <span class="centre">
@@ -217,7 +242,10 @@
       <span class="state-display">
         <ng-container
           [ngTemplateOutlet]="stateLink"
-          [ngTemplateOutletContext]="{ score: latestItem.percentInOperation }"
+          [ngTemplateOutletContext]="{
+            score: latestItem.percentInOperation,
+            fnToggle: toggleGraphMode.bind(this)
+          }"
         >
         </ng-container>
 

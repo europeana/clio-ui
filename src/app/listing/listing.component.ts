@@ -44,11 +44,10 @@ export class ListingComponent {
 
   listSelectionCount = 0;
   graphMode = false;
+  graphModeInner = false;
 
   requestDownload = output<void>();
   requestSummaryDatasetId = output<string>();
-
-  previewedId?: number;
 
   form = new UntypedFormGroup({
     run_ids: new UntypedFormGroup({})
@@ -75,6 +74,24 @@ export class ListingComponent {
         this.setCheckboxes(true);
       }
     });
+  }
+
+  cancelGraphMode(): void {
+    this.graphMode = false;
+  }
+
+  cancelGraphModeInner(): void {
+    this.graphModeInner = false;
+  }
+
+  toggleGraphMode(): void {
+    this.graphMode = !this.graphMode;
+    console.log('toggleGraphMode > ' + this.graphMode);
+  }
+
+  toggleGraphModeInner(): void {
+    this.graphModeInner = !this.graphModeInner;
+    console.log('graphModeInner > ' + this.graphModeInner);
   }
 
   setCheckboxes(val: boolean): void {
