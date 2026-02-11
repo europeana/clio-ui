@@ -68,6 +68,22 @@
       ></a>
     </span>
 
+    <span class="filter-label">Dataset Name</span>
+    <span class="input-wrapper">
+      <input
+        data-e2e="dataset-name"
+        placeholder="dataset name"
+        formControlName="datasetName"
+        (keyUp.enter)="updatePageUrl()"
+      />
+      <a
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl()"
+        (keyUp.enter)="updatePageUrl()"
+      ></a>
+    </span>
+
     <span class="filter-label">From</span>
     <span class="input-wrapper">
       <input

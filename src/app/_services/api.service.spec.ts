@@ -4,11 +4,13 @@ import {
   provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { APIService } from './';
 import {
   provideHttpClient,
   withInterceptorsFromDi
 } from '@angular/common/http';
+
+import { Run } from '../_models';
+import { APIService } from './';
 
 describe('API Service', () => {
   let service: APIService;
@@ -27,6 +29,21 @@ describe('API Service', () => {
 
   it('should create', () => {
     expect(service).toBeTruthy();
+  });
+
+  it('should group the runs', () => {
+    const grouped = service.groupRuns([
+      {
+        datasetId: 1
+      },
+      {
+        datasetId: 1
+      },
+      {
+        datasetId: 2
+      }
+    ] as unknown as Array<Run>);
+    expect(grouped.length).toEqual(2);
   });
 
   it('should get the filtered reports', () => {

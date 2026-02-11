@@ -183,6 +183,14 @@ export function dataServerRequest(
             if (!filter.values.includes(run.datasetId)) {
               res = false;
             }
+          }
+          if (fName === 'dataset-name') {
+            res = false;
+            filter.values.forEach((val: string) => {
+              if (run.datasetName.indexOf(val) > -1) {
+                res = true;
+              }
+            });
           } else if (fName === 'date-from') {
             const dateParam = Date.parse(filter.values[0]);
             const runDate = Date.parse(run['creationTime']);

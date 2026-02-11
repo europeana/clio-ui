@@ -20,7 +20,7 @@
     [attr.disabled]="!!fnToggle ? null : 'disabled'"
     (click)="fnToggle ? fnToggle() : undefined"
     (keyUp.enter)="fnToggle ? fnToggle() : undefined"
-    tabindex="0"
+    tabindex="!!fnToggle ? 0 : -1"
     [ngClass]="getClioClass(score)"
     class="clio-state"
     title="links in operation: {{ score }}%"

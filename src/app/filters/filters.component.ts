@@ -72,10 +72,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
   form = new UntypedFormGroup({
     dataProvider: new UntypedFormGroup({}),
     provider: new UntypedFormGroup({}),
-
     dateFrom: new FormControl(),
     dateTo: new FormControl(),
-
+    datasetName: new FormControl(),
     datasetId: new FormControl(),
     datasetIds: new UntypedFormGroup({})
   });
@@ -101,6 +100,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
       )
       .subscribe((queryParams) => {
         const datasetId = queryParams['dataset-id'];
+        const datasetName = queryParams['dataset-name'];
 
         if (datasetId) {
           const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
@@ -108,6 +108,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
             datasetIds.addControl(part.trim(), new FormControl(part));
           });
         }
+
         this.queryParams = queryParams;
 
         const dateFrom = this.queryParams['date-from'];
@@ -116,6 +117,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
         this.form.controls.dateFrom.setValue(dateFrom ? dateFrom[0] : '');
         this.form.controls.dateTo.setValue(dateTo ? dateTo[0] : '');
         this.form.controls.datasetId.setValue(datasetId ? datasetId[0] : '');
+        this.form.controls.datasetName.setValue(
+          datasetName ? datasetName[0] : ''
+        );
 
         this.loadData();
       });
@@ -183,6 +187,20 @@ export class FiltersComponent implements OnInit, OnDestroy {
           label: `${label} (${values[0]})`,
           fn: () => {
             this.form.patchValue({ datasetId: '' });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'dataset-name') {
+        const label = 'Dataset Name';
+        if (index > 0) {
+          res.push({
+            label: 'and'
+          });
+        }
+        res.push({
+          label: `${label} (${values[0]})`,
+          fn: () => {
+            this.form.patchValue({ datasetName: '' });
             this.updatePageUrl();
           }
         });
@@ -320,7 +338,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
       }
     );
 
-    const dataset = this.form.value.datasetId;
+    const datasetId = this.form.value.datasetId;
+    const datasetName = this.form.value.datasetName;
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
 
@@ -330,8 +349,11 @@ export class FiltersComponent implements OnInit, OnDestroy {
     if (valTo) {
       qp['date-to'] = getDateAsISOString(new Date(valTo));
     }
-    if (dataset) {
-      qp['dataset-id'] = dataset;
+    if (datasetId) {
+      qp['dataset-id'] = datasetId;
+    }
+    if (datasetName) {
+      qp['dataset-name'] = datasetName;
     }
 
     this.router.navigate([''], {

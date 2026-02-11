@@ -7,6 +7,12 @@ describe('prefilling', () => {
     cy.get('[data-e2e=dataset-id]').should('have.value', id);
   })
 
+  it('prefills the dataset name', () => {
+    const name = 'my_dataset_3';
+    cy.visit(`/?dataset-name=${name}`);
+    cy.get('[data-e2e=dataset-name]').should('have.value', name);
+  })
+
   it('prefills the filters (provider)', () => {
     const provider = 'CultureGrid';
     cy.visit(`/?provider=${provider}`);
