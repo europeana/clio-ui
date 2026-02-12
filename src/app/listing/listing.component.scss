@@ -3,6 +3,8 @@
 @use '../../scss/functions/mixins';
 @use '../../scss/functions/icon_urls';
 
+$cell-height: 2.25em;
+
 .align-centre {
   text-align: center;
 }
@@ -66,6 +68,23 @@
     font-weight: bold;
   }
 
+  &:has(.opener.opened)
+    .sublisting:not(.run-list, :has(.opener.opened))
+    > li:not(:hover) {
+    position: relative;
+    opacity: 0.7;
+    &::after {
+      backdrop-filter: blur(2.5px);
+      content: '';
+      display: block;
+      height: $cell-height;
+      position: absolute;
+      top: 0;
+      opacity: 0.4;
+      width: 100%;
+    }
+  }
+
   .sublisting {
     display: grid;
     grid-column: 1 / -1;
@@ -86,7 +105,7 @@
     }
 
     .csv-download-block {
-      height: 2.25em;
+      height: $cell-height;
       justify-content: center;
       transform: scale(0.75);
     }
@@ -116,7 +135,7 @@
     grid-template-columns: subgrid;
 
     * {
-      line-height: 2.25em;
+      line-height: $cell-height;
     }
   }
 
@@ -148,24 +167,23 @@
 
 .opener {
   display: flex;
-  //justify-content: center;
   align-items: center;
   position: relative;
   &::after {
     content: '>';
     display: block;
     font-weight: bold;
-    position: relative;
-    line-height: 1em;
-    transition: transform 0.3s linear;
-    transform: translateX(-0.4em) rotate(0deg);
-    transform-origin: center;
-    width: 1em;
     height: 1em;
-    margin-left: 1em;
+    line-height: 1em;
+    margin-left: auto;
+    position: relative;
+    transform: translateX(-1em) rotate(0deg);
+    transform-origin: right;
+    transition: transform 0.3s linear;
+    width: 2em;
   }
   &.opened::after {
-    transform: translateX(-0.4em) rotate(90deg);
+    transform: translate(-1.25em, 0.25em) rotate(90deg);
   }
 }
 
@@ -180,8 +198,12 @@
   }
 
   &.group-header {
-    border-bottom: 1px solid colours.$offwhite;
     top: 10rem;
+    .run-list {
+      margin-left: 1em;
+      border-left: 1px solid colours.$mid-grey;
+      border-bottom: 1px solid colours.$mid-grey;
+    }
   }
 }
 
