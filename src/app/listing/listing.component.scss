@@ -172,6 +172,7 @@ $cell-height: 2.25em;
 .opener {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   position: relative;
 
   &::after {
@@ -180,13 +181,12 @@ $cell-height: 2.25em;
     font-weight: bold;
     height: 1em;
     line-height: 1em;
-    margin-left: auto;
-    position: relative;
+    position: absolute;
     transform: translateX(-1em) rotate(0deg) scale(0.75);
     transform-origin: center;
     transition: transform 0.3s linear;
     width: 1em;
-    left: 1em;
+    right: -1em;
   }
   &.opened::after {
     transform: translate(-0.875em, 0) rotate(90deg) scale(0.75);
@@ -197,7 +197,7 @@ $cell-height: 2.25em;
   }
 
   .opener-content {
-    margin-right: 0.5em;
+    margin-right: 1.5em;
   }
 }
 
