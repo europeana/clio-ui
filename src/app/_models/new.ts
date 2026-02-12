@@ -27,7 +27,7 @@ export interface RunGroup {
 export interface ClioInfo {
   filterOps: { [key: string]: Array<string> };
   list: Array<Run>;
-  groupedRuns: Array<RunGroup>;
+  datasetRuns: { [key: string]: RunGroup };
   listLength: number;
   listAverageScore: number;
   titleMarkup: Array<{ label: string; fn?: () => void }>;

@@ -56,7 +56,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
   modelClioInfo: ModelSignal<ClioInfo> = model({
-    groupedRuns: [],
+    datasetRuns: {},
     list: [],
     listLength: -1,
     listAverageScore: -1,
@@ -132,10 +132,6 @@ export class FiltersComponent implements OnInit, OnDestroy {
       }
     });
     this.subs = [];
-  }
-
-  downloadDatasetHistoric(id: string): void {
-    console.log('downloadDatasetHistoric ' + id);
   }
 
   summariseDatasetId(id: string): void {
@@ -308,7 +304,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
           this.modelClioInfo.set({
             filterOps: ops,
-            groupedRuns: this.api.groupRuns(list),
+            datasetRuns: this.api.groupRunsByDatasetId(list),
             list,
             listLength: list.length,
             listAverageScore,

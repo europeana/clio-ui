@@ -95,8 +95,8 @@
         <a
           class="csv-download-block"
           tabindex="0"
-          (click)="requestDownload.emit()"
-          (keyUp.enter)="requestDownload.emit()"
+          (click)="requestDownloadAll.emit()"
+          (keyUp.enter)="requestDownloadAll.emit()"
           [attr.label]="text"
         ></a>
       </span>
@@ -113,7 +113,10 @@
     }
   </li>
 
-  @for (group of clioInfo().groupedRuns; track group) {
+  @for (dsRun of clioInfo().datasetRuns | keyvalue; track dsRun.key) {
+    @let group = dsRun.value;
+    @let dsId = dsRun.key;
+
     <li class="group-header" [ngClass]="{ 'header-section': group.opened }">
       <ul class="sublisting">
         <li>
@@ -146,7 +149,7 @@
             (click)="group.opened = !group.opened"
             (keyUp.enter)="group.opened = !group.opened"
           >
-            {{ group.list[0].datasetId }}
+            {{ dsId }}
             {{ group.list[0].datasetName }}
           </a>
 
@@ -163,8 +166,8 @@
               class="csv-download-block"
               target="_blank"
               tabindex="0"
-              (click)="requestSummaryDatasetHistoric.emit(group.list[0].datasetId)"
-              (keyUp.enter)="requestSummaryDatasetHistoric.emit(group.list[0].datasetId)"
+              (click)="requestDownloadDataset.emit(dsId)"
+              (keyUp.enter)="requestDownloadDataset.emit(dsId)"
             ></a>
           </span>
 

@@ -9,7 +9,11 @@ import { FormGroup } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
-import { MockAPIService, MockAPIServiceErrors } from './_mocked';
+import {
+  MockAPIService,
+  MockAPIServiceErrors,
+  MockFiltersComponent
+} from './_mocked';
 import { APIService, ClickService } from './_services';
 
 import { AppComponent } from './app.component';
@@ -34,7 +38,13 @@ describe('AppComponent', () => {
           useClass: errorMode ? MockAPIServiceErrors : MockAPIService
         }
       ]
-    }).compileComponents();
+    })
+      .overrideComponent(AppComponent, {
+        remove: { imports: [FiltersComponent] },
+        add: { imports: [MockFiltersComponent] }
+      })
+      .compileComponents();
+
     api = TestBed.inject(APIService);
     clicks = TestBed.inject(ClickService);
   };
@@ -68,8 +78,33 @@ describe('AppComponent', () => {
       expect(spyNext).toHaveBeenCalledTimes(2);
     }));
 
+    it('should download datasets', () => {
+      jest.spyOn(app.filters, 'getDataServerDataRequest');
+      jest.spyOn(api, 'getDownloadDataset');
+      app.listing = {
+        form: {
+          value: {
+            run_ids: ['1']
+          }
+        } as unknown as FormGroup,
+        clioInfo: () => {
+          return {
+            datasetRuns: {
+              x: {
+                list: []
+              }
+            }
+          };
+        }
+      } as unknown as ListingComponent;
+
+      app.downloadDataset('x');
+      expect(app.filters.getDataServerDataRequest).toHaveBeenCalled();
+      expect(api.getDownloadDataset).toHaveBeenCalled();
+    });
+
     it('should download all', () => {
-      jest.spyOn(api, 'getDownload');
+      jest.spyOn(api, 'getDownloadAll');
       app.listing = {
         form: {
           value: {
@@ -84,7 +119,7 @@ describe('AppComponent', () => {
 
       app.downloadAll();
       expect(app.filters.getDataServerDataRequest).toHaveBeenCalled();
-      expect(api.getDownload).toHaveBeenCalled();
+      expect(api.getDownloadAll).toHaveBeenCalled();
     });
   });
 });

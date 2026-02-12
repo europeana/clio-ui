@@ -1,5 +1,6 @@
 import {
   DatePipe,
+  KeyValuePipe,
   NgClass,
   NgFor,
   NgStyle,
@@ -31,6 +32,7 @@ import { CheckboxComponent } from '../checkbox';
   imports: [
     CheckboxComponent,
     DatePipe,
+    KeyValuePipe,
     NgClass,
     NgFor,
     NgStyle,
@@ -44,9 +46,9 @@ export class ListingComponent {
 
   listSelectionCount = 0;
   graphMode = false;
-  requestDownload = output<void>();
+  requestDownloadAll = output<void>();
   requestSummaryDatasetId = output<string>();
-  requestSummaryDatasetHistoric = output<string>();
+  requestDownloadDataset = output<string>();
 
   form = new UntypedFormGroup({
     run_ids: new UntypedFormGroup({})

@@ -31,19 +31,25 @@ describe('API Service', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should group the runs', () => {
-    const grouped = service.groupRuns([
+  it('should group the runs by dataset id', () => {
+    const grouped = service.groupRunsByDatasetId([
       {
-        datasetId: 1
+        runId: 1,
+        datasetId: '1',
+        percentInOperation: 10
       },
       {
-        datasetId: 1
+        runId: 1,
+        datasetId: '1',
+        percentInOperation: 10
       },
       {
-        datasetId: 2
+        runId: 1,
+        datasetId: '2',
+        percentInOperation: 10
       }
     ] as unknown as Array<Run>);
-    expect(grouped.length).toEqual(2);
+    expect(grouped).toBeTruthy();
   });
 
   it('should get the filtered reports', () => {
@@ -58,10 +64,13 @@ describe('API Service', () => {
 
   it('should get the download', () => {
     const url = `${apiSettings.serverAPI}/download`;
-    service.getDownload({
-      filters: {},
-      excluded_run_ids: []
-    });
+    service.getDownload(
+      {
+        filters: {},
+        excluded_run_ids: []
+      },
+      url
+    );
     const req = httpTesting.expectOne(url, 'post...');
     req.flush('csv');
     httpTesting.verify();

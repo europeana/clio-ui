@@ -17,17 +17,12 @@ import { apiSettings } from '../../environments/apisettings';
 export class APIService {
   constructor(private readonly http: HttpClient) {}
 
-  /** getRunAverage
-   *  calculates average percentInOperation
+  /** groupRunsByDatasetId
+   *  maps array entries - keys by dataset id,
+   *  initialises the opened and percentInOperation fields
    **/
-
-  // TODO
-
-  /** groupRuns
-   *  groups array entries by dataset id,
-   *  initialising the opened and percentInOperation fields
-   **/
-  groupRuns(results: Array<Run>): Array<RunGroup> {
+  groupRunsByDatasetId(results: Array<Run>): { [key: string]: RunGroup } {
+    const res: { [key: string]: RunGroup } = {};
     const mapped = results.reduce(
       (map: { [key: string]: Array<Run> }, run: Run) => {
         const id = run.datasetId;
@@ -38,18 +33,18 @@ export class APIService {
       {}
     );
 
-    return Object.keys(mapped).map((id: string) => {
+    Object.keys(mapped).forEach((id: string) => {
       const list = mapped[id];
       const percentInOperation = Math.floor(
         list.reduce((sum, obj) => sum + obj.percentInOperation, 0) / list.length
       );
-      return {
+      res[id] = {
         list,
         opened: false,
-        url: `${apiSettings.serverAPI}/download-historic?dataset-id=${id}`,
         percentInOperation
       };
     });
+    return res;
   }
 
   getFilteredReports(request: BreakdownRequest): Observable<BreakdownResults> {
@@ -79,13 +74,21 @@ export class APIService {
     document.body.removeChild(anchor);
   }
 
-  getDownload(request: DownloadRequest): void {
+  getDownloadAll(request: DownloadRequest): void {
+    this.getDownload(request, `${apiSettings.serverAPI}/download`);
+  }
+
+  getDownloadDataset(request: DownloadRequest): void {
+    this.getDownload(request, `${apiSettings.serverAPI}/download-dataset`);
+  }
+
+  getDownload(request: DownloadRequest, url: string): void {
     const headers = new HttpHeaders().set(
       'Content-Type',
       'text/plain; charset=utf-8'
     );
     this.http
-      .post(`${apiSettings.serverAPI}/download`, request, {
+      .post(url, request, {
         headers: headers,
         responseType: 'text'
       })

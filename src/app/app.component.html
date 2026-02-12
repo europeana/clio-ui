@@ -9,8 +9,8 @@
       <app-listing
         #listing
         (requestSummaryDatasetId)="filters.summariseDatasetId($event)"
-        (requestSummaryDatasetHistoric)="filters.downloadDatasetHistoric($event)"
-        (requestDownload)="downloadAll()"
+        (requestDownloadDataset)="downloadDataset($event)"
+        (requestDownloadAll)="downloadAll()"
         [clioInfo]="filters.modelClioInfo"
       ></app-listing>
     </div>

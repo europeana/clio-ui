@@ -1,6 +1,12 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { BreakdownRequest, BreakdownResults, Run, RunGroup } from '../_models';
+import {
+  BreakdownRequest,
+  BreakdownResults,
+  DownloadRequest,
+  Run,
+  RunGroup
+} from '../_models';
 
 export class MockAPIService {
   errorMode = false;
@@ -13,12 +19,18 @@ export class MockAPIService {
     );
   }
 
-  groupRuns(_: Array<Run>): Array<RunGroup> {
-    return [] as Array<RunGroup>;
+  groupRunsByDatasetId(_: Array<Run>): { [key: string]: RunGroup } {
+    return {} as { [key: string]: RunGroup };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   getDownload(_: BreakdownRequest): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  getDownloadAll(_: DownloadRequest): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  getDownloadDataset(_: DownloadRequest): void {}
 
   getFilteredReports(_: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
