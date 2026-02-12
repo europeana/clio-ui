@@ -134,15 +134,6 @@ export class FiltersComponent implements OnInit, OnDestroy {
     this.subs = [];
   }
 
-  summariseDatasetId(id: string): void {
-    if (this.form.value['datasetId'] === id) {
-      this.form.controls.datasetId.setValue(undefined);
-    } else {
-      this.form.controls.datasetId.setValue(id);
-    }
-    this.updatePageUrl();
-  }
-
   generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
     const res: Array<{ label: string; fn?: () => void }> = [];
     const queryKeys = Object.keys(this.queryParams);

@@ -64,6 +64,7 @@ export class APIService {
 
   async download(data: string, downloadName: string): Promise<void> {
     const anchor = document.createElement('a');
+    anchor.className = 'download-anchor';
     anchor.href = window.URL.createObjectURL(
       new Blob([data], { type: 'text/csv;charset=utf-8' })
     );

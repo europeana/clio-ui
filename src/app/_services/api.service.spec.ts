@@ -62,6 +62,24 @@ describe('API Service', () => {
       });
   });
 
+  it('should get the download (all)', () => {
+    jest.spyOn(service, 'getDownload');
+    service.getDownloadAll({
+      filters: {},
+      excluded_run_ids: []
+    });
+    expect(service.getDownload).toHaveBeenCalled();
+  });
+
+  it('should get the download (dataset)', () => {
+    jest.spyOn(service, 'getDownload');
+    service.getDownloadDataset({
+      filters: {},
+      excluded_run_ids: []
+    });
+    expect(service.getDownload).toHaveBeenCalled();
+  });
+
   it('should get the download', () => {
     const url = `${apiSettings.serverAPI}/download`;
     service.getDownload(

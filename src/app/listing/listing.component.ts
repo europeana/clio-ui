@@ -49,7 +49,6 @@ export class ListingComponent {
   listSelectionCount = 0;
   graphMode = false;
   requestDownloadAll = output<void>();
-  requestSummaryDatasetId = output<string>();
   requestDownloadDataset = output<string>();
 
   form = new UntypedFormGroup({

@@ -53,13 +53,6 @@ describe('FiltersComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should summarise by datasetId', () => {
-      jest.spyOn(component, 'updatePageUrl');
-      component.ngOnInit();
-      component.summariseDatasetId('1');
-      expect(component.updatePageUrl).toHaveBeenCalled();
-    });
-
     it('should update the page location', () => {
       jest.spyOn(router, 'navigate');
       component.ngOnInit();
@@ -67,6 +60,16 @@ describe('FiltersComponent', () => {
       component.updatePageUrl();
       expect(router.navigate).toHaveBeenCalled();
     });
+
+    it('should react to the page params (dataset-name)', fakeAsync(() => {
+      jest.spyOn(component, 'loadData');
+      component.ngOnInit();
+      queryParams.next({});
+      queryParams.next({ 'dataset-name': 'my_dataset' });
+      tick(0);
+      fixture.detectChanges();
+      expect(component.loadData).toHaveBeenCalled();
+    }));
 
     it('should react to the page params (dataset-id)', fakeAsync(() => {
       jest.spyOn(component, 'loadData');
@@ -138,7 +141,9 @@ describe('FiltersComponent', () => {
       queryParams.next({
         provider: ['A', 'B'],
         'date-from': '19:12:76',
-        'date-to': '19:12:77'
+        'date-to': '19:12:77',
+        'dataset-id': '1',
+        'dataset-name': 'my_dataset'
       });
       tick(1);
       fixture.detectChanges();

@@ -1,5 +1,3 @@
-<a #downloadAnchor tabindex="-1"></a>
-
 <ng-template
   #dateCheckbox
   let-time="time"
@@ -9,26 +7,34 @@
   let-datasetList="datasetList"
 >
   <span class="last-cell" [ngClass]="{ 'top-time': isTopTime }">
-    <span class="time-label">
-      {{ time | date: DATE_CONCISE_FMT }}
-    </span>
-    @if (isTopTime) {
-      <span class="time-label-all"> all </span>
-      <app-checkbox
-        [form]="formDatasets"
-        [controlName]="datasetId + ''"
-        [title]="'zzzzzzzzzzzzzzzzzzzzzzzzzzz'"
-        [group]="'dataset_ids'"
-        (valueChanged)="checkAll(datasetId, datasetList)"
-      ></app-checkbox>
-    } @else {
+    <span class="time">
+      <span>
+        {{ time | date: DATE_CONCISE_FMT }}
+      </span>
       <app-checkbox
         [form]="form"
         [controlName]="runId + ''"
-        [title]="'include in top-level download'"
+        [title]="'include in download'"
         [group]="'run_ids'"
         (valueChanged)="updateIds()"
       ></app-checkbox>
+    </span>
+
+    @if (isTopTime) {
+      <span class="time-all">
+        <span>all</span>
+        <app-checkbox
+          [form]="formDatasets"
+          [controlName]="datasetId + ''"
+          [attr.title]="
+            (formDatasets.value['dataset_ids'][datasetId]
+              ? 'uncheck'
+              : 'check') + ' all'
+          "
+          [group]="'dataset_ids'"
+          (valueChanged)="checkAll(datasetId, datasetList)"
+        ></app-checkbox>
+      </span>
     }
   </span>
 </ng-template>
@@ -78,7 +84,7 @@
   }"
   libClickAware
   (clickOutside)="clickOutside()"
-  [ignoreClasses]="[]"
+  [ignoreClasses]="['download-anchor']"
 >
   <li class="header-section">
     @let clioInfoValue = clioInfo();
@@ -191,6 +197,7 @@
               class="csv-download-block"
               target="_blank"
               tabindex="0"
+              [attr.title]="'download history for dataset \'' + dsId + '\''"
               (click)="requestDownloadDataset.emit(dsId)"
               (keyUp.enter)="requestDownloadDataset.emit(dsId)"
             ></a>
@@ -235,6 +242,7 @@
                     <a
                       class="csv-download"
                       target="_blank"
+                      title="download run data"
                       [href]="group.list[0].url"
                     ></a>
                   </span>

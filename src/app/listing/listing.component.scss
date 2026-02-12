@@ -91,21 +91,21 @@ $cell-height: 2.25em;
     grid-template-columns: subgrid;
     position: relative;
 
+    .time-all,
+    .time {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+
     :not(:has(.opener.opened)) {
-      .top-time {
-        .time-label-all {
-          display: none;
-        }
+      .top-time .time-all {
+        display: none;
       }
     }
     :has(.opener.opened) {
-      .top-time {
-        .time-label-all {
-          font-weight: bold;
-        }
-        .time-label:not(.time-label-all) {
-          display: none;
-        }
+      .top-time .time {
+        display: none;
       }
     }
 

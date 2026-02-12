@@ -75,6 +75,49 @@ describe('ListingComponent', () => {
     expect(cmp.value['1']).toBeTruthy();
   });
 
+  it('should handle clicks outside', () => {
+    component.clioInfo.set({
+      ...structuredClone(clioInfo),
+      datasetRuns: {
+        '1': {
+          list: [
+            {
+              runId: 0,
+              creationTime: '',
+              datasetId: '1',
+              datasetName: '1',
+              dataProvider: '',
+              provider: '',
+              percentInOperation: 0,
+              url: ''
+            }
+          ],
+          opened: true,
+          percentInOperation: 0
+        }
+      }
+    });
+    TestBed.flushEffects();
+
+    expect(component.clioInfo().datasetRuns['1']?.opened).toBeTruthy();
+    component.clickOutside();
+    expect(component.clioInfo().datasetRuns['1']?.opened).toBeFalsy();
+  });
+
+  it('should cancel the graph mode', () => {
+    component.graphMode = true;
+    component.cancelGraphMode();
+    expect(component.graphMode).toBeFalsy();
+  });
+
+  it('should toggle the graph mode', () => {
+    expect(component.graphMode).toBeFalsy();
+    component.toggleGraphMode();
+    expect(component.graphMode).toBeTruthy();
+    component.toggleGraphMode();
+    expect(component.graphMode).toBeFalsy();
+  });
+
   it('should update the list selection count', () => {
     expect(component.listSelectionCount).toEqual(0);
 
