@@ -8,8 +8,6 @@ import {
 } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-
-//import { SubscriptionManager } from '../subscription-manager/subscription.manager';
 import { ClickService } from '../_services/click.service';
 
 @Directive({
@@ -18,7 +16,6 @@ import { ClickService } from '../_services/click.service';
   standalone: true
 })
 export class ClickAwareDirective {
-  //export class ClickAwareDirective extends SubscriptionManager {
   @Input() ignoreClasses: Array<string> = [];
   @Input() clickAwareIgnoreWhen?: boolean;
   @Output() clickOutside: EventEmitter<void> = new EventEmitter();

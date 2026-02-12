@@ -21,6 +21,7 @@ import {
 } from '@angular/forms';
 
 import { DATE_CONCISE_FMT } from '../_data/static/date-formats';
+import { ClickAwareDirective } from '../_directives';
 import { ClioInfo, Run } from '../_models';
 import { RenameFilterPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
@@ -31,6 +32,7 @@ import { CheckboxComponent } from '../checkbox';
   styleUrls: ['./listing.component.scss'],
   imports: [
     CheckboxComponent,
+    ClickAwareDirective,
     DatePipe,
     KeyValuePipe,
     NgClass,
@@ -75,6 +77,15 @@ export class ListingComponent {
         this.setCheckboxes(true);
       }
     });
+  }
+
+  clickOutside(): void {
+    const datasetRuns = this.clioInfo().datasetRuns;
+    if (datasetRuns) {
+      Object.keys(datasetRuns).forEach((key: string) => {
+        datasetRuns[key].opened = false;
+      });
+    }
   }
 
   cancelGraphMode(): void {

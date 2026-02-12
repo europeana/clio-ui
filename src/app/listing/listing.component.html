@@ -58,6 +58,9 @@
   [ngClass]="{
     'extra-col': graphMode
   }"
+  libClickAware
+  (clickOutside)="clickOutside()"
+  [ignoreClasses]="[]"
 >
   <li class="header-section">
     @let clioInfoValue = clioInfo();
