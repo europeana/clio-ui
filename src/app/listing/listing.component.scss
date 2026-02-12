@@ -91,11 +91,14 @@ $cell-height: 2.25em;
     grid-template-columns: subgrid;
     position: relative;
 
-    .opener-content,
     * {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .opener :first-child {
+      overflow: visible;
     }
 
     .clio-state {
@@ -166,14 +169,11 @@ $cell-height: 2.25em;
   margin-right: 0.25em;
 }
 
-.opener-content {
-  margin-right: 0.5em;
-}
-
 .opener {
   display: flex;
   align-items: center;
   position: relative;
+
   &::after {
     content: '\25b6';
     display: block;
@@ -190,6 +190,14 @@ $cell-height: 2.25em;
   }
   &.opened::after {
     transform: translate(-0.875em, 0) rotate(90deg) scale(0.75);
+  }
+
+  :first-child {
+    margin-right: 0.75em;
+  }
+
+  .opener-content {
+    margin-right: 0.5em;
   }
 }
 

@@ -152,8 +152,10 @@
             (click)="group.opened = !group.opened"
             (keyUp.enter)="group.opened = !group.opened"
           >
+            <span>
+              {{ dsId }}
+            </span>
             <span class="opener-content">
-              {{ dsId }} /
               {{ group.list[0].datasetName }}
             </span>
           </a>
