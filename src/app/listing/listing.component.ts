@@ -56,25 +56,43 @@ export class ListingComponent {
     run_ids: new UntypedFormGroup({})
   });
 
+  formDatasets = new UntypedFormGroup({
+    dataset_ids: new UntypedFormGroup({})
+  });
+
   @Input() clioInfo: ModelSignal<ClioInfo>;
 
+  /**
+   * when info changes...
+   * add form controls (run ids)
+   * add form controls (group ids)
+   * update the listSelectionCount
+   * reset checkboxes
+   **/
   constructor() {
     effect(() => {
       if (this.clioInfo().list) {
-        this.setCheckboxes(false);
-        const list = this.clioInfo().list;
-        const formGroup = this.form.get('run_ids') as UntypedFormGroup;
+        this.setRunCheckboxes(false);
+        const runFormGroup = this.form.get('run_ids') as UntypedFormGroup;
+        const datasetFormGroup = this.formDatasets.get(
+          'dataset_ids'
+        ) as UntypedFormGroup;
 
+        const list = this.clioInfo().list;
         list.forEach((report: Run) => {
           const fName = `${report.runId}`;
-          const ctrl = this.form.get(fName);
-          if (!ctrl) {
-            formGroup.addControl(fName, new FormControl(true, []));
+          const ctrlRun = this.form.get(fName);
+          if (!ctrlRun) {
+            runFormGroup.addControl(fName, new FormControl(true, []));
+          }
+          const dsId = `${report.datasetId}`;
+          const ctrlDatset = this.formDatasets.get(dsId);
+          if (!ctrlDatset) {
+            datasetFormGroup.addControl(dsId, new FormControl(true, []));
           }
         });
-
         this.listSelectionCount = list.length;
-        this.setCheckboxes(true);
+        this.setRunCheckboxes(true);
       }
     });
   }
@@ -96,7 +114,7 @@ export class ListingComponent {
     this.graphMode = !this.graphMode;
   }
 
-  setCheckboxes(val: boolean): void {
+  setRunCheckboxes(val: boolean): void {
     Object.keys(this.form.controls).forEach((group: string) => {
       Object.keys((this.form.get(group) as UntypedFormGroup).controls).forEach(
         (key) => {
@@ -114,6 +132,15 @@ export class ListingComponent {
         }
       );
     });
+  }
+
+  checkAll(datasetId: string, groupList: Array<Run>): void {
+    const val = this.formDatasets.value['dataset_ids'][datasetId];
+    groupList.forEach((run: Run) => {
+      const ctrl = this.form.get('run_ids.' + run.runId) as FormControl;
+      ctrl.setValue(val);
+    });
+    this.updateIds();
   }
 
   getClioClass(score: number): string {

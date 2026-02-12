@@ -58,7 +58,7 @@ $cell-height: 2.25em;
 .listing {
   border-top: 1px solid variables.$clio-colour;
   display: grid;
-  grid-template-columns: repeat(6, auto);
+  grid-template-columns: 2em repeat(5, auto);
   grid-column-gap: 1em;
   padding: 0;
   position: relative;
@@ -90,6 +90,24 @@ $cell-height: 2.25em;
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
     position: relative;
+
+    :not(:has(.opener.opened)) {
+      .top-time {
+        .time-label-all {
+          display: none;
+        }
+      }
+    }
+    :has(.opener.opened) {
+      .top-time {
+        .time-label-all {
+          font-weight: bold;
+        }
+        .time-label:not(.time-label-all) {
+          display: none;
+        }
+      }
+    }
 
     * {
       overflow: hidden;

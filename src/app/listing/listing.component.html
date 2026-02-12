@@ -1,17 +1,35 @@
 <a #downloadAnchor tabindex="-1"></a>
 
-<ng-template #dateCheckbox let-time="time" let-runId="runId">
-  <span class="last-cell">
-    <span>
+<ng-template
+  #dateCheckbox
+  let-time="time"
+  let-runId="runId"
+  let-isTopTime="isTopTime"
+  let-datasetId="datasetId"
+  let-datasetList="datasetList"
+>
+  <span class="last-cell" [ngClass]="{ 'top-time': isTopTime }">
+    <span class="time-label">
       {{ time | date: DATE_CONCISE_FMT }}
     </span>
-    <app-checkbox
-      [form]="form"
-      [controlName]="runId + ''"
-      [title]="'include in top-level download'"
-      [group]="'run_ids'"
-      (valueChanged)="updateIds()"
-    ></app-checkbox>
+    @if (isTopTime) {
+      <span class="time-label-all"> all </span>
+      <app-checkbox
+        [form]="formDatasets"
+        [controlName]="datasetId + ''"
+        [title]="'zzzzzzzzzzzzzzzzzzzzzzzzzzz'"
+        [group]="'dataset_ids'"
+        (valueChanged)="checkAll(datasetId, datasetList)"
+      ></app-checkbox>
+    } @else {
+      <app-checkbox
+        [form]="form"
+        [controlName]="runId + ''"
+        [title]="'include in top-level download'"
+        [group]="'run_ids'"
+        (valueChanged)="updateIds()"
+      ></app-checkbox>
+    }
   </span>
 </ng-template>
 
@@ -182,7 +200,10 @@
             [ngTemplateOutlet]="dateCheckbox"
             [ngTemplateOutletContext]="{
               time: group.list[0].creationTime,
-              runId: group.list[0].runId + ''
+              runId: group.list[0].runId + '',
+              isTopTime: true,
+              datasetId: dsId,
+              datasetList: group.list
             }"
           >
           </ng-container>

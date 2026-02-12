@@ -69,9 +69,9 @@ describe('ListingComponent', () => {
     const cmp = component.form.controls.run_ids as FormGroup;
 
     expect(cmp.value['1']).toBeTruthy();
-    component.setCheckboxes(false);
+    component.setRunCheckboxes(false);
     expect(cmp.value['1']).toBeFalsy();
-    component.setCheckboxes(true);
+    component.setRunCheckboxes(true);
     expect(cmp.value['1']).toBeTruthy();
   });
 
