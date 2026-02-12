@@ -78,13 +78,13 @@ export class ListingComponent {
         ) as UntypedFormGroup;
 
         const list = this.clioInfo().list;
-        list.forEach((report: Run) => {
-          const fName = `${report.runId}`;
+        list.forEach((run: Run) => {
+          const fName = `${run.runId}`;
           const ctrlRun = this.form.get(fName);
           if (!ctrlRun) {
             runFormGroup.addControl(fName, new FormControl(true, []));
           }
-          const dsId = `${report.datasetId}`;
+          const dsId = `${run.datasetId}`;
           const ctrlDatset = this.formDatasets.get(dsId);
           if (!ctrlDatset) {
             datasetFormGroup.addControl(dsId, new FormControl(true, []));

@@ -32,9 +32,9 @@ export class MockAPIService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   getDownloadDataset(_: DownloadRequest): void {}
 
-  getFilteredReports(_: BreakdownRequest): Observable<BreakdownResults> {
+  getFilteredRuns(_: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
-      return this.getError('mock getFilteredReports throws error');
+      return this.getError('mock getFilteredRuns throws error');
     }
     return of({
       filteringOptions: {},

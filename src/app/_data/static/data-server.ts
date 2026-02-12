@@ -166,7 +166,7 @@ export function dataServerRequest(
 ): BreakdownResults {
   const filterproof: Array<string> = [];
   const specifiedFilterNames = Object.keys(breakdownRequest.filters);
-  const filteredReports = structuredClone(allRunData).filter((run: Run) => {
+  const filteredRuns = structuredClone(allRunData).filter((run: Run) => {
     let res = true;
 
     specifiedFilterNames.forEach((fName: string) => {
@@ -218,7 +218,7 @@ export function dataServerRequest(
       const possibleValues = getDistinctValues(
         filterproof.includes(fName)
           ? structuredClone(allRunData)
-          : filteredReports,
+          : filteredRuns,
         fName
       );
       result[fName] = possibleValues;
@@ -229,6 +229,6 @@ export function dataServerRequest(
 
   return {
     filteringOptions: filterOptions,
-    results: filteredReports
+    results: filteredRuns
   };
 }

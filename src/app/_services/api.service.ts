@@ -47,9 +47,9 @@ export class APIService {
     return res;
   }
 
-  getFilteredReports(request: BreakdownRequest): Observable<BreakdownResults> {
+  getFilteredRuns(request: BreakdownRequest): Observable<BreakdownResults> {
     return this.http
-      .post<BreakdownResults>(`${apiSettings.serverAPI}/reports`, request)
+      .post<BreakdownResults>(`${apiSettings.serverAPI}/runs`, request)
       .pipe(
         catchError(() => {
           const fakeResult = dataServerRequest(request);

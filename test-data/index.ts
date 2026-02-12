@@ -77,23 +77,23 @@ new (class {
           const csvData = srv.csvFromRuns(data);
           response.end(csvData);
         }
-        else if(route.match(/\/reports/)) {
+        else if(route.match(/\/runs/)) {
           this.handleBreakdownRequest(response, br);
         }
       });
-      return;
     }
     else if(route.includes('download-historic')) {
       this.headerText(response);
       response.end('csv-for-historic');
-      return;
     }
-    else if(route.match(/\/report/)) {
+    else if(route.match(/\/run/)) {
       this.headerText(response);
-      response.end('csv-for-individual-report');
-      return;
+      response.end('csv-for-individual-run');
     }
-    response.end({});
+    else {
+      this.headerText(response);
+      response.end('csv not found for route: ' + route);
+    }
   }
 
   /** handleBreakdownRequest

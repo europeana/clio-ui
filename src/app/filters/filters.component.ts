@@ -139,7 +139,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const queryKeys = Object.keys(this.queryParams);
 
     if (!queryKeys || queryKeys.length === 0) {
-      res.push({ label: 'All reports' });
+      res.push({ label: 'All runs' });
     }
 
     queryKeys.forEach((key: string, index: number) => {
@@ -269,7 +269,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     this.error = undefined;
     this.subs.push(
       this.api
-        .getFilteredReports(this.getDataServerDataRequest())
+        .getFilteredRuns(this.getDataServerDataRequest())
         .pipe(
           catchError((err: HttpErrorResponse) => {
             this.error = err;

@@ -1,7 +1,8 @@
 @use '../colours';
 
 @mixin empty-list {
-  color: colours.$mid-grey;
+  grid-column: 1 /3;
+  color: #777;
   font-style: italic;
   left: 1.7em;
   position: relative;

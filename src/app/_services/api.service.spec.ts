@@ -54,7 +54,7 @@ describe('API Service', () => {
 
   it('should get the filtered reports', () => {
     service
-      .getFilteredReports({
+      .getFilteredRuns({
         filters: {}
       })
       .subscribe((data: unknown) => {
