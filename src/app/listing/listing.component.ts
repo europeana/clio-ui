@@ -46,6 +46,7 @@ export class ListingComponent {
   graphMode = false;
   requestDownload = output<void>();
   requestSummaryDatasetId = output<string>();
+  requestSummaryDatasetHistoric = output<string>();
 
   form = new UntypedFormGroup({
     run_ids: new UntypedFormGroup({})

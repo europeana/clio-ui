@@ -158,13 +158,13 @@
             {{ group.list[0].provider }}
           </span>
 
-          <!-- TODO: url endpoint for dataset (historic) -->
-
           <span class="centre">
             <a
               class="csv-download-block"
               target="_blank"
-              [href]="group.list[0].url"
+              tabindex="0"
+              (click)="requestSummaryDatasetHistoric.emit(group.list[0].datasetId)"
+              (keyUp.enter)="requestSummaryDatasetHistoric.emit(group.list[0].datasetId)"
             ></a>
           </span>
 

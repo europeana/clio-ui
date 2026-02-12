@@ -134,6 +134,10 @@ export class FiltersComponent implements OnInit, OnDestroy {
     this.subs = [];
   }
 
+  downloadDatasetHistoric(id: string): void {
+    console.log('downloadDatasetHistoric ' + id);
+  }
+
   summariseDatasetId(id: string): void {
     if (this.form.value['datasetId'] === id) {
       this.form.controls.datasetId.setValue(undefined);
@@ -198,7 +202,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
           });
         }
         res.push({
-          label: `${label} (${values[0]})`,
+          label: `${label} "${values[0]}"`,
           fn: () => {
             this.form.patchValue({ datasetName: '' });
             this.updatePageUrl();

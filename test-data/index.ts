@@ -33,7 +33,7 @@ new (class {
   }
 
   headerText(response: ServerResponse): void {
-    response.setHeader('Content-Type', 'text/html;charset=UTF-8');
+    response.writeHead(200, {'Content-Type':'text/csv;charset=utf-8'});
   }
 
   handleOptions(response: ServerResponse){
@@ -82,7 +82,13 @@ new (class {
         }
       });
       return;
-    } else if(route.match(/\/report/)) {
+    }
+    else if(route.includes('download-historic')) {
+      this.headerText(response);
+      response.end('csv-for-historic');
+      return;
+    }
+    else if(route.match(/\/report/)) {
       this.headerText(response);
       response.end('csv-for-individual-report');
       return;

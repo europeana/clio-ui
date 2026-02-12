@@ -169,18 +169,20 @@ describe('FiltersComponent', () => {
       const clause1 = 'provider A or B';
       const clause2 = 'dataProvider C or D';
       const clause3 = 'Dataset Id (101)';
-      const clause4 = 'from Dec 12th';
-      const clause5 = 'until June 10th';
+      const clause4 = 'Dataset Name "MyDataset"';
+      const clause5 = 'from Dec 12th';
+      const clause6 = 'until June 10th';
       component.queryParams = {
         provider: ['A', 'B'],
         dataProvider: ['C', 'D'],
         'dataset-id': ['101'],
+        'dataset-name': ['MyDataset'],
         'date-from': ['Dec 12th'],
         'date-to': ['June 10th']
       };
       markup = component.generateTitleMarkup();
       expect(markup.map((m) => m.label).join(' ')).toEqual(
-        `${clause1} and ${clause2} and ${clause3} ${clause4} ${clause5}`
+        `${clause1} and ${clause2} and ${clause3} and ${clause4} ${clause5} ${clause6}`
       );
       jest.spyOn(component.form, 'patchValue');
       markup.forEach((m: { fn?: () => void }) => {
@@ -188,7 +190,7 @@ describe('FiltersComponent', () => {
           m.fn();
         }
       });
-      expect(component.form.patchValue).toHaveBeenCalledTimes(7);
+      expect(component.form.patchValue).toHaveBeenCalledTimes(8);
     });
   });
 

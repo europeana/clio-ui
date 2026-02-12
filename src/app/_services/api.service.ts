@@ -46,6 +46,7 @@ export class APIService {
       return {
         list,
         opened: false,
+        url: `${apiSettings.serverAPI}/download-historic?dataset-id=${id}`,
         percentInOperation
       };
     });

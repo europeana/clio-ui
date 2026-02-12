@@ -38,6 +38,7 @@
 
   .bar-outer {
     border: 1px solid colours.$offwhite;
+    box-sizing: content-box;
     margin: 0 0.5em;
     min-width: 5em;
   }
@@ -45,19 +46,6 @@
   .bar-inner {
     background: variables.$clio-highlight-colour;
     width: 60%;
-  }
-}
-
-.run-list .score-display {
-  .bar-inner,
-  .bar-outer {
-    background: colours.$offwhite;
-  }
-  .bar-outer {
-    border: none;
-  }
-  .bar-inner {
-    border: 2px solid variables.$clio-highlight-colour;
   }
 }
 
@@ -106,13 +94,17 @@
     .run-list {
       li > :first-child {
         margin-right: auto;
-        margin-left: 2em;
+        margin-left: 0.5em;
         grid-column: 1 / 5;
         display: flex;
         align-items: center;
       }
       .clio-state {
         transform: scale(0.5);
+      }
+      .score-display .bar-inner {
+        background: colours.$offwhite;
+        border: 2px solid variables.$clio-highlight-colour;
       }
     }
   }
