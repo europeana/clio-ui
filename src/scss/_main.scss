@@ -79,3 +79,12 @@ input {
     }
   }
 }
+
+.footer {
+  border-bottom: 1px solid colours.$mid-grey;
+  border-top: 1px solid colours.$mid-grey;
+  line-height: 2.25em;
+  margin-top: 2.25em;
+  display: flex;
+  width: 100%;
+}

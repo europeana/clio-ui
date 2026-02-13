@@ -113,6 +113,16 @@ export class ListingComponent {
     this.graphMode = !this.graphMode;
   }
 
+  getSelectedCount(list: Array<Run>): number {
+    return list
+      .map((run: Run) => {
+        return run.runId;
+      })
+      .filter((id: number) => {
+        return this.form.value['run_ids'][id];
+      }).length;
+  }
+
   setRunCheckboxes(val: boolean): void {
     Object.keys(this.form.controls).forEach((group: string) => {
       Object.keys((this.form.get(group) as UntypedFormGroup).controls).forEach(

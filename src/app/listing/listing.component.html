@@ -5,6 +5,7 @@
   let-isTopTime="isTopTime"
   let-datasetId="datasetId"
   let-datasetList="datasetList"
+  let-datasetCount="datasetCount"
 >
   <span class="last-cell" [ngClass]="{ 'top-time': isTopTime }">
     <span class="time">
@@ -22,7 +23,7 @@
 
     @if (isTopTime) {
       <span class="time-all">
-        <span>all</span>
+        <span>all ({{ datasetCount }})</span>
         <app-checkbox
           [form]="formDatasets"
           [controlName]="datasetId + ''"
@@ -193,12 +194,22 @@
             {{ group.list[0].provider }}
           </span>
 
+          @let selectedCount = getSelectedCount(group.list);
+
           <span class="centre">
+            @let disabled = selectedCount === 0;
             <a
               class="csv-download-block"
               target="_blank"
-              tabindex="0"
-              [attr.title]="'export checks for dataset \'' + dsId + '\''"
+              tabindex="disabled ? -1 : 0"
+              [ngClass]="{ disabled: disabled }"
+              [attr.title]="
+                'export ' +
+                selectedCount +
+                ' checks for dataset \'' +
+                dsId +
+                '\''
+              "
               (click)="requestDownloadDataset.emit(dsId)"
               (keyUp.enter)="requestDownloadDataset.emit(dsId)"
             ></a>
@@ -211,7 +222,8 @@
               runId: group.list[0].runId + '',
               isTopTime: true,
               datasetId: dsId,
-              datasetList: group.list
+              datasetList: group.list,
+              datasetCount: selectedCount
             }"
           >
           </ng-container>

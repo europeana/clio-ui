@@ -74,7 +74,6 @@ $cell-height: 2.25em;
     position: relative;
     opacity: 0.7;
     &::after {
-      backdrop-filter: blur(2.5px);
       content: '';
       display: block;
       height: $cell-height;
@@ -106,18 +105,18 @@ $cell-height: 2.25em;
       }
     }
     &:has(.opener.opened) {
-      .top-time .time {
-        display: none;
-      }
-      & > * {
-        border-right: 1px solid colours.$mid-grey;
-      }
       border-image: linear-gradient(
           to right,
           colours.$white 0px,
           colours.$mid-grey 72px
         )
         1 / 1px 0 0 0;
+      .top-time .time {
+        display: none;
+      }
+      & > * {
+        border-right: 1px solid colours.$mid-grey;
+      }
     }
 
     * {

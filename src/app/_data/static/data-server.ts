@@ -21,7 +21,9 @@ const providers: Array<string> = [
   'Daguerreobase',
   'Europeana 280',
   'Foundation Virtual Library Miguel de Cervantes',
-  'Galileo Museum'
+  'Galileo Museum',
+  'Digital Library of Latvia',
+  'Philharmonie de Paris'
 ];
 
 const dataProviders: Array<DataProvider> = [
@@ -89,10 +91,45 @@ const dataProviders: Array<DataProvider> = [
     id: 12,
     name: '"Alexandru Ioan Cuza" University',
     providers: [0, 5]
+  },
+  {
+    id: 13,
+    name: 'A. Ozoliņas privātkolekcija',
+    providers: [7]
+  },
+  {
+    id: 14,
+    name: 'Artūrs Bebris',
+    providers: [7]
+  },
+  {
+    id: 15,
+    name: 'Edgars Šķenderis',
+    providers: [7]
+  },
+  {
+    id: 16,
+    name: 'Elmārs Priednieks',
+    providers: [7]
+  },
+  {
+    id: 17,
+    name: 'Kursīši Library information centre',
+    providers: [7]
+  },
+  {
+    id: 18,
+    name: 'Philharmonie de Paris',
+    providers: [4, 8]
+  },
+  {
+    id: 19,
+    name: 'Balzac House',
+    providers: [3]
   }
 ];
 
-export const dataSets: Array<Dataset> = new Array(25)
+export const dataSets: Array<Dataset> = new Array(100)
   .fill(null)
   .map((_: unknown, index: number) => {
     const dataProvider = dataProviders[index % dataProviders.length];
@@ -102,15 +139,13 @@ export const dataSets: Array<Dataset> = new Array(25)
     return {
       id: index,
       datasetName: `my_dataset_${index}`,
-      size: (index * 13) % 7,
       dataProvider: dataProvider.name,
-      provider,
-      lastIndexTime: ''
+      provider
     };
   });
 
 // Factory of all runs
-const numRuns = 100;
+const numRuns = 1000;
 const runs: Array<Run> = new Array(numRuns)
   .fill(null)
   .map((_: unknown, index: number) => {
@@ -177,8 +212,7 @@ export function dataServerRequest(
           if (!filter.values.includes(run.datasetId)) {
             res = false;
           }
-        }
-        if (fName === 'dataset-name') {
+        } else if (fName === 'dataset-name') {
           res = false;
           filter.values.forEach((val: string) => {
             if (run.datasetName.indexOf(val) > -1) {

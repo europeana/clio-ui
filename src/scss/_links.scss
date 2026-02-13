@@ -73,4 +73,10 @@ a {
     color: variables.$clio-highlight-colour;
     outline: none;
   }
+  &.disabled {
+    pointer-events: none;
+    &::after {
+      background-color: colours.$mid-grey;
+    }
+  }
 }

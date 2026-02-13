@@ -1,10 +1,8 @@
 export interface Dataset {
   id: number;
   datasetName: string;
-  size: number;
   dataProvider: string;
   provider: string;
-  lastIndexTime: string;
 }
 
 export interface Run {
