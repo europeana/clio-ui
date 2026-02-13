@@ -14,7 +14,7 @@
       <app-checkbox
         [form]="form"
         [controlName]="runId + ''"
-        [title]="'include in download'"
+        [title]="'include in export'"
         [group]="'run_ids'"
         (valueChanged)="updateIds()"
       ></app-checkbox>
@@ -121,6 +121,7 @@
         @let text = 'export ' + count + ' check' + (count !== 1 ? 's' : '');
         <a
           class="csv-download-block"
+          [attr.title]="text"
           tabindex="0"
           (click)="requestDownloadAll.emit()"
           (keyUp.enter)="requestDownloadAll.emit()"
@@ -135,7 +136,7 @@
         <span class="list-header align-centre">Export</span>
         <span class="list-header align-left">Check Date</span>
       } @else {
-        <span class="list-empty">no runs available</span>
+        <span class="list-empty">no checks available</span>
       }
     }
   </li>
@@ -197,7 +198,7 @@
               class="csv-download-block"
               target="_blank"
               tabindex="0"
-              [attr.title]="'download history for dataset \'' + dsId + '\''"
+              [attr.title]="'export checks for dataset \'' + dsId + '\''"
               (click)="requestDownloadDataset.emit(dsId)"
               (keyUp.enter)="requestDownloadDataset.emit(dsId)"
             ></a>
@@ -242,7 +243,7 @@
                     <a
                       class="csv-download"
                       target="_blank"
-                      title="download run data"
+                      title="export check data"
                       [href]="group.list[0].url"
                     ></a>
                   </span>

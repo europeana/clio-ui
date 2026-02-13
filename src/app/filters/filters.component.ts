@@ -139,7 +139,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const queryKeys = Object.keys(this.queryParams);
 
     if (!queryKeys || queryKeys.length === 0) {
-      res.push({ label: 'All runs' });
+      res.push({ label: 'All checks' });
     }
 
     queryKeys.forEach((key: string, index: number) => {
