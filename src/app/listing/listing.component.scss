@@ -56,7 +56,7 @@ $cell-height: 2.25em;
 }
 
 .listing {
-  border-top: 1px solid variables.$clio-colour;
+  border-top: 1px solid colours.$mid-grey;
   display: grid;
   grid-template-columns: 2em repeat(5, auto);
   grid-column-gap: 1em;
@@ -86,6 +86,7 @@ $cell-height: 2.25em;
   }
 
   .sublisting {
+    border-top: 1px solid transparent;
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
@@ -98,15 +99,25 @@ $cell-height: 2.25em;
       align-items: center;
     }
 
-    :not(:has(.opener.opened)) {
+    &:not(:has(.opener.opened)) {
+      border-right: 1px solid transparent;
       .top-time .time-all {
         display: none;
       }
     }
-    :has(.opener.opened) {
+    &:has(.opener.opened) {
       .top-time .time {
         display: none;
       }
+      & > * {
+        border-right: 1px solid colours.$mid-grey;
+      }
+      border-image: linear-gradient(
+          to right,
+          colours.$white 0px,
+          colours.$mid-grey 72px
+        )
+        1 / 1px 0 0 0;
     }
 
     * {
@@ -230,7 +241,7 @@ $cell-height: 2.25em;
   }
 
   &.group-header {
-    top: 10rem;
+    top: 10.25rem;
     .run-list {
       margin-left: 1em;
       border-left: 1px solid colours.$mid-grey;
@@ -242,7 +253,7 @@ $cell-height: 2.25em;
 .summary-bar {
   align-items: center;
   background: colours.$white;
-  border-bottom: 1px solid variables.$clio-colour;
+  border-bottom: 1px solid colours.$mid-grey;
   display: flex;
   font-weight: bold;
   grid-column: 1 / -1;

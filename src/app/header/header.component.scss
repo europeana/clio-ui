@@ -20,8 +20,8 @@ a:focus {
 .header {
   align-items: center;
   background: colours.$offwhite;
-  border-top: 1px solid variables.$clio-colour;
-  border-bottom: 1px solid variables.$clio-colour;
+  border-top: 2px solid colours.$mid-grey;
+  border-bottom: 2px solid colours.$mid-grey;
   padding: 4px 0;
 }
 
@@ -75,7 +75,7 @@ a:focus {
       right: 0;
       width: 49px;
       height: 0.7px;
-      background: variables.$clio-colour;
+      background: colours.$mid-grey;
     }
 
     &::before {
