@@ -48,6 +48,7 @@ export class ListingComponent {
 
   listSelectionCount = 0;
   graphMode = false;
+  requestDownloadCheck = output<number>();
   requestDownloadAll = output<void>();
   requestDownloadDataset = output<string>();
 

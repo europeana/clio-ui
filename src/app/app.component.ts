@@ -30,6 +30,16 @@ export class AppComponent {
     this.clickService.documentClickedTarget.next(event.target);
   }
 
+  downloadCheck(id: number): void {
+    this.api.getDownloadCheck({
+      filters: {
+        'run-id': {
+          values: [`${id}`]
+        }
+      }
+    });
+  }
+
   downloadDataset(id: string): void {
     const runIdsForDatasetId = this.listing
       .clioInfo()

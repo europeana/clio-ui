@@ -7,7 +7,7 @@ export interface BreakdownRequest {
 }
 
 export interface DownloadRequest extends BreakdownRequest {
-  excluded_run_ids: Array<string>;
+  excluded_run_ids?: Array<string>;
 }
 
 export interface RequestFilter {

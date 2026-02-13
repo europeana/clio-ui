@@ -75,6 +75,10 @@ export class APIService {
     document.body.removeChild(anchor);
   }
 
+  getDownloadCheck(request: DownloadRequest): void {
+    this.getDownload(request, `${apiSettings.serverAPI}/download`);
+  }
+
   getDownloadAll(request: DownloadRequest): void {
     this.getDownload(request, `${apiSettings.serverAPI}/download`);
   }

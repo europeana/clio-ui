@@ -73,6 +73,18 @@ a {
     color: variables.$clio-highlight-colour;
     outline: none;
   }
+
+  &.asterisked::before {
+    content: '*';
+    position: absolute;
+    top: 0;
+    font-size: 24px;
+    display: block;
+    left: 50%;
+    height: 1em;
+    width: 1em;
+  }
+
   &.disabled {
     pointer-events: none;
     &::after {

@@ -198,14 +198,18 @@
 
           <span class="centre">
             @let disabled = selectedCount === 0;
+            @let asterisked = selectedCount !== group.list.length;
+            @let selectedCountText =
+              asterisked ? ' (of ' + group.list.length + ')' : '';
             <a
               class="csv-download-block"
               target="_blank"
-              tabindex="disabled ? -1 : 0"
-              [ngClass]="{ disabled: disabled }"
+              [attr.tabindex]="disabled ? -1 : 0"
+              [ngClass]="{ disabled: disabled, asterisked }"
               [attr.title]="
                 'export ' +
                 selectedCount +
+                selectedCountText +
                 ' checks for dataset \'' +
                 dsId +
                 '\''
@@ -256,7 +260,8 @@
                       class="csv-download"
                       target="_blank"
                       title="export check data"
-                      [href]="group.list[0].url"
+                      (click)="requestDownloadCheck.emit(entry.runId)"
+                      (keyUp.enter)="requestDownloadCheck.emit(entry.runId)"
                     ></a>
                   </span>
 
