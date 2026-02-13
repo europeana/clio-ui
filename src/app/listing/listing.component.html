@@ -122,12 +122,17 @@
         @let text = 'export ' + count + ' check' + (count !== 1 ? 's' : '');
         <a
           class="csv-download-block"
+          [ngClass]="{
+            asterisked: listSelectionCount !== clioInfo().listLength
+          }"
           [attr.title]="text"
           tabindex="0"
           (click)="requestDownloadAll.emit()"
           (keyUp.enter)="requestDownloadAll.emit()"
           [attr.label]="text"
-        ></a>
+        >
+          {{ text }}
+        </a>
       </span>
 
       @if (clioInfoValue.listLength) {

@@ -52,6 +52,7 @@ a {
 .csv-download-block {
   align-items: center;
   display: flex;
+  position: relative;
 
   &::after {
     content: '';

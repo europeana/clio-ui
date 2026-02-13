@@ -140,6 +140,10 @@ $cell-height: 2.25em;
       height: $cell-height;
       justify-content: center;
       transform: scale(0.75);
+
+      &.asterisked::before {
+        font-size: 24px;
+      }
     }
 
     .run-list {
@@ -272,10 +276,13 @@ $cell-height: 2.25em;
   .csv-download-block {
     margin: 0 0 0 auto;
     white-space: nowrap;
-    &::before {
-      content: attr(label);
-      font-weight: bold;
-      margin: 0 0.75em 0 1em;
+    &::after {
+      margin-left: 0.75em;
+    }
+    &:before {
+      left: unset;
+      right: -0.5em;
+      width: 0.4em;
     }
   }
 
