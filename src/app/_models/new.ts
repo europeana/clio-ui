@@ -13,7 +13,6 @@ export interface Run {
   provider: string;
   dataProvider: string;
   percentInOperation: number;
-  url: string;
 }
 
 export interface RunGroup {

@@ -75,25 +75,13 @@ export class APIService {
     document.body.removeChild(anchor);
   }
 
-  getDownloadCheck(request: DownloadRequest): void {
-    this.getDownload(request, `${apiSettings.serverAPI}/download`);
-  }
-
-  getDownloadAll(request: DownloadRequest): void {
-    this.getDownload(request, `${apiSettings.serverAPI}/download`);
-  }
-
-  getDownloadDataset(request: DownloadRequest): void {
-    this.getDownload(request, `${apiSettings.serverAPI}/download-dataset`);
-  }
-
-  getDownload(request: DownloadRequest, url: string): void {
+  getDownload(request: DownloadRequest): void {
     const headers = new HttpHeaders().set(
       'Content-Type',
       'text/plain; charset=utf-8'
     );
     this.http
-      .post(url, request, {
+      .post(`${apiSettings.serverAPI}/download`, request, {
         headers: headers,
         responseType: 'text'
       })

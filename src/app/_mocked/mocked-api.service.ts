@@ -26,12 +26,6 @@ export class MockAPIService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   getDownload(_: BreakdownRequest): void {}
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  getDownloadAll(_: DownloadRequest): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  getDownloadDataset(_: DownloadRequest): void {}
-
   getFilteredRuns(_: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
       return this.getError('mock getFilteredRuns throws error');

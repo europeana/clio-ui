@@ -155,7 +155,6 @@ const runs: Array<Run> = new Array(numRuns)
     const datasetName = dataset.datasetName;
     const dataProvider = dataset.dataProvider;
     const provider = dataset.provider;
-    const url = `http://localhost:3000/report?id=${runId}`;
     const percentInOperation = 100 - Math.floor((index * 17.6) % 100);
     const creationTime = new Date(today);
 
@@ -166,7 +165,6 @@ const runs: Array<Run> = new Array(numRuns)
       creationTime: creationTime.toISOString(),
       datasetId,
       datasetName,
-      url,
       dataProvider,
       provider,
       percentInOperation
@@ -229,6 +227,10 @@ export function dataServerRequest(
           const dateParam = Date.parse(filter.values[0]);
           const runDate = Date.parse(run['creationTime']);
           if (runDate > dateParam) {
+            res = false;
+          }
+        } else if (fName === 'run-id') {
+          if (!filter.values.includes(`${run.runId}`)) {
             res = false;
           }
         } else if (

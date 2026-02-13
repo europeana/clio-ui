@@ -82,18 +82,6 @@ new (class {
         }
       });
     }
-    else if(route.includes('download-historic')) {
-      this.headerText(response);
-      response.end('csv-for-historic');
-    }
-    else if(route.match(/\/run/)) {
-      this.headerText(response);
-      response.end('csv-for-individual-run');
-    }
-    else {
-      this.headerText(response);
-      response.end('csv not found for route: ' + route);
-    }
   }
 
   /** handleBreakdownRequest

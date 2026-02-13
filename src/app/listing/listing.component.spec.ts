@@ -1,5 +1,10 @@
 import { CUSTOM_ELEMENTS_SCHEMA, model } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick
+} from '@angular/core/testing';
 import { FormGroup } from '@angular/forms';
 import { ListingComponent } from '.';
 import { ClioInfo, Run } from '../_models';
@@ -10,10 +15,50 @@ describe('ListingComponent', () => {
 
   const clioInfo = {
     filterOps: {},
-    list: [],
-    datasetRuns: {},
-    listLength: -1,
-    listAverageScore: -1,
+    list: [
+      {
+        runId: 1,
+        datasetId: '1'
+      },
+      {
+        runId: 2,
+        datasetId: '2'
+      }
+    ] as unknown as Array<Run>,
+    datasetRuns: {
+      '1': {
+        list: [
+          {
+            runId: 1,
+            creationTime: '',
+            datasetId: '1',
+            datasetName: '1',
+            dataProvider: '',
+            provider: '',
+            percentInOperation: 0
+          }
+        ],
+        opened: true,
+        percentInOperation: 0
+      },
+      '2': {
+        list: [
+          {
+            runId: 2,
+            creationTime: '',
+            datasetId: '2',
+            datasetName: '2',
+            dataProvider: '',
+            provider: '',
+            percentInOperation: 0
+          }
+        ],
+        opened: true,
+        percentInOperation: 0
+      }
+    },
+    listLength: 2,
+    listAverageScore: 0,
     titleMarkup: []
   } as ClioInfo;
 
@@ -34,8 +79,8 @@ describe('ListingComponent', () => {
       component.clioInfo = model(structuredClone(clioInfo));
     });
 
-    fixture.detectChanges();
     TestBed.flushEffects();
+    fixture.detectChanges();
   };
 
   beforeEach(b4Each);
@@ -55,17 +100,6 @@ describe('ListingComponent', () => {
   });
 
   it('should set the checkboxes', () => {
-    component.clioInfo.set({
-      ...structuredClone(clioInfo),
-      list: [
-        {
-          runId: '1'
-        } as unknown as Run
-      ]
-    });
-    TestBed.flushEffects();
-    fixture.detectChanges();
-
     const cmp = component.form.controls.run_ids as FormGroup;
 
     expect(cmp.value['1']).toBeTruthy();
@@ -88,8 +122,7 @@ describe('ListingComponent', () => {
               datasetName: '1',
               dataProvider: '',
               provider: '',
-              percentInOperation: 0,
-              url: ''
+              percentInOperation: 0
             }
           ],
           opened: true,
@@ -118,27 +151,33 @@ describe('ListingComponent', () => {
     expect(component.graphMode).toBeFalsy();
   });
 
+  it('should check all', () => {
+    jest.spyOn(component, 'updateIds');
+    component.checkAll('1', []);
+    expect(component.updateIds).toHaveBeenCalled();
+  });
+
+  it('should get the selected run count', fakeAsync(() => {
+    const list = component.clioInfo().list;
+
+    expect(component.getSelectedRunCount(list)).toEqual(2);
+
+    component.form.patchValue({ run_ids: { '1': false } });
+    expect(component.getSelectedRunCount(list)).toEqual(1);
+
+    component.form.patchValue({ run_ids: { '2': false } });
+    expect(component.getSelectedRunCount(list)).toEqual(0);
+  }));
+
   it('should update the list selection count', () => {
-    expect(component.listSelectionCount).toEqual(0);
-
-    component.clioInfo.set({
-      ...structuredClone(clioInfo),
-      list: [
-        {
-          runId: '1'
-        } as unknown as Run
-      ]
-    });
-
-    TestBed.flushEffects();
-    fixture.detectChanges();
-
-    component.form.setValue({ run_ids: { '1': true } });
+    expect(component.listSelectionCount).toEqual(2);
+    component.form.setValue({ run_ids: { '1': false, '2': true } });
+    expect(component.listSelectionCount).toEqual(2);
+    component.updateIds();
     expect(component.listSelectionCount).toEqual(1);
 
-    component.form.setValue({ run_ids: { '1': false } });
+    component.form.setValue({ run_ids: { '1': false, '2': false } });
     expect(component.listSelectionCount).toEqual(1);
-
     component.updateIds();
     expect(component.listSelectionCount).toEqual(0);
   });

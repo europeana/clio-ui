@@ -31,7 +31,7 @@ export class AppComponent {
   }
 
   downloadCheck(id: number): void {
-    this.api.getDownloadCheck({
+    this.api.getDownload({
       filters: {
         'run-id': {
           values: [`${id}`]
@@ -57,7 +57,7 @@ export class AppComponent {
       values: [id]
     };
 
-    this.api.getDownloadDataset({
+    this.api.getDownload({
       ...downloadRequest,
       excluded_run_ids: exclusionList
     });
@@ -68,7 +68,7 @@ export class AppComponent {
     const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
       return !exclusionMap[key];
     });
-    this.api.getDownloadAll({
+    this.api.getDownload({
       ...this.filters.getDataServerDataRequest(),
       excluded_run_ids: exclusionList
     });

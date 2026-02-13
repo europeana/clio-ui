@@ -15,8 +15,7 @@ describe('ExportCSVService', () => {
       creationTime: timestamp,
       dataProvider: dataProvider,
       provider: 'Daguerreobase',
-      percentInOperation: 14,
-      url: 'http://123'
+      percentInOperation: 14
     },
     {
       runId: 1,
@@ -25,8 +24,7 @@ describe('ExportCSVService', () => {
       creationTime: timestamp,
       dataProvider: dataProvider,
       provider: 'Daguerreobase',
-      percentInOperation: 81,
-      url: 'http://456'
+      percentInOperation: 81
     }
   ];
 
@@ -46,9 +44,9 @@ describe('ExportCSVService', () => {
     expect(res).toBeTruthy();
 
     const line1 =
-      'id,dataset-id,dataset-name,creation-time,data-provider,provider,percent-in-operation,url';
-    const line2 = `2,"11","dataset_11","${timestamp}","${dataProvider}","Daguerreobase",14,"http://123"`;
-    const line3 = `1,"12","dataset_12","${timestamp}","${dataProvider}","Daguerreobase",81,"http://456"`;
+      'id,dataset-id,dataset-name,creation-time,data-provider,provider,percent-in-operation';
+    const line2 = `2,"11","dataset_11","${timestamp}","${dataProvider}","Daguerreobase",14`;
+    const line3 = `1,"12","dataset_12","${timestamp}","${dataProvider}","Daguerreobase",81`;
 
     expect(res).toEqual(`${line1}\n\r${line2}\n${line3}`);
   });

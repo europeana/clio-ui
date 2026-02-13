@@ -114,7 +114,7 @@ export class ListingComponent {
     this.graphMode = !this.graphMode;
   }
 
-  getSelectedCount(list: Array<Run>): number {
+  getSelectedRunCount(list: Array<Run>): number {
     return list
       .map((run: Run) => {
         return run.runId;

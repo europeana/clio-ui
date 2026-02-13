@@ -80,7 +80,7 @@ describe('AppComponent', () => {
 
     it('should download datasets', () => {
       jest.spyOn(app.filters, 'getDataServerDataRequest');
-      jest.spyOn(api, 'getDownloadDataset');
+      jest.spyOn(api, 'getDownload');
       app.listing = {
         form: {
           value: {
@@ -100,11 +100,11 @@ describe('AppComponent', () => {
 
       app.downloadDataset('x');
       expect(app.filters.getDataServerDataRequest).toHaveBeenCalled();
-      expect(api.getDownloadDataset).toHaveBeenCalled();
+      expect(api.getDownload).toHaveBeenCalled();
     });
 
     it('should download all', () => {
-      jest.spyOn(api, 'getDownloadAll');
+      jest.spyOn(api, 'getDownload');
       app.listing = {
         form: {
           value: {
@@ -119,7 +119,7 @@ describe('AppComponent', () => {
 
       app.downloadAll();
       expect(app.filters.getDataServerDataRequest).toHaveBeenCalled();
-      expect(api.getDownloadAll).toHaveBeenCalled();
+      expect(api.getDownload).toHaveBeenCalled();
     });
   });
 });

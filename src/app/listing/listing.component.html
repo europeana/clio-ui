@@ -194,11 +194,11 @@
             {{ group.list[0].provider }}
           </span>
 
-          @let selectedCount = getSelectedCount(group.list);
+          @let selectedRunCount = getSelectedRunCount(group.list);
 
           <span class="centre">
-            @let disabled = selectedCount === 0;
-            @let asterisked = selectedCount !== group.list.length;
+            @let disabled = selectedRunCount === 0;
+            @let asterisked = selectedRunCount !== group.list.length;
             @let selectedCountText =
               asterisked ? ' (of ' + group.list.length + ')' : '';
             <a
@@ -208,7 +208,7 @@
               [ngClass]="{ disabled: disabled, asterisked }"
               [attr.title]="
                 'export ' +
-                selectedCount +
+                selectedRunCount +
                 selectedCountText +
                 ' checks for dataset \'' +
                 dsId +
@@ -227,7 +227,7 @@
               isTopTime: true,
               datasetId: dsId,
               datasetList: group.list,
-              datasetCount: selectedCount
+              datasetCount: selectedRunCount
             }"
           >
           </ng-container>

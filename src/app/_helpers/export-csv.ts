@@ -8,8 +8,7 @@ export class ExportCSVService {
     'creation-time',
     'data-provider',
     'provider',
-    'percent-in-operation',
-    'url'
+    'percent-in-operation'
   ];
 
   fieldNamesRun = [
@@ -19,8 +18,7 @@ export class ExportCSVService {
     'creationTime',
     'dataProvider',
     'provider',
-    'percentInOperation',
-    'url'
+    'percentInOperation'
   ];
 
   sanitiseVal(str: string): string {
