@@ -26,7 +26,7 @@ import { getDateAsISOString } from '../_helpers/date-helpers';
 import { fromCSL, toInputSafeName } from '../_helpers/date-helpers';
 import { filterList } from '../_helpers/string-helpers';
 
-import { BreakdownRequest, BreakdownResults, ClioInfo } from '../_models';
+import { BreakdownResults, CheckDataRequest, ClioInfo } from '../_models';
 import { CheckboxComponent } from '../checkbox';
 
 @Component({
@@ -56,7 +56,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
   modelClioInfo: ModelSignal<ClioInfo> = model({
-    datasetRuns: {},
+    datasetChecks: {},
     list: [],
     listLength: -1,
     listAverageScore: -1,
@@ -230,21 +230,21 @@ export class FiltersComponent implements OnInit, OnDestroy {
     return res;
   }
 
-  getDataServerDataRequest(): BreakdownRequest {
-    const breakdownRequest: BreakdownRequest = { filters: {} };
+  getDataServerDataRequest(): CheckDataRequest {
+    const dataRequest: CheckDataRequest = { filters: {} };
 
     Object.keys(this.queryParams).forEach((key: string) => {
-      breakdownRequest.filters[key] = { values: this.queryParams[key] };
+      dataRequest.filters[key] = { values: this.queryParams[key] };
     });
 
     const valDatasetId = this.form.value.datasetId;
 
     if (valDatasetId) {
-      breakdownRequest.filters['dataset-id'] = {
+      dataRequest.filters['dataset-id'] = {
         values: fromCSL(valDatasetId)
       };
     }
-    return breakdownRequest;
+    return dataRequest;
   }
 
   addOrUpdateFilterControls(name: string, options: Array<string>): void {
@@ -269,7 +269,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     this.error = undefined;
     this.subs.push(
       this.api
-        .getFilteredRuns(this.getDataServerDataRequest())
+        .getFiltereClioChecks(this.getDataServerDataRequest())
         .pipe(
           catchError((err: HttpErrorResponse) => {
             this.error = err;
@@ -295,7 +295,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
           this.modelClioInfo.set({
             filterOps: ops,
-            datasetRuns: this.api.groupRunsByDatasetId(list),
+            datasetChecks: this.api.groupChecksByDatasetId(list),
             list,
             listLength: list.length,
             listAverageScore,

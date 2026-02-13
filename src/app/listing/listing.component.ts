@@ -22,7 +22,7 @@ import {
 
 import { DATE_CONCISE_FMT } from '../_data/static/date-formats';
 import { ClickAwareDirective } from '../_directives';
-import { ClioInfo, Run } from '../_models';
+import { ClioCheck, ClioInfo } from '../_models';
 import { RenameFilterPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
 
@@ -53,7 +53,7 @@ export class ListingComponent {
   requestDownloadDataset = output<string>();
 
   form = new UntypedFormGroup({
-    run_ids: new UntypedFormGroup({})
+    check_ids: new UntypedFormGroup({})
   });
 
   formDatasets = new UntypedFormGroup({
@@ -72,36 +72,36 @@ export class ListingComponent {
   constructor() {
     effect(() => {
       if (this.clioInfo().list) {
-        this.setRunCheckboxes(false);
-        const runFormGroup = this.form.get('run_ids') as UntypedFormGroup;
+        this.setClioCheckFormValues(false);
+        const runFormGroup = this.form.get('check_ids') as UntypedFormGroup;
         const datasetFormGroup = this.formDatasets.get(
           'dataset_ids'
         ) as UntypedFormGroup;
 
         const list = this.clioInfo().list;
-        list.forEach((run: Run) => {
-          const fName = `${run.runId}`;
+        list.forEach((check: ClioCheck) => {
+          const fName = `${check.checkId}`;
           const ctrlRun = this.form.get(fName);
           if (!ctrlRun) {
             runFormGroup.addControl(fName, new FormControl(true, []));
           }
-          const dsId = `${run.datasetId}`;
+          const dsId = `${check.datasetId}`;
           const ctrlDatset = this.formDatasets.get(dsId);
           if (!ctrlDatset) {
             datasetFormGroup.addControl(dsId, new FormControl(true, []));
           }
         });
         this.listSelectionCount = list.length;
-        this.setRunCheckboxes(true);
+        this.setClioCheckFormValues(true);
       }
     });
   }
 
   clickOutside(): void {
-    const datasetRuns = this.clioInfo().datasetRuns;
-    if (datasetRuns) {
-      Object.keys(datasetRuns).forEach((key: string) => {
-        datasetRuns[key].opened = false;
+    const datasetChecks = this.clioInfo().datasetChecks;
+    if (datasetChecks) {
+      Object.keys(datasetChecks).forEach((key: string) => {
+        datasetChecks[key].opened = false;
       });
     }
   }
@@ -114,24 +114,24 @@ export class ListingComponent {
     this.graphMode = !this.graphMode;
   }
 
-  getSelectedRunCount(list: Array<Run>): number {
+  getSelectedRunCount(list: Array<ClioCheck>): number {
     return list
-      .map((run: Run) => {
-        return run.runId;
+      .map((run: ClioCheck) => {
+        return run.checkId;
       })
       .filter((id: number) => {
-        return this.form.value['run_ids'][id];
+        return this.form.value['check_ids'][id];
       }).length;
   }
 
-  setRunCheckboxes(val: boolean): void {
+  setClioCheckFormValues(val: boolean): void {
     Object.keys(this.form.controls).forEach((group: string) => {
       Object.keys((this.form.get(group) as UntypedFormGroup).controls).forEach(
         (key) => {
           const ctrl = this.form.get(group + '.' + key) as FormControl;
           if (val) {
-            const arrVisible = this.clioInfo().list.map((item: Run) => {
-              return `${item.runId}`;
+            const arrVisible = this.clioInfo().list.map((item: ClioCheck) => {
+              return `${item.checkId}`;
             });
             if (arrVisible.includes(key)) {
               ctrl.setValue(val);
@@ -144,10 +144,10 @@ export class ListingComponent {
     });
   }
 
-  checkAll(datasetId: string, groupList: Array<Run>): void {
+  checkAll(datasetId: string, groupList: Array<ClioCheck>): void {
     const val = this.formDatasets.value['dataset_ids'][datasetId];
-    groupList.forEach((run: Run) => {
-      const ctrl = this.form.get('run_ids.' + run.runId) as FormControl;
+    groupList.forEach((run: ClioCheck) => {
+      const ctrl = this.form.get('check_ids.' + run.checkId) as FormControl;
       ctrl.setValue(val);
     });
     this.updateIds();
@@ -159,7 +159,7 @@ export class ListingComponent {
   }
 
   updateIds(): void {
-    const vals = this.form.value['run_ids'];
+    const vals = this.form.value['check_ids'];
     this.listSelectionCount = Object.keys(vals).filter((key: string) => {
       return vals[key];
     }).length;

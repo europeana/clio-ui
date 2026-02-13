@@ -1,7 +1,7 @@
-import { Run } from '../_models';
+import { ClioCheck } from '../_models';
 
 export class ExportCSVService {
-  headersRun: Array<string> = [
+  headersCheck: Array<string> = [
     'id',
     'dataset-id',
     'dataset-name',
@@ -12,10 +12,10 @@ export class ExportCSVService {
   ];
 
   fieldNamesRun = [
-    'runId',
+    'checkId',
     'datasetId',
     'datasetName',
-    'creationTime',
+    'createdDate',
     'dataProvider',
     'provider',
     'percentInOperation'
@@ -42,19 +42,19 @@ export class ExportCSVService {
     return res;
   }
 
-  csvFromRuns(items: Array<Run>): string {
+  csvFromClioChecks(items: Array<ClioCheck>): string {
     const tuples: Array<Array<string | number | undefined>> = [];
     let tuple: Array<string | number | undefined> = [];
 
-    items.forEach((item: Run) => {
+    items.forEach((item: ClioCheck) => {
       this.fieldNamesRun.forEach((fieldName: string) => {
-        this.pushToTuple(tuple, item[fieldName as keyof Run]);
+        this.pushToTuple(tuple, item[fieldName as keyof ClioCheck]);
       });
       tuples.push(tuple);
       tuple = this.getTuple(0);
     });
 
-    return this.joinCSV(this.headersRun, tuples);
+    return this.joinCSV(this.headersCheck, tuples);
   }
 
   joinCSV(

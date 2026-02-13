@@ -1,9 +1,5 @@
-import {
-  BreakdownRequest,
-  BreakdownResults,
-  RequestFilter
-} from '../../_models';
-import { Dataset, Run } from '../../_models/new';
+import { BreakdownResults, CheckDataRequest } from '../../_models';
+import { ClioCheck, Dataset } from '../../_models/new';
 
 export const today = new Date().toISOString().split('T')[0];
 export const yearZero = new Date(Date.parse('20 Nov 2008 12:00:00 GMT'));
@@ -144,25 +140,25 @@ export const dataSets: Array<Dataset> = new Array(100)
     };
   });
 
-// Factory of all runs
-const numRuns = 1000;
-const runs: Array<Run> = new Array(numRuns)
+// Factory of all checks
+const numChecks = 1000;
+const checks: Array<ClioCheck> = new Array(numChecks)
   .fill(null)
   .map((_: unknown, index: number) => {
-    const runId = index;
+    const checkId = index;
     const dataset = dataSets[index % dataSets.length];
     const datasetId = `${dataset.id}`;
     const datasetName = dataset.datasetName;
     const dataProvider = dataset.dataProvider;
     const provider = dataset.provider;
     const percentInOperation = 100 - Math.floor((index * 17.6) % 100);
-    const creationTime = new Date(today);
+    const createdDate = new Date(today);
 
-    creationTime.setDate(yearZero.getDate() - index);
+    createdDate.setDate(yearZero.getDate() - index);
 
     return {
-      runId,
-      creationTime: creationTime.toISOString(),
+      checkId,
+      createdDate: createdDate.toISOString(),
       datasetId,
       datasetName,
       dataProvider,
@@ -171,18 +167,18 @@ const runs: Array<Run> = new Array(numRuns)
     };
   });
 
-const allRunData: Array<Run> = runs;
+const allRunData: Array<ClioCheck> = checks;
 
 // MOCK STATS SERVER...
 
 function getDistinctValues(
-  runs: Array<Run>,
+  checks: Array<ClioCheck>,
   filterName: string,
   top?: number
 ): Array<string> {
   let res = Object.keys(
-    runs.reduce((map: { [key: string]: boolean }, run: Run) => {
-      const rVal = (run as unknown as { [key: string]: string })[filterName];
+    checks.reduce((map: { [key: string]: boolean }, check: ClioCheck) => {
+      const rVal = (check as unknown as { [key: string]: string })[filterName];
       map[rVal] = true;
       return map;
     }, {})
@@ -195,57 +191,59 @@ function getDistinctValues(
 }
 
 export function dataServerRequest(
-  breakdownRequest: BreakdownRequest
+  dataRequest: CheckDataRequest
 ): BreakdownResults {
   const filterproof: Array<string> = [];
-  const specifiedFilterNames = Object.keys(breakdownRequest.filters);
-  const filteredRuns = structuredClone(allRunData).filter((run: Run) => {
-    let res = true;
+  const specifiedFilterNames = Object.keys(dataRequest.filters);
+  const filteredRuns = structuredClone(allRunData).filter(
+    (check: ClioCheck) => {
+      let res = true;
 
-    specifiedFilterNames.forEach((fName: string) => {
-      const filter = breakdownRequest.filters[fName] as RequestFilter;
+      specifiedFilterNames.forEach((fName: string) => {
+        const filter = dataRequest.filters[fName];
 
-      if (filter.values) {
-        if (fName === 'dataset-id') {
-          if (!filter.values.includes(run.datasetId)) {
-            res = false;
-          }
-        } else if (fName === 'dataset-name') {
-          res = false;
-          filter.values.forEach((val: string) => {
-            if (run.datasetName.indexOf(val) > -1) {
-              res = true;
+        if (filter.values) {
+          if (fName === 'dataset-id') {
+            if (!filter.values.includes(check.datasetId)) {
+              res = false;
             }
-          });
-        } else if (fName === 'date-from') {
-          const dateParam = Date.parse(filter.values[0]);
-          const runDate = Date.parse(run['creationTime']);
-          if (runDate < dateParam) {
+          } else if (fName === 'dataset-name') {
             res = false;
-          }
-        } else if (fName === 'date-to') {
-          const dateParam = Date.parse(filter.values[0]);
-          const runDate = Date.parse(run['creationTime']);
-          if (runDate > dateParam) {
+            filter.values.forEach((val: string) => {
+              if (check.datasetName.indexOf(val) > -1) {
+                res = true;
+              }
+            });
+          } else if (fName === 'date-from') {
+            const dateParam = Date.parse(filter.values[0]);
+            const checkDate = Date.parse(check['createdDate']);
+            if (checkDate < dateParam) {
+              res = false;
+            }
+          } else if (fName === 'date-to') {
+            const dateParam = Date.parse(filter.values[0]);
+            const checkDate = Date.parse(check['createdDate']);
+            if (checkDate > dateParam) {
+              res = false;
+            }
+          } else if (fName === 'check-id') {
+            if (!filter.values.includes(`${check.checkId}`)) {
+              res = false;
+            }
+          } else if (
+            !filter.values.includes(
+              (check as unknown as { [key: string]: string })[fName]
+            )
+          ) {
             res = false;
+          } else {
+            filterproof.push(fName);
           }
-        } else if (fName === 'run-id') {
-          if (!filter.values.includes(`${run.runId}`)) {
-            res = false;
-          }
-        } else if (
-          !filter.values.includes(
-            (run as unknown as { [key: string]: string })[fName]
-          )
-        ) {
-          res = false;
-        } else {
-          filterproof.push(fName);
         }
-      }
-    });
-    return res;
-  });
+      });
+      return res;
+    }
+  );
 
   const facetNames = ['dataProvider', 'provider'];
 

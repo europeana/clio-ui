@@ -5,9 +5,9 @@ export interface Dataset {
   provider: string;
 }
 
-export interface Run {
-  runId: number;
-  creationTime: string;
+export interface ClioCheck {
+  checkId: number;
+  createdDate: string;
   datasetId: string;
   datasetName: string;
   provider: string;
@@ -15,16 +15,16 @@ export interface Run {
   percentInOperation: number;
 }
 
-export interface RunGroup {
-  list: Array<Run>;
+export interface CheckGroup {
+  list: Array<ClioCheck>;
   opened: boolean;
   percentInOperation: number;
 }
 
 export interface ClioInfo {
   filterOps: { [key: string]: Array<string> };
-  list: Array<Run>;
-  datasetRuns: { [key: string]: RunGroup };
+  list: Array<ClioCheck>;
+  datasetChecks: { [key: string]: CheckGroup };
   listLength: number;
   listAverageScore: number;
   titleMarkup: Array<{ label: string; fn?: () => void }>;

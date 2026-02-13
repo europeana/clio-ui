@@ -1,11 +1,11 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
-  BreakdownRequest,
   BreakdownResults,
-  DownloadRequest,
-  Run,
-  RunGroup
+  CheckDataRequest,
+  CheckGroup,
+  ClioCheck
+  //, DownloadRequest
 } from '../_models';
 
 export class MockAPIService {
@@ -19,16 +19,16 @@ export class MockAPIService {
     );
   }
 
-  groupRunsByDatasetId(_: Array<Run>): { [key: string]: RunGroup } {
-    return {} as { [key: string]: RunGroup };
+  groupChecksByDatasetId(_: Array<ClioCheck>): { [key: string]: CheckGroup } {
+    return {} as { [key: string]: CheckGroup };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  getDownload(_: BreakdownRequest): void {}
+  getDownload(_: CheckDataRequest): void {}
 
-  getFilteredRuns(_: BreakdownRequest): Observable<BreakdownResults> {
+  getFiltereClioChecks(_: CheckDataRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
-      return this.getError('mock getFilteredRuns throws error');
+      return this.getError('mock getFiltereClioChecks throws error');
     }
     return of({
       filteringOptions: {},

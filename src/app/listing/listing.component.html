@@ -1,7 +1,7 @@
 <ng-template
   #dateCheckbox
   let-time="time"
-  let-runId="runId"
+  let-checkId="checkId"
   let-isTopTime="isTopTime"
   let-datasetId="datasetId"
   let-datasetList="datasetList"
@@ -14,9 +14,9 @@
       </span>
       <app-checkbox
         [form]="form"
-        [controlName]="runId + ''"
+        [controlName]="checkId + ''"
         [title]="'include in export'"
-        [group]="'run_ids'"
+        [group]="'check_ids'"
         (valueChanged)="updateIds()"
       ></app-checkbox>
     </span>
@@ -142,7 +142,7 @@
     }
   </li>
 
-  @for (dsRun of clioInfo().datasetRuns | keyvalue; track dsRun.key) {
+  @for (dsRun of clioInfo().datasetChecks | keyvalue; track dsRun.key) {
     @let group = dsRun.value;
     @let dsId = dsRun.key;
 
@@ -222,8 +222,8 @@
           <ng-container
             [ngTemplateOutlet]="dateCheckbox"
             [ngTemplateOutletContext]="{
-              time: group.list[0].creationTime,
-              runId: group.list[0].runId + '',
+              time: group.list[0].createdDate,
+              checkId: group.list[0].checkId + '',
               isTopTime: true,
               datasetId: dsId,
               datasetList: group.list,
@@ -260,16 +260,16 @@
                       class="csv-download"
                       target="_blank"
                       title="export check data"
-                      (click)="requestDownloadCheck.emit(entry.runId)"
-                      (keyUp.enter)="requestDownloadCheck.emit(entry.runId)"
+                      (click)="requestDownloadCheck.emit(entry.checkId)"
+                      (keyUp.enter)="requestDownloadCheck.emit(entry.checkId)"
                     ></a>
                   </span>
 
                   <ng-container
                     [ngTemplateOutlet]="dateCheckbox"
                     [ngTemplateOutletContext]="{
-                      time: entry.creationTime,
-                      runId: entry.runId + ''
+                      time: entry.createdDate,
+                      checkId: entry.checkId + ''
                     }"
                   >
                   </ng-container>

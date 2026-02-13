@@ -9,19 +9,19 @@ describe('ExportCSVService', () => {
 
   const testRuns = [
     {
-      runId: 2,
+      checkId: 2,
       datasetId: '11',
       datasetName: 'dataset_11',
-      creationTime: timestamp,
+      createdDate: timestamp,
       dataProvider: dataProvider,
       provider: 'Daguerreobase',
       percentInOperation: 14
     },
     {
-      runId: 1,
+      checkId: 1,
       datasetId: '12',
       datasetName: 'dataset_12',
-      creationTime: timestamp,
+      createdDate: timestamp,
       dataProvider: dataProvider,
       provider: 'Daguerreobase',
       percentInOperation: 81
@@ -40,7 +40,7 @@ describe('ExportCSVService', () => {
   });
 
   it('should convert', () => {
-    const res = service.csvFromRuns(testRuns);
+    const res = service.csvFromClioChecks(testRuns);
     expect(res).toBeTruthy();
 
     const line1 =

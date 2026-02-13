@@ -4,11 +4,11 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import {
-  BreakdownRequest,
   BreakdownResults,
-  DownloadRequest,
-  Run,
-  RunGroup
+  CheckDataRequest,
+  CheckGroup,
+  ClioCheck,
+  DownloadRequest
 } from '../_models';
 import { dataServerRequest } from '../_data/static/data-server';
 import { apiSettings } from '../../environments/apisettings';
@@ -17,14 +17,16 @@ import { apiSettings } from '../../environments/apisettings';
 export class APIService {
   constructor(private readonly http: HttpClient) {}
 
-  /** groupRunsByDatasetId
+  /** groupChecksByDatasetId
    *  maps array entries - keys by dataset id,
    *  initialises the opened and percentInOperation fields
    **/
-  groupRunsByDatasetId(results: Array<Run>): { [key: string]: RunGroup } {
-    const res: { [key: string]: RunGroup } = {};
+  groupChecksByDatasetId(results: Array<ClioCheck>): {
+    [key: string]: CheckGroup;
+  } {
+    const res: { [key: string]: CheckGroup } = {};
     const mapped = results.reduce(
-      (map: { [key: string]: Array<Run> }, run: Run) => {
+      (map: { [key: string]: Array<ClioCheck> }, run: ClioCheck) => {
         const id = run.datasetId;
         map[id] = map[id] ?? [];
         map[id].push(run);
@@ -47,9 +49,11 @@ export class APIService {
     return res;
   }
 
-  getFilteredRuns(request: BreakdownRequest): Observable<BreakdownResults> {
+  getFiltereClioChecks(
+    request: CheckDataRequest
+  ): Observable<BreakdownResults> {
     return this.http
-      .post<BreakdownResults>(`${apiSettings.serverAPI}/runs`, request)
+      .post<BreakdownResults>(`${apiSettings.serverAPI}/checks`, request)
       .pipe(
         catchError(() => {
           const fakeResult = dataServerRequest(request);

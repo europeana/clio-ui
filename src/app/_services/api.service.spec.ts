@@ -9,7 +9,7 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 
-import { Run } from '../_models';
+import { ClioCheck } from '../_models';
 import { APIService } from './';
 
 describe('API Service', () => {
@@ -32,29 +32,29 @@ describe('API Service', () => {
   });
 
   it('should group the runs by dataset id', () => {
-    const grouped = service.groupRunsByDatasetId([
+    const grouped = service.groupChecksByDatasetId([
       {
-        runId: 1,
+        checkId: 1,
         datasetId: '1',
         percentInOperation: 10
       },
       {
-        runId: 1,
+        checkId: 1,
         datasetId: '1',
         percentInOperation: 10
       },
       {
-        runId: 1,
+        checkId: 1,
         datasetId: '2',
         percentInOperation: 10
       }
-    ] as unknown as Array<Run>);
+    ] as unknown as Array<ClioCheck>);
     expect(grouped).toBeTruthy();
   });
 
   it('should get the filtered reports', () => {
     service
-      .getFilteredRuns({
+      .getFiltereClioChecks({
         filters: {}
       })
       .subscribe((data: unknown) => {
@@ -66,7 +66,7 @@ describe('API Service', () => {
     const url = `${apiSettings.serverAPI}/download`;
     service.getDownload({
       filters: {},
-      excluded_run_ids: []
+      excluded_check_ids: []
     });
     const req = httpTesting.expectOne(url, 'post...');
     req.flush('csv');

@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import {
-  BreakdownRequest,
+  CheckDataRequest,
   BreakdownResults
 } from '../src/app/_models';
 
@@ -69,28 +69,28 @@ new (class {
         body += chunk;
       });
       request.on('end', () => {
-        const br = JSON.parse(body) as BreakdownRequest;
+        const br = JSON.parse(body) as CheckDataRequest;
         if(route.match(/\/download/)) {
           this.headerText(response);
           const data = dataServerRequest(br).results;
           const srv = new ExportCSVService();
-          const csvData = srv.csvFromRuns(data);
+          const csvData = srv.csvFromClioChecks(data);
           response.end(csvData);
         }
-        else if(route.match(/\/runs/)) {
-          this.handleBreakdownRequest(response, br);
+        else if(route.match(/\/checks/)) {
+          this.handleCheckDataRequest(response, br);
         }
       });
     }
   }
 
-  /** handleBreakdownRequest
+  /** handleCheckDataRequest
   */
-  handleBreakdownRequest(
+  handleCheckDataRequest(
     response: ServerResponse,
-    breakdownRequest: BreakdownRequest
+    dataRequest: CheckDataRequest
   ): void {
     this.headerJSON(response);
-    response.end(JSON.stringify(dataServerRequest(breakdownRequest)));
+    response.end(JSON.stringify(dataServerRequest(dataRequest)));
   }
 });

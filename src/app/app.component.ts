@@ -1,6 +1,6 @@
 import { Component, HostListener, inject, ViewChild } from '@angular/core';
 
-import { Run } from './_models';
+import { ClioCheck } from './_models';
 import { APIService, ClickService } from './_services';
 import { HeaderComponent } from './header';
 import { FiltersComponent } from './filters';
@@ -33,7 +33,7 @@ export class AppComponent {
   downloadCheck(id: number): void {
     this.api.getDownload({
       filters: {
-        'run-id': {
+        'check-id': {
           values: [`${id}`]
         }
       }
@@ -43,11 +43,11 @@ export class AppComponent {
   downloadDataset(id: string): void {
     const runIdsForDatasetId = this.listing
       .clioInfo()
-      .datasetRuns[id].list.map((run: Run) => {
-        return `${run.runId}`;
+      .datasetChecks[id].list.map((run: ClioCheck) => {
+        return `${run.checkId}`;
       });
 
-    const exclusionMap = this.listing.form.value['run_ids'];
+    const exclusionMap = this.listing.form.value['check_ids'];
     const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
       return !exclusionMap[key] && runIdsForDatasetId.includes(key);
     });
@@ -59,18 +59,18 @@ export class AppComponent {
 
     this.api.getDownload({
       ...downloadRequest,
-      excluded_run_ids: exclusionList
+      excluded_check_ids: exclusionList
     });
   }
 
   downloadAll(): void {
-    const exclusionMap = this.listing.form.value['run_ids'];
+    const exclusionMap = this.listing.form.value['check_ids'];
     const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
       return !exclusionMap[key];
     });
     this.api.getDownload({
       ...this.filters.getDataServerDataRequest(),
-      excluded_run_ids: exclusionList
+      excluded_check_ids: exclusionList
     });
   }
 }

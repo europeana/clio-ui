@@ -84,12 +84,12 @@ describe('AppComponent', () => {
       app.listing = {
         form: {
           value: {
-            run_ids: ['1']
+            check_ids: ['1']
           }
         } as unknown as FormGroup,
         clioInfo: () => {
           return {
-            datasetRuns: {
+            datasetChecks: {
               x: {
                 list: []
               }
@@ -108,7 +108,7 @@ describe('AppComponent', () => {
       app.listing = {
         form: {
           value: {
-            run_ids: ['1']
+            check_ids: ['1']
           }
         } as unknown as FormGroup
       } as unknown as ListingComponent;

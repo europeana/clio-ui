@@ -1,13 +1,8 @@
 import { CUSTOM_ELEMENTS_SCHEMA, model } from '@angular/core';
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormGroup } from '@angular/forms';
 import { ListingComponent } from '.';
-import { ClioInfo, Run } from '../_models';
+import { ClioCheck, ClioInfo } from '../_models';
 
 describe('ListingComponent', () => {
   let component: ListingComponent;
@@ -17,20 +12,20 @@ describe('ListingComponent', () => {
     filterOps: {},
     list: [
       {
-        runId: 1,
+        checkId: 1,
         datasetId: '1'
       },
       {
-        runId: 2,
+        checkId: 2,
         datasetId: '2'
       }
-    ] as unknown as Array<Run>,
-    datasetRuns: {
+    ] as unknown as Array<ClioCheck>,
+    datasetChecks: {
       '1': {
         list: [
           {
-            runId: 1,
-            creationTime: '',
+            checkId: 1,
+            createdDate: '',
             datasetId: '1',
             datasetName: '1',
             dataProvider: '',
@@ -44,8 +39,8 @@ describe('ListingComponent', () => {
       '2': {
         list: [
           {
-            runId: 2,
-            creationTime: '',
+            checkId: 2,
+            createdDate: '',
             datasetId: '2',
             datasetName: '2',
             dataProvider: '',
@@ -99,25 +94,25 @@ describe('ListingComponent', () => {
     expect(component.getClioClass(19)).toEqual('clio-state-0');
   });
 
-  it('should set the checkboxes', () => {
-    const cmp = component.form.controls.run_ids as FormGroup;
+  it('should set the run checkboxes', () => {
+    const cmp = component.form.controls.check_ids as FormGroup;
 
     expect(cmp.value['1']).toBeTruthy();
-    component.setRunCheckboxes(false);
+    component.setClioCheckFormValues(false);
     expect(cmp.value['1']).toBeFalsy();
-    component.setRunCheckboxes(true);
+    component.setClioCheckFormValues(true);
     expect(cmp.value['1']).toBeTruthy();
   });
 
   it('should handle clicks outside', () => {
     component.clioInfo.set({
       ...structuredClone(clioInfo),
-      datasetRuns: {
+      datasetChecks: {
         '1': {
           list: [
             {
-              runId: 0,
-              creationTime: '',
+              checkId: 0,
+              createdDate: '',
               datasetId: '1',
               datasetName: '1',
               dataProvider: '',
@@ -132,9 +127,9 @@ describe('ListingComponent', () => {
     });
     TestBed.flushEffects();
 
-    expect(component.clioInfo().datasetRuns['1']?.opened).toBeTruthy();
+    expect(component.clioInfo().datasetChecks['1']?.opened).toBeTruthy();
     component.clickOutside();
-    expect(component.clioInfo().datasetRuns['1']?.opened).toBeFalsy();
+    expect(component.clioInfo().datasetChecks['1']?.opened).toBeFalsy();
   });
 
   it('should cancel the graph mode', () => {
@@ -157,26 +152,26 @@ describe('ListingComponent', () => {
     expect(component.updateIds).toHaveBeenCalled();
   });
 
-  it('should get the selected run count', fakeAsync(() => {
+  it('should get the selected run count', () => {
     const list = component.clioInfo().list;
 
     expect(component.getSelectedRunCount(list)).toEqual(2);
 
-    component.form.patchValue({ run_ids: { '1': false } });
+    component.form.patchValue({ check_ids: { '1': false } });
     expect(component.getSelectedRunCount(list)).toEqual(1);
 
-    component.form.patchValue({ run_ids: { '2': false } });
+    component.form.patchValue({ check_ids: { '2': false } });
     expect(component.getSelectedRunCount(list)).toEqual(0);
-  }));
+  });
 
   it('should update the list selection count', () => {
     expect(component.listSelectionCount).toEqual(2);
-    component.form.setValue({ run_ids: { '1': false, '2': true } });
+    component.form.setValue({ check_ids: { '1': false, '2': true } });
     expect(component.listSelectionCount).toEqual(2);
     component.updateIds();
     expect(component.listSelectionCount).toEqual(1);
 
-    component.form.setValue({ run_ids: { '1': false, '2': false } });
+    component.form.setValue({ check_ids: { '1': false, '2': false } });
     expect(component.listSelectionCount).toEqual(1);
     component.updateIds();
     expect(component.listSelectionCount).toEqual(0);

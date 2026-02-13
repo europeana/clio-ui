@@ -1,5 +1,5 @@
 import { Component, model, ModelSignal } from '@angular/core';
-import { BreakdownRequest, ClioInfo } from '../_models';
+import { CheckDataRequest, ClioInfo } from '../_models';
 
 @Component({
   selector: 'app-filters',
@@ -7,7 +7,7 @@ import { BreakdownRequest, ClioInfo } from '../_models';
 })
 export class MockFiltersComponent {
   modelClioInfo: ModelSignal<ClioInfo> = model({
-    datasetRuns: {},
+    datasetChecks: {},
     list: [],
     listLength: -1,
     listAverageScore: -1,
@@ -15,9 +15,9 @@ export class MockFiltersComponent {
     titleMarkup: []
   } as ClioInfo);
 
-  getDataServerDataRequest(): BreakdownRequest {
+  getDataServerDataRequest(): CheckDataRequest {
     return {
       filters: {}
-    } as unknown as BreakdownRequest;
+    } as unknown as CheckDataRequest;
   }
 }
