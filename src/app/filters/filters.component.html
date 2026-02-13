@@ -40,7 +40,7 @@
         >
           <app-checkbox
             [form]="form"
-            [controlName]="option"
+            [controlName]="toInputSafeName(option)"
             [labelText]="option"
             [group]="field.key"
             (valueChanged)="updatePageUrl()"

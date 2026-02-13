@@ -130,7 +130,9 @@ export const dataSets: Array<Dataset> = new Array(100)
   .map((_: unknown, index: number) => {
     const dataProvider = dataProviders[index % dataProviders.length];
     const provider =
-      providers[dataProvider.providers[index % dataProvider.providers.length]];
+      providers[
+        dataProvider.providers[(index + 1) % dataProvider.providers.length]
+      ];
 
     return {
       id: index,
@@ -167,7 +169,7 @@ const checks: Array<ClioCheck> = new Array(numChecks)
     };
   });
 
-const allRunData: Array<ClioCheck> = checks;
+const allChecks: Array<ClioCheck> = checks;
 
 // MOCK STATS SERVER...
 
@@ -195,64 +197,60 @@ export function dataServerRequest(
 ): BreakdownResults {
   const filterproof: Array<string> = [];
   const specifiedFilterNames = Object.keys(dataRequest.filters);
-  const filteredRuns = structuredClone(allRunData).filter(
-    (check: ClioCheck) => {
-      let res = true;
+  const filteredRuns = structuredClone(allChecks).filter((check: ClioCheck) => {
+    let res = true;
 
-      specifiedFilterNames.forEach((fName: string) => {
-        const filter = dataRequest.filters[fName];
+    specifiedFilterNames.forEach((fName: string) => {
+      const filter = dataRequest.filters[fName];
 
-        if (filter.values) {
-          if (fName === 'dataset-id') {
-            if (!filter.values.includes(check.datasetId)) {
-              res = false;
-            }
-          } else if (fName === 'dataset-name') {
+      if (filter.values) {
+        if (fName === 'dataset-id') {
+          if (!filter.values.includes(check.datasetId)) {
             res = false;
-            filter.values.forEach((val: string) => {
-              if (check.datasetName.indexOf(val) > -1) {
-                res = true;
-              }
-            });
-          } else if (fName === 'date-from') {
-            const dateParam = Date.parse(filter.values[0]);
-            const checkDate = Date.parse(check['createdDate']);
-            if (checkDate < dateParam) {
-              res = false;
-            }
-          } else if (fName === 'date-to') {
-            const dateParam = Date.parse(filter.values[0]);
-            const checkDate = Date.parse(check['createdDate']);
-            if (checkDate > dateParam) {
-              res = false;
-            }
-          } else if (fName === 'check-id') {
-            if (!filter.values.includes(`${check.checkId}`)) {
-              res = false;
-            }
-          } else if (
-            !filter.values.includes(
-              (check as unknown as { [key: string]: string })[fName]
-            )
-          ) {
-            res = false;
-          } else {
-            filterproof.push(fName);
           }
+        } else if (fName === 'dataset-name') {
+          res = false;
+          filter.values.forEach((val: string) => {
+            if (check.datasetName.indexOf(val) > -1) {
+              res = true;
+            }
+          });
+        } else if (fName === 'date-from') {
+          const dateParam = Date.parse(filter.values[0]);
+          const checkDate = Date.parse(check['createdDate']);
+          if (checkDate < dateParam) {
+            res = false;
+          }
+        } else if (fName === 'date-to') {
+          const dateParam = Date.parse(filter.values[0]);
+          const checkDate = Date.parse(check['createdDate']);
+          if (checkDate > dateParam) {
+            res = false;
+          }
+        } else if (fName === 'check-id') {
+          if (!filter.values.includes(`${check.checkId}`)) {
+            res = false;
+          }
+        } else if (
+          !filter.values.includes(
+            (check as unknown as { [key: string]: string })[fName]
+          )
+        ) {
+          res = false;
+        } else {
+          filterproof.push(fName);
         }
-      });
-      return res;
-    }
-  );
+      }
+    });
+    return res;
+  });
 
   const facetNames = ['dataProvider', 'provider'];
 
   const filterOptions = facetNames.reduce(
     (result: { [key: string]: Array<string> }, fName: string) => {
       const possibleValues = getDistinctValues(
-        filterproof.includes(fName)
-          ? structuredClone(allRunData)
-          : filteredRuns,
+        filterproof.includes(fName) ? structuredClone(allChecks) : filteredRuns,
         fName
       );
       result[fName] = possibleValues;

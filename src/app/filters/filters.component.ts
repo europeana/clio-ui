@@ -22,8 +22,11 @@ import { catchError, debounceTime, map } from 'rxjs/operators';
 
 import { RenameFilterPipe } from '../_translate';
 import { APIService } from '../_services';
-import { getDateAsISOString } from '../_helpers/date-helpers';
-import { fromCSL, toInputSafeName } from '../_helpers/date-helpers';
+import {
+  fromCSL,
+  fromInputSafeName,
+  toInputSafeName
+} from '../_helpers/date-helpers';
 import { filterList } from '../_helpers/string-helpers';
 
 import { BreakdownResults, CheckDataRequest, ClioInfo } from '../_models';
@@ -50,6 +53,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
   private readonly api = inject(APIService);
 
   public filterList = filterList;
+  public toInputSafeName = toInputSafeName;
 
   subs: Array<Subscription> = [];
   queryParams: Params = {};
@@ -134,6 +138,14 @@ export class FiltersComponent implements OnInit, OnDestroy {
     this.subs = [];
   }
 
+  getDateAsISOString(localDate: Date): string {
+    const date = new Date(localDate.toISOString());
+    const dateUTC = new Date(
+      date.getTime() - localDate.getTimezoneOffset() * 60000
+    );
+    return dateUTC.toISOString().split('T')[0];
+  }
+
   generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
     const res: Array<{ label: string; fn?: () => void }> = [];
     const queryKeys = Object.keys(this.queryParams);
@@ -143,7 +155,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
     }
 
     queryKeys.forEach((key: string, index: number) => {
-      const values = this.queryParams[key];
+      const values = this.queryParams[key].map((paramName: string) => {
+        return fromInputSafeName(paramName);
+      });
 
       if (key === 'date-from') {
         res.push({
@@ -232,9 +246,12 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
   getDataServerDataRequest(): CheckDataRequest {
     const dataRequest: CheckDataRequest = { filters: {} };
-
     Object.keys(this.queryParams).forEach((key: string) => {
-      dataRequest.filters[key] = { values: this.queryParams[key] };
+      dataRequest.filters[key] = {
+        values: this.queryParams[key].map((paramName: string) => {
+          return fromInputSafeName(paramName);
+        })
+      };
     });
 
     const valDatasetId = this.form.value.datasetId;
@@ -254,7 +271,6 @@ export class FiltersComponent implements OnInit, OnDestroy {
       const fName = toInputSafeName(option);
       const ctrl = this.form.get(`${name}.${fName}`);
       const defaultValue = `${this.queryParams[name]}`.includes(fName);
-
       if (!ctrl) {
         checkboxes.addControl(fName, new FormControl(defaultValue));
       } else {
@@ -281,10 +297,10 @@ export class FiltersComponent implements OnInit, OnDestroy {
         )
         .subscribe((breakdownResults: BreakdownResults) => {
           const list = breakdownResults.results;
-          const ops = breakdownResults.filteringOptions;
+          const filterOps = breakdownResults.filteringOptions;
 
-          Object.keys(ops).forEach((key: string) => {
-            this.addOrUpdateFilterControls(key, ops[key]);
+          Object.keys(filterOps).forEach((key: string) => {
+            this.addOrUpdateFilterControls(key, filterOps[key]);
           });
 
           const averageScore = Math.floor(
@@ -292,14 +308,16 @@ export class FiltersComponent implements OnInit, OnDestroy {
               list.length
           );
           const listAverageScore = Math.floor(averageScore / 20);
+          const datasetChecks = this.api.groupChecksByDatasetId(list);
+          const titleMarkup = this.generateTitleMarkup();
 
           this.modelClioInfo.set({
-            filterOps: ops,
-            datasetChecks: this.api.groupChecksByDatasetId(list),
+            filterOps,
+            datasetChecks,
             list,
             listLength: list.length,
             listAverageScore,
-            titleMarkup: this.generateTitleMarkup()
+            titleMarkup
           });
         })
     );
@@ -335,10 +353,10 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const valTo = this.form.value.dateTo;
 
     if (valFrom) {
-      qp['date-from'] = getDateAsISOString(new Date(valFrom));
+      qp['date-from'] = this.getDateAsISOString(new Date(valFrom));
     }
     if (valTo) {
-      qp['date-to'] = getDateAsISOString(new Date(valTo));
+      qp['date-to'] = this.getDateAsISOString(new Date(valTo));
     }
     if (datasetId) {
       qp['dataset-id'] = datasetId;
