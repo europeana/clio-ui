@@ -1,4 +1,8 @@
-import { BreakdownResults, CheckDataRequest } from '../../_models';
+import {
+  BreakdownResults,
+  CheckDataRequest,
+  FilterParameterName
+} from '../../_models';
 import { ClioCheck, Dataset } from '../../_models/new';
 
 export const today = new Date().toISOString().split('T')[0];
@@ -196,11 +200,13 @@ export function dataServerRequest(
   dataRequest: CheckDataRequest
 ): BreakdownResults {
   const filterproof: Array<string> = [];
-  const specifiedFilterNames = Object.keys(dataRequest.filters);
+  const specifiedFilterNames = Object.keys(
+    dataRequest.filters
+  ) as Array<FilterParameterName>;
   const filteredRuns = structuredClone(allChecks).filter((check: ClioCheck) => {
     let res = true;
 
-    specifiedFilterNames.forEach((fName: string) => {
+    specifiedFilterNames.forEach((fName: FilterParameterName) => {
       const filter = dataRequest.filters[fName];
 
       if (filter.values) {

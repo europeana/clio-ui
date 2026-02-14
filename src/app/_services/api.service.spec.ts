@@ -9,7 +9,7 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 
-import { ClioCheck } from '../_models';
+import { CheckDataRequest, ClioCheck, DownloadRequest } from '../_models';
 import { APIService } from './';
 
 describe('API Service', () => {
@@ -56,7 +56,7 @@ describe('API Service', () => {
     service
       .getFiltereClioChecks({
         filters: {}
-      })
+      } as CheckDataRequest)
       .subscribe((data: unknown) => {
         expect(data).toBeTruthy();
       });
@@ -67,7 +67,7 @@ describe('API Service', () => {
     service.getDownload({
       filters: {},
       excluded_check_ids: []
-    });
+    } as unknown as DownloadRequest);
     const req = httpTesting.expectOne(url, 'post...');
     req.flush('csv');
     httpTesting.verify();

@@ -4,9 +4,19 @@ interface RequestFilter {
   values?: Array<string>;
 }
 
+export type FilterParameterName =
+  | 'provider'
+  | 'data-provider'
+  | 'dataset-id'
+  | 'dataset-name'
+  | 'date-from'
+  | 'date-to'
+  | 'check-id'
+  | 'score';
+
 export interface CheckDataRequest {
   filters: {
-    [details: string]: RequestFilter;
+    [details in FilterParameterName]: RequestFilter;
   };
 }
 

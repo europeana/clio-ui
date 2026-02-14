@@ -1,6 +1,6 @@
 import { Component, HostListener, inject, ViewChild } from '@angular/core';
 
-import { ClioCheck } from './_models';
+import { ClioCheck, DownloadRequest } from './_models';
 import { APIService, ClickService } from './_services';
 import { HeaderComponent } from './header';
 import { FiltersComponent } from './filters';
@@ -37,7 +37,7 @@ export class AppComponent {
           values: [`${id}`]
         }
       }
-    });
+    } as DownloadRequest);
   }
 
   downloadDataset(id: string): void {

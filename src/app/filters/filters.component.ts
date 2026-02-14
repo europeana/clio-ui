@@ -29,7 +29,12 @@ import {
 } from '../_helpers/date-helpers';
 import { filterList } from '../_helpers/string-helpers';
 
-import { BreakdownResults, CheckDataRequest, ClioInfo } from '../_models';
+import {
+  BreakdownResults,
+  CheckDataRequest,
+  ClioInfo,
+  FilterParameterName
+} from '../_models';
 import { CheckboxComponent } from '../checkbox';
 
 @Component({
@@ -262,10 +267,10 @@ export class FiltersComponent implements OnInit, OnDestroy {
   }
 
   getDataServerDataRequest(): CheckDataRequest {
-    const dataRequest: CheckDataRequest = { filters: {} };
+    const dataRequest = { filters: {} } as CheckDataRequest;
     Object.keys(this.queryParams).forEach((key: string) => {
-      dataRequest.filters[key] = {
-        values: this.queryParams[key].map((paramName: string) => {
+      dataRequest.filters[key as FilterParameterName] = {
+        values: this.queryParams[key].map((paramName: FilterParameterName) => {
           return fromInputSafeName(paramName);
         })
       };
