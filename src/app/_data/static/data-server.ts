@@ -227,6 +227,12 @@ export function dataServerRequest(
           if (checkDate > dateParam) {
             res = false;
           }
+        } else if (fName === 'score') {
+          const scoreParam = parseInt(filter.values[0]);
+          const checkScore = check.percentInOperation;
+          if (checkScore < scoreParam || checkScore > scoreParam + 20) {
+            res = false;
+          }
         } else if (fName === 'check-id') {
           if (!filter.values.includes(`${check.checkId}`)) {
             res = false;

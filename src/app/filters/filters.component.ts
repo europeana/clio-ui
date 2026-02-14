@@ -1,4 +1,4 @@
-import { JsonPipe, KeyValuePipe, NgFor } from '@angular/common';
+import { JsonPipe, KeyValuePipe, NgClass, NgFor } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
@@ -37,6 +37,7 @@ import { CheckboxComponent } from '../checkbox';
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.scss'],
   imports: [
+    NgClass,
     NgFor,
     CheckboxComponent,
     JsonPipe,
@@ -78,6 +79,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     provider: new UntypedFormGroup({}),
     dateFrom: new FormControl(),
     dateTo: new FormControl(),
+    score: new FormControl(),
     datasetName: new FormControl(),
     datasetId: new FormControl(),
     datasetIds: new UntypedFormGroup({})
@@ -105,6 +107,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
       .subscribe((queryParams) => {
         const datasetId = queryParams['dataset-id'];
         const datasetName = queryParams['dataset-name'];
+        const score = queryParams['score'];
 
         if (datasetId) {
           const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
@@ -124,7 +127,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         this.form.controls.datasetName.setValue(
           datasetName ? datasetName[0] : ''
         );
-
+        this.form.controls.score.setValue(score ? score[0] : '');
         this.loadData();
       });
   }
@@ -206,6 +209,20 @@ export class FiltersComponent implements OnInit, OnDestroy {
           label: `${label} "${values[0]}"`,
           fn: () => {
             this.form.patchValue({ datasetName: '' });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'score') {
+        const label = 'Score';
+        if (index > 0) {
+          res.push({
+            label: 'and'
+          });
+        }
+        res.push({
+          label: `${label} "${values[0]}"`,
+          fn: () => {
+            this.form.patchValue({ score: '' });
             this.updatePageUrl();
           }
         });
@@ -351,6 +368,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const datasetName = this.form.value.datasetName;
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
+    const score = this.form.value.score;
 
     if (valFrom) {
       qp['date-from'] = this.getDateAsISOString(new Date(valFrom));
@@ -363,6 +381,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
     }
     if (datasetName) {
       qp['dataset-name'] = datasetName;
+    }
+    if (score) {
+      qp['score'] = score;
     }
 
     this.router.navigate([''], {

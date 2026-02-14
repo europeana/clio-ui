@@ -12,6 +12,21 @@ input {
   width: 9em;
 }
 
+select {
+  background-color: colours.$white;
+  border: 1px solid variables.$clio-colour;
+  color: variables.$text-colour;
+  padding: 0.25em;
+
+  &:focus-visible {
+    outline: 1px solid variables.$clio-highlight-colour;
+  }
+  & + .clio-state {
+    margin-left: 0.5rem;
+    transform: scale(0.75);
+  }
+}
+
 .input-wrapper {
   align-items: center;
   display: flex;
@@ -48,20 +63,6 @@ input {
       background-color: variables.$clio-highlight-colour;
       outline-color: variables.$clio-highlight-colour;
     }
-  }
-}
-
-select {
-  background: colours.$offwhite;
-  color: variables.$text-colour;
-  margin-top: 0.6em;
-  font-size: 1em;
-  font-weight: bold;
-  padding: 0.75em 0 0.25em 0;
-  margin-bottom: 1em;
-
-  &:focus-visible {
-    outline: 1px solid variables.$clio-highlight-colour;
   }
 }
 
@@ -122,7 +123,6 @@ select {
 
 .filter-label {
   font-weight: bold;
-  text-transform: capitalize;
 }
 
 .checkbox-filter {
@@ -139,6 +139,11 @@ select {
       color: transparent;
     }
   }
+
+  .filter-label {
+    text-transform: capitalize;
+  }
+
   .search-icon {
     background-image: icon_urls.svg-url-icon-search(variables.$text-colour);
     background-repeat: no-repeat;
