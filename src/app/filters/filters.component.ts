@@ -225,7 +225,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
           });
         }
         res.push({
-          label: `${label} "${values[0]}"`,
+          label: `${label} ${values[0]}% - ${parseInt(values[0]) + 20}%`,
           fn: () => {
             this.form.patchValue({ score: '' });
             this.updatePageUrl();
