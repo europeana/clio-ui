@@ -2,7 +2,6 @@ import {
   appendDiacriticEquivalents,
   filterList,
   fromCSL,
-  //fromInputSafeName,
   replaceDiacritics
 } from '.';
 
