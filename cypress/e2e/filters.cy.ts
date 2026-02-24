@@ -3,13 +3,13 @@ describe('Filters', () => {
 describe('prefilling', () => {
   it('prefills the dataset id', () => {
     const id = 71;
-    cy.visit(`/?dataset-id=${id}`);
+    cy.visit(`/?datasetId=${id}`);
     cy.get('[data-e2e=dataset-id]').should('have.value', id);
   })
 
   it('prefills the dataset name', () => {
     const name = 'my_dataset_3';
-    cy.visit(`/?dataset-name=${name}`);
+    cy.visit(`/?datasetName=${name}`);
     cy.get('[data-e2e=dataset-name]').should('have.value', name);
   })
 
@@ -27,13 +27,13 @@ describe('prefilling', () => {
 
   it('prefills the date (from)', () => {
     const date = '2026-01-19';
-    cy.visit(`/?date-from=${date}`);
+    cy.visit(`/?dateFrom=${date}`);
     cy.get('[data-e2e=date-from]').should('have.value', date);
   })
 
   it('prefills the date (to)', () => {
     const date = '2026-12-31';
-    cy.visit(`/?date-to=${date}`);
+    cy.visit(`/?dateTo=${date}`);
     cy.get('[data-e2e=date-to]').should('have.value', date);
   })
 

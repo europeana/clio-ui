@@ -110,8 +110,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe((queryParams) => {
-        const datasetId = queryParams['dataset-id'];
-        const datasetName = queryParams['dataset-name'];
+        const datasetId = queryParams['datasetId'];
+        const datasetName = queryParams['datasetName'];
         const score = queryParams['score'];
 
         if (datasetId) {
@@ -123,8 +123,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
         this.queryParams = queryParams;
 
-        const dateFrom = this.queryParams['date-from'];
-        const dateTo = this.queryParams['date-to'];
+        const dateFrom = this.queryParams['dateFrom'];
+        const dateTo = this.queryParams['dateTo'];
 
         this.form.controls.dateFrom.setValue(dateFrom ? dateFrom[0] : '');
         this.form.controls.dateTo.setValue(dateTo ? dateTo[0] : '');
@@ -167,7 +167,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         return fromInputSafeName(paramName);
       });
 
-      if (key === 'date-from') {
+      if (key === 'dateFrom') {
         res.push({
           label: `from`
         });
@@ -178,7 +178,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
             this.updatePageUrl();
           }
         });
-      } else if (key === 'date-to') {
+      } else if (key === 'dateTo') {
         res.push({
           label: `until`
         });
@@ -189,7 +189,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
             this.updatePageUrl();
           }
         });
-      } else if (key === 'dataset-id') {
+      } else if (key === 'datasetId') {
         const label = 'Dataset Id';
         if (index > 0) {
           res.push({
@@ -203,7 +203,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
             this.updatePageUrl();
           }
         });
-      } else if (key === 'dataset-name') {
+      } else if (key === 'datasetName') {
         const label = 'Dataset Name';
         if (index > 0) {
           res.push({
@@ -279,8 +279,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const valDatasetId = this.form.value.datasetId;
 
     if (valDatasetId) {
-      dataRequest.filters['dataset-id'] = fromCSL(valDatasetId);
+      dataRequest.filters['datasetId'] = fromCSL(valDatasetId);
     }
+
     return dataRequest;
   }
 
@@ -374,16 +375,16 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const score = this.form.value.score;
 
     if (valFrom) {
-      qp['date-from'] = this.getDateAsISOString(new Date(valFrom));
+      qp['dateFrom'] = this.getDateAsISOString(new Date(valFrom));
     }
     if (valTo) {
-      qp['date-to'] = this.getDateAsISOString(new Date(valTo));
+      qp['dateTo'] = this.getDateAsISOString(new Date(valTo));
     }
     if (datasetId) {
-      qp['dataset-id'] = datasetId;
+      qp['datasetId'] = datasetId;
     }
     if (datasetName) {
-      qp['dataset-name'] = datasetName;
+      qp['datasetName'] = datasetName;
     }
     if (score) {
       qp['score'] = score;

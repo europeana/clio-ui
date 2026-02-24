@@ -71,21 +71,21 @@ describe('FiltersComponent', () => {
       expect(component.loadData).toHaveBeenCalled();
     }));
 
-    it('should react to the page params (dataset-id)', fakeAsync(() => {
+    it('should react to the page params (datasetId)', fakeAsync(() => {
       jest.spyOn(component, 'loadData');
       component.ngOnInit();
       queryParams.next({});
-      queryParams.next({ 'dataset-id': '1' });
+      queryParams.next({ datasetId: '1' });
       tick(0);
       fixture.detectChanges();
       expect(component.loadData).toHaveBeenCalled();
     }));
 
-    it('should react to the page params (dataset-ids)', fakeAsync(() => {
+    it('should react to the page params (datasetIds)', fakeAsync(() => {
       jest.spyOn(component, 'loadData');
       component.ngOnInit();
       queryParams.next({});
-      queryParams.next({ 'dataset-id': '1,2' });
+      queryParams.next({ datasetId: '1,2' });
       tick(0);
       fixture.detectChanges();
       expect(component.loadData).toHaveBeenCalled();
@@ -95,7 +95,7 @@ describe('FiltersComponent', () => {
       jest.spyOn(component, 'loadData');
       component.ngOnInit();
       queryParams.next({});
-      queryParams.next({ 'date-from': '2026-01-06' });
+      queryParams.next({ dateFrom: '2026-01-06' });
       tick(0);
       fixture.detectChanges();
       expect(component.loadData).toHaveBeenCalled();
@@ -105,7 +105,7 @@ describe('FiltersComponent', () => {
       jest.spyOn(component, 'loadData');
       component.ngOnInit();
       queryParams.next({});
-      queryParams.next({ 'date-to': '2026-01-06' });
+      queryParams.next({ dateTo: '2026-01-06' });
       tick(0);
       fixture.detectChanges();
       expect(component.loadData).toHaveBeenCalled();
@@ -140,10 +140,10 @@ describe('FiltersComponent', () => {
       queryParams.next({});
       queryParams.next({
         provider: ['A', 'B'],
-        'date-from': '19:12:76',
-        'date-to': '19:12:77',
-        'dataset-id': '1',
-        'dataset-name': 'my_dataset'
+        dateFrom: '19:12:76',
+        dateTo: '19:12:77',
+        datasetId: '1',
+        datasetName: 'my_dataset'
       });
       tick(1);
       fixture.detectChanges();
@@ -180,10 +180,10 @@ describe('FiltersComponent', () => {
       component.queryParams = {
         provider: ['A', 'B'],
         dataProvider: ['C', 'D'],
-        'dataset-id': ['101'],
-        'dataset-name': ['MyDataset'],
-        'date-from': ['Dec 12th'],
-        'date-to': ['June 10th']
+        datasetId: ['101'],
+        datasetName: ['MyDataset'],
+        dateFrom: ['Dec 12th'],
+        dateTo: ['June 10th']
       };
       markup = component.generateTitleMarkup();
       expect(markup.map((m) => m.label).join(' ')).toEqual(

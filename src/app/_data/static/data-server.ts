@@ -209,24 +209,24 @@ export function dataServerRequest(
     specifiedFilterNames.forEach((fName: FilterParameterName) => {
       const filter = dataRequest.filters[fName];
 
-      if (fName === 'dataset-id') {
+      if (fName === 'datasetId') {
         if (!filter.includes(check.datasetId)) {
           res = false;
         }
-      } else if (fName === 'dataset-name') {
+      } else if (fName === 'datasetName') {
         res = false;
         filter.forEach((val: string) => {
           if (check.datasetName.indexOf(val) > -1) {
             res = true;
           }
         });
-      } else if (fName === 'date-from') {
+      } else if (fName === 'dateFrom') {
         const dateParam = Date.parse(filter[0]);
         const checkDate = Date.parse(check['createdDate']);
         if (checkDate < dateParam) {
           res = false;
         }
-      } else if (fName === 'date-to') {
+      } else if (fName === 'dateTo') {
         const dateParam = Date.parse(filter[0]);
         const checkDate = Date.parse(check['createdDate']);
         if (checkDate > dateParam) {
@@ -238,7 +238,7 @@ export function dataServerRequest(
         if (checkScore < scoreParam || checkScore > scoreParam + 20) {
           res = false;
         }
-      } else if (fName === 'check-id') {
+      } else if (fName === 'checkId') {
         if (!filter.includes(`${check.checkId}`)) {
           res = false;
         }

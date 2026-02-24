@@ -2,12 +2,12 @@ import { ClioCheck } from '../_models';
 
 export type FilterParameterName =
   | 'provider'
-  | 'data-provider'
-  | 'dataset-id'
-  | 'dataset-name'
-  | 'date-from'
-  | 'date-to'
-  | 'check-id'
+  | 'dataProvider'
+  | 'datasetId'
+  | 'datasetName'
+  | 'dateFrom'
+  | 'dateTo'
+  | 'checkId'
   | 'score';
 
 export interface CheckDataRequest {
