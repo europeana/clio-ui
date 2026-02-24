@@ -1,7 +1,7 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import {
   CheckDataRequest,
-  BreakdownResults
+  CheckDataResults
 } from '../src/app/_models';
 
 import { ExportCSVService } from '../src/app/_helpers/export-csv';

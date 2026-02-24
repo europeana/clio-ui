@@ -30,8 +30,8 @@ import {
 import { filterList } from '../_helpers/string-helpers';
 
 import {
-  BreakdownResults,
   CheckDataRequest,
+  CheckDataResults,
   ClioInfo,
   FilterParameterName
 } from '../_models';
@@ -317,9 +317,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
             });
           })
         )
-        .subscribe((breakdownResults: BreakdownResults) => {
-          const list = breakdownResults.results;
-          const filterOps = breakdownResults.filteringOptions;
+        .subscribe((CheckDataResults: CheckDataResults) => {
+          const list = CheckDataResults.results;
+          const filterOps = CheckDataResults.filteringOptions;
 
           Object.keys(filterOps).forEach((key: string) => {
             this.addOrUpdateFilterControls(key, filterOps[key]);

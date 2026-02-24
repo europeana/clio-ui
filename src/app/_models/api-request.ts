@@ -24,7 +24,7 @@ export interface DownloadRequest extends CheckDataRequest {
   excluded_check_ids?: Array<string>;
 }
 
-export interface BreakdownResults {
+export interface CheckDataResults {
   filteringOptions: { [key: string]: Array<string> };
   results: Array<ClioCheck>;
 }

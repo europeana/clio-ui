@@ -4,8 +4,8 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import {
-  BreakdownResults,
   CheckDataRequest,
+  CheckDataResults,
   CheckGroup,
   ClioCheck,
   DownloadRequest
@@ -51,9 +51,9 @@ export class APIService {
 
   getFiltereClioChecks(
     request: CheckDataRequest
-  ): Observable<BreakdownResults> {
+  ): Observable<CheckDataResults> {
     return this.http
-      .post<BreakdownResults>(`${apiSettings.serverAPI}/checks`, request)
+      .post<CheckDataResults>(`${apiSettings.serverAPI}/checks`, request)
       .pipe(
         catchError(() => {
           const fakeResult = dataServerRequest(request);

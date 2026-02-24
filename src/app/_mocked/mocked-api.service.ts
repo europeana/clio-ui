@@ -1,11 +1,10 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
-  BreakdownResults,
   CheckDataRequest,
+  CheckDataResults,
   CheckGroup,
   ClioCheck
-  //, DownloadRequest
 } from '../_models';
 
 export class MockAPIService {
@@ -26,14 +25,14 @@ export class MockAPIService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   getDownload(_: CheckDataRequest): void {}
 
-  getFiltereClioChecks(_: CheckDataRequest): Observable<BreakdownResults> {
+  getFiltereClioChecks(_: CheckDataRequest): Observable<CheckDataResults> {
     if (this.errorMode) {
       return this.getError('mock getFiltereClioChecks throws error');
     }
     return of({
       filteringOptions: {},
       results: []
-    } as BreakdownResults);
+    } as CheckDataResults);
   }
 }
 

@@ -1,6 +1,6 @@
 import {
-  BreakdownResults,
   CheckDataRequest,
+  CheckDataResults,
   FilterParameterName
 } from '../../_models';
 import { ClioCheck, Dataset } from '../../_models/new';
@@ -198,7 +198,7 @@ function getDistinctValues(
 
 export function dataServerRequest(
   dataRequest: CheckDataRequest
-): BreakdownResults {
+): CheckDataResults {
   const filterproof: Array<string> = [];
   const specifiedFilterNames = Object.keys(
     dataRequest.filters
