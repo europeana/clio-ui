@@ -1,9 +1,5 @@
 import { ClioCheck } from '../_models';
 
-interface RequestFilter {
-  values?: Array<string>;
-}
-
 export type FilterParameterName =
   | 'provider'
   | 'data-provider'
@@ -16,7 +12,7 @@ export type FilterParameterName =
 
 export interface CheckDataRequest {
   filters: {
-    [details in FilterParameterName]: RequestFilter;
+    [details in FilterParameterName]: Array<string>;
   };
 }
 

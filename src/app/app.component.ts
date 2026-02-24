@@ -33,9 +33,7 @@ export class AppComponent {
   downloadCheck(id: number): void {
     this.api.getDownload({
       filters: {
-        'check-id': {
-          values: [`${id}`]
-        }
+        'check-id': [`${id}`]
       }
     } as DownloadRequest);
   }
@@ -53,9 +51,7 @@ export class AppComponent {
     });
     const downloadRequest = this.filters.getDataServerDataRequest();
 
-    downloadRequest.filters['dataset-id'] = {
-      values: [id]
-    };
+    downloadRequest.filters['dataset-id'] = [id];
 
     this.api.getDownload({
       ...downloadRequest,

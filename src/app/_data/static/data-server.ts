@@ -209,49 +209,45 @@ export function dataServerRequest(
     specifiedFilterNames.forEach((fName: FilterParameterName) => {
       const filter = dataRequest.filters[fName];
 
-      if (filter.values) {
-        if (fName === 'dataset-id') {
-          if (!filter.values.includes(check.datasetId)) {
-            res = false;
-          }
-        } else if (fName === 'dataset-name') {
+      if (fName === 'dataset-id') {
+        if (!filter.includes(check.datasetId)) {
           res = false;
-          filter.values.forEach((val: string) => {
-            if (check.datasetName.indexOf(val) > -1) {
-              res = true;
-            }
-          });
-        } else if (fName === 'date-from') {
-          const dateParam = Date.parse(filter.values[0]);
-          const checkDate = Date.parse(check['createdDate']);
-          if (checkDate < dateParam) {
-            res = false;
-          }
-        } else if (fName === 'date-to') {
-          const dateParam = Date.parse(filter.values[0]);
-          const checkDate = Date.parse(check['createdDate']);
-          if (checkDate > dateParam) {
-            res = false;
-          }
-        } else if (fName === 'score') {
-          const scoreParam = parseInt(filter.values[0]);
-          const checkScore = check.percentInOperation;
-          if (checkScore < scoreParam || checkScore > scoreParam + 20) {
-            res = false;
-          }
-        } else if (fName === 'check-id') {
-          if (!filter.values.includes(`${check.checkId}`)) {
-            res = false;
-          }
-        } else if (
-          !filter.values.includes(
-            (check as unknown as { [key: string]: string })[fName]
-          )
-        ) {
-          res = false;
-        } else {
-          filterproof.push(fName);
         }
+      } else if (fName === 'dataset-name') {
+        res = false;
+        filter.forEach((val: string) => {
+          if (check.datasetName.indexOf(val) > -1) {
+            res = true;
+          }
+        });
+      } else if (fName === 'date-from') {
+        const dateParam = Date.parse(filter[0]);
+        const checkDate = Date.parse(check['createdDate']);
+        if (checkDate < dateParam) {
+          res = false;
+        }
+      } else if (fName === 'date-to') {
+        const dateParam = Date.parse(filter[0]);
+        const checkDate = Date.parse(check['createdDate']);
+        if (checkDate > dateParam) {
+          res = false;
+        }
+      } else if (fName === 'score') {
+        const scoreParam = parseInt(filter[0]);
+        const checkScore = check.percentInOperation;
+        if (checkScore < scoreParam || checkScore > scoreParam + 20) {
+          res = false;
+        }
+      } else if (fName === 'check-id') {
+        if (!filter.includes(`${check.checkId}`)) {
+          res = false;
+        }
+      } else if (
+        !filter.includes((check as unknown as { [key: string]: string })[fName])
+      ) {
+        res = false;
+      } else {
+        filterproof.push(fName);
       }
     });
     return res;

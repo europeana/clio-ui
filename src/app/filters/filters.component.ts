@@ -269,19 +269,17 @@ export class FiltersComponent implements OnInit, OnDestroy {
   getDataServerDataRequest(): CheckDataRequest {
     const dataRequest = { filters: {} } as CheckDataRequest;
     Object.keys(this.queryParams).forEach((key: string) => {
-      dataRequest.filters[key as FilterParameterName] = {
-        values: this.queryParams[key].map((paramName: FilterParameterName) => {
-          return fromInputSafeName(paramName);
-        })
-      };
+      dataRequest.filters[key as FilterParameterName] = this.queryParams[
+        key
+      ].map((paramName: FilterParameterName) => {
+        return fromInputSafeName(paramName);
+      });
     });
 
     const valDatasetId = this.form.value.datasetId;
 
     if (valDatasetId) {
-      dataRequest.filters['dataset-id'] = {
-        values: fromCSL(valDatasetId)
-      };
+      dataRequest.filters['dataset-id'] = fromCSL(valDatasetId);
     }
     return dataRequest;
   }
