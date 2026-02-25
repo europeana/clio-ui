@@ -1,4 +1,4 @@
-<span [formGroup]="form" style="display: flex">
+<span *ngIf="form" [formGroup]="form" style="display: flex">
   <input
     type="range"
     min="0"
