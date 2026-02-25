@@ -235,7 +235,7 @@ export function dataServerRequest(
       } else if (fName === 'percentInOperation') {
         const scoreParam = parseInt(filter[0]);
         const checkScore = check.percentInOperation;
-        if (checkScore < scoreParam || checkScore > scoreParam + 20) {
+        if (checkScore < scoreParam) {
           res = false;
         }
       } else if (fName === 'checkId') {

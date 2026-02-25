@@ -52,12 +52,15 @@
   </ng-container>
 
   <span>
-    <app-slider
-      (change)="updatePageUrl()"
-      [form]="form"
-      [controlName]="'percentInOperation'"
-    >
-    </app-slider>
+    <span class="filter-label">Percent In Operation</span>
+    <span class="input-wrapper">
+      <app-slider
+        (change)="updatePageUrl()"
+        [form]="form"
+        [controlName]="'percentInOperation'"
+      >
+      </app-slider>
+    </span>
   </span>
 
   <div [formGroup]="form">

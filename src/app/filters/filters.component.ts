@@ -221,14 +221,14 @@ export class FiltersComponent implements OnInit, OnDestroy {
           }
         });
       } else if (key === 'percentInOperation') {
-        const label = 'Score';
+        const label = 'Percent In Operation';
         if (index > 0) {
           res.push({
             label: 'and'
           });
         }
         res.push({
-          label: `${label} ${values[0]}% - ${Number.parseInt(values[0]) + 20}%`,
+          label: `${label} >= ${values[0]}%`,
           fn: () => {
             this.form.patchValue({ percentInOperation: '' });
             this.updatePageUrl();
