@@ -232,7 +232,7 @@ export function dataServerRequest(
         if (checkDate > dateParam) {
           res = false;
         }
-      } else if (fName === 'score') {
+      } else if (fName === 'percentInOperation') {
         const scoreParam = parseInt(filter[0]);
         const checkScore = check.percentInOperation;
         if (checkScore < scoreParam || checkScore > scoreParam + 20) {

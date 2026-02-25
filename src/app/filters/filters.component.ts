@@ -84,7 +84,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     provider: new UntypedFormGroup({}),
     dateFrom: new FormControl(),
     dateTo: new FormControl(),
-    score: new FormControl(),
+    percentInOperation: new FormControl(),
     datasetName: new FormControl(),
     datasetId: new FormControl(),
     datasetIds: new UntypedFormGroup({})
@@ -112,7 +112,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
       .subscribe((queryParams) => {
         const datasetId = queryParams['datasetId'];
         const datasetName = queryParams['datasetName'];
-        const score = queryParams['score'];
+        const percentInOperation = queryParams['percentInOperation'];
 
         if (datasetId) {
           const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
@@ -132,7 +132,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
         this.form.controls.datasetName.setValue(
           datasetName ? datasetName[0] : ''
         );
-        this.form.controls.score.setValue(score ? score[0] : '');
+        this.form.controls.percentInOperation.setValue(
+          percentInOperation ? percentInOperation[0] : ''
+        );
         this.loadData();
       });
   }
@@ -217,7 +219,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
             this.updatePageUrl();
           }
         });
-      } else if (key === 'score') {
+      } else if (key === 'percentInOperation') {
         const label = 'Score';
         if (index > 0) {
           res.push({
@@ -227,7 +229,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         res.push({
           label: `${label} ${values[0]}% - ${Number.parseInt(values[0]) + 20}%`,
           fn: () => {
-            this.form.patchValue({ score: '' });
+            this.form.patchValue({ percentInOperation: '' });
             this.updatePageUrl();
           }
         });
@@ -372,7 +374,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const datasetName = this.form.value.datasetName;
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
-    const score = this.form.value.score;
+    const percentInOperation = this.form.value.percentInOperation;
 
     if (valFrom) {
       qp['dateFrom'] = this.getDateAsISOString(new Date(valFrom));
@@ -386,8 +388,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
     if (datasetName) {
       qp['datasetName'] = datasetName;
     }
-    if (score) {
-      qp['score'] = score;
+    if (percentInOperation) {
+      qp['percentInOperation'] = percentInOperation;
     }
 
     this.router.navigate([''], {

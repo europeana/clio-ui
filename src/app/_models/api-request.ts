@@ -8,7 +8,7 @@ export type FilterParameterName =
   | 'dateFrom'
   | 'dateTo'
   | 'checkId'
-  | 'score';
+  | 'percentInOperation';
 
 export interface CheckDataRequest {
   filters: {
