@@ -1,0 +1,24 @@
+<span [formGroup]="form" style="display: flex">
+  <input
+    type="range"
+    min="0"
+    max="80"
+    step="20"
+    [formControlName]="controlName"
+    [(ngModel)]="value"
+    (ngModelChange)="updateChanges()"
+  />
+
+  @let actualScore = form.value['percentInOperation'];
+  <span
+    class="clio-state"
+    [ngClass]="{
+      'clio-state-0': actualScore === '0',
+      'clio-state-1': actualScore === '20',
+      'clio-state-2': actualScore === '40',
+      'clio-state-3': actualScore === '60',
+      'clio-state-4': actualScore === '80'
+    }"
+  >
+  </span>
+</span>

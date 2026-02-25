@@ -51,35 +51,14 @@
     </div>
   </ng-container>
 
-  <div [formGroup]="form">
-    <span class="filter-label">Links in Operation (%)</span>
-    <span class="input-wrapper">
-      <select
-        data-e2e="score"
-        formControlName="percentInOperation"
-        (change)="updatePageUrl()"
-      >
-        <option value="0">0% - 20%</option>
-        <option value="20">20% - 40%</option>
-        <option value="40">40% - 60%</option>
-        <option value="60">60% - 80%</option>
-        <option value="80">80% - 100%</option>
-      </select>
-
-      @let actualScore = form.value['percentInOperation'];
-      <span
-        class="clio-state"
-        [ngClass]="{
-          'clio-state-0': actualScore === '0',
-          'clio-state-1': actualScore === '20',
-          'clio-state-2': actualScore === '40',
-          'clio-state-3': actualScore === '60',
-          'clio-state-4': actualScore === '80'
-        }"
-      >
-      </span>
-    </span>
-  </div>
+  <span>
+    <app-slider
+      (change)="updatePageUrl()"
+      [form]="form"
+      [controlName]="'percentInOperation'"
+    >
+    </app-slider>
+  </span>
 
   <div [formGroup]="form">
     <span class="filter-label">Dataset Id(s)</span>

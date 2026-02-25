@@ -1,4 +1,4 @@
-import { JsonPipe, KeyValuePipe, NgClass, NgFor } from '@angular/common';
+import { JsonPipe, KeyValuePipe, NgFor } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
@@ -36,20 +36,21 @@ import {
   FilterParameterName
 } from '../_models';
 import { CheckboxComponent } from '../checkbox';
+import { SliderComponent } from '../slider';
 
 @Component({
   selector: 'app-filters',
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.scss'],
   imports: [
-    NgClass,
     NgFor,
     CheckboxComponent,
     JsonPipe,
     KeyValuePipe,
     FormsModule,
     ReactiveFormsModule,
-    RenameFilterPipe
+    RenameFilterPipe,
+    SliderComponent
   ]
 })
 export class FiltersComponent implements OnInit, OnDestroy {

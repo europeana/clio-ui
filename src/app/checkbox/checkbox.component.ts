@@ -1,11 +1,9 @@
 import {
   Component,
-  ElementRef,
   EventEmitter,
   forwardRef,
   Input,
-  Output,
-  ViewChild
+  Output
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -39,14 +37,12 @@ export class CheckboxComponent implements ControlValueAccessor {
   @Input() group: string;
   @Input() controlName: string;
 
-  @ViewChild('baseInput') baseInput: ElementRef;
-
   @Output() valueChanged: EventEmitter<boolean> = new EventEmitter();
   @Output() keySelectionMade: EventEmitter<InputDescription> =
     new EventEmitter();
 
   writeValue(): void {
-    // unimplemented
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
   }
 
   registerOnChange(fn: () => void): void {
@@ -54,12 +50,13 @@ export class CheckboxComponent implements ControlValueAccessor {
   }
 
   registerOnTouched(): void {
-    // unimplemented
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
   }
 
   setParent(): void {
-    // unimplemented
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
   }
+
   onChange(): void {
     this.valueChanged.emit();
   }
