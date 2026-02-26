@@ -1,5 +1,5 @@
 import { Component, forwardRef, Input } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -18,7 +18,7 @@ import {
       multi: true
     }
   ],
-  imports: [FormsModule, NgClass, ReactiveFormsModule]
+  imports: [FormsModule, NgClass, NgIf, ReactiveFormsModule]
 })
 export class SliderComponent implements ControlValueAccessor {
   @Input() form: UntypedFormGroup;
