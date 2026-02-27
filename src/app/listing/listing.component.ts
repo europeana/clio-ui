@@ -22,7 +22,7 @@ import {
 
 import { DATE_CONCISE_FMT } from '../_data/static/date-formats';
 import { ClickAwareDirective } from '../_directives';
-import { ClioCheck, ClioInfo } from '../_models';
+import { CheckGroup, ClioCheck, ClioInfo } from '../_models';
 import { RenameFilterPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
 
@@ -45,6 +45,9 @@ import { CheckboxComponent } from '../checkbox';
 export class ListingComponent {
   public DATE_CONCISE_FMT = DATE_CONCISE_FMT;
   private readonly fb = inject(UntypedFormBuilder);
+
+  MAX_IN_VIEWPORT = 5;
+  currentPage = 0;
 
   listSelectionCount = 0;
   graphMode = false;
@@ -124,6 +127,32 @@ export class ListingComponent {
       }).length;
   }
 
+  getPage(): { [key: string]: CheckGroup } {
+    const clioInfoValue = this.clioInfo();
+    const startIndex = this.currentPage * this.MAX_IN_VIEWPORT;
+    const endIndex = startIndex + this.MAX_IN_VIEWPORT;
+
+    const keyList = Object.keys(clioInfoValue.datasetChecks).slice(
+      startIndex,
+      Math.min(endIndex, clioInfoValue.list.length)
+    );
+
+    return keyList.reduce((map: { [key: string]: CheckGroup }, key: string) => {
+      if (!map[key]) {
+        map[key] = clioInfoValue.datasetChecks[key];
+      }
+      return map;
+    }, {});
+  }
+
+  paginationInfo(): number {
+    const clioInfoValue = this.clioInfo();
+    const total = clioInfoValue.list.length;
+    const totalPages = total / this.MAX_IN_VIEWPORT;
+    return totalPages;
+  }
+
+  /*
   setClioCheckFormValues(val: boolean): void {
     Object.keys(this.form.controls).forEach((group: string) => {
       Object.keys((this.form.get(group) as UntypedFormGroup).controls).forEach(
@@ -141,6 +170,25 @@ export class ListingComponent {
           }
         }
       );
+    });
+  }
+  */
+
+  setClioCheckFormValues(val: boolean): void {
+    const groupControls = (this.form.get('check_ids') as UntypedFormGroup)
+      .controls;
+    Object.keys(groupControls).forEach((key) => {
+      const ctrl = this.form.get('check_ids.' + key) as FormControl;
+      if (val) {
+        const arrVisible = this.clioInfo().list.map((item: ClioCheck) => {
+          return `${item.checkId}`;
+        });
+        if (arrVisible.includes(key)) {
+          ctrl.setValue(val);
+        }
+      } else {
+        ctrl.setValue(false);
+      }
     });
   }
 

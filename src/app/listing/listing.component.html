@@ -147,7 +147,12 @@
     }
   </li>
 
+  <!--
   @for (dsRun of clioInfo().datasetChecks | keyvalue; track dsRun.key) {
+  @if($index < MAX_IN_VIEWPORT) {
+  @for (dsRun of clioInfo().datasetChecks | keyvalue; track dsRun.key) {
+  -->
+  @for (dsRun of getPage() | keyvalue; track dsRun.key) {
     @let group = dsRun.value;
     @let dsId = dsRun.key;
 
@@ -286,4 +291,20 @@
       </ul>
     </li>
   }
+
+  <li>
+    <ul>
+      <li>
+        <a (click)="currentPage = currentPage - 1"> &lt;&lt; </a>
+        {{ currentPage }}
+        <a (click)="currentPage = currentPage + 1"> &gt;&gt; </a>
+      </li>
+      <li>of</li>
+      <li>
+        {{ paginationInfo() }}
+      </li>
+    </ul>
+  </li>
+  <!--
+  -->
 </ul>
