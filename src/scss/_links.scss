@@ -6,6 +6,10 @@ a {
   color: variables.$clio-colour;
   text-decoration: none;
 
+  &[disabled] {
+    pointer-events: none;
+  }
+
   &:not([disabled]) {
     cursor: pointer;
     &:focus-visible,

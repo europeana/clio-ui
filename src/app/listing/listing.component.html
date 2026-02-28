@@ -293,18 +293,28 @@
   }
 
   <li>
-    <ul>
-      <li>
-        <a (click)="currentPage = currentPage - 1"> &lt;&lt; </a>
-        {{ currentPage }}
-        <a (click)="currentPage = currentPage + 1"> &gt;&gt; </a>
-      </li>
-      <li>of</li>
-      <li>
-        {{ paginationInfo() }}
-      </li>
-    </ul>
+    <span style="grid-column: 1 / -1; display: flex; justify-content: flex-end">
+      <a
+        [attr.tabindex]="currentPage === 0 ? -1 : 0"
+        [attr.disabled]="currentPage === 0 ? 'disabled' : null"
+        (click)="currentPage = currentPage - 1"
+        (keyUp.enter)="currentPage = currentPage - 1"
+      >
+        &lt;</a
+      >
+      &nbsp;
+      {{ currentPage + 1 }}
+      &nbsp;
+      <a
+        [attr.tabindex]="currentPage + 1 < totalPages ? 0 : -1"
+        [attr.disabled]="currentPage + 1 < totalPages ? null : 'disabled'"
+        (keyUp.enter)="currentPage = currentPage + 1"
+        (click)="currentPage = currentPage + 1"
+      >
+        &gt;</a
+      >
+      &nbsp; of
+      {{ totalPages }}
+    </span>
   </li>
-  <!--
-  -->
 </ul>

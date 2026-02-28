@@ -46,8 +46,9 @@ export class ListingComponent {
   public DATE_CONCISE_FMT = DATE_CONCISE_FMT;
   private readonly fb = inject(UntypedFormBuilder);
 
-  MAX_IN_VIEWPORT = 5;
+  MAX_IN_VIEWPORT = 50;
   currentPage = 0;
+  totalPages = 0;
 
   listSelectionCount = 0;
   graphMode = false;
@@ -96,6 +97,9 @@ export class ListingComponent {
         });
         this.listSelectionCount = list.length;
         this.setClioCheckFormValues(true);
+
+        this.currentPage = 0;
+        this.totalPages = list.length / this.MAX_IN_VIEWPORT;
       }
     });
   }
@@ -144,35 +148,6 @@ export class ListingComponent {
       return map;
     }, {});
   }
-
-  paginationInfo(): number {
-    const clioInfoValue = this.clioInfo();
-    const total = clioInfoValue.list.length;
-    const totalPages = total / this.MAX_IN_VIEWPORT;
-    return totalPages;
-  }
-
-  /*
-  setClioCheckFormValues(val: boolean): void {
-    Object.keys(this.form.controls).forEach((group: string) => {
-      Object.keys((this.form.get(group) as UntypedFormGroup).controls).forEach(
-        (key) => {
-          const ctrl = this.form.get(group + '.' + key) as FormControl;
-          if (val) {
-            const arrVisible = this.clioInfo().list.map((item: ClioCheck) => {
-              return `${item.checkId}`;
-            });
-            if (arrVisible.includes(key)) {
-              ctrl.setValue(val);
-            }
-          } else {
-            ctrl.setValue(false);
-          }
-        }
-      );
-    });
-  }
-  */
 
   setClioCheckFormValues(val: boolean): void {
     const groupControls = (this.form.get('check_ids') as UntypedFormGroup)
