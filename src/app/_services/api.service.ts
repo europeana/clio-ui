@@ -49,7 +49,7 @@ export class APIService {
     return res;
   }
 
-  getFiltereClioChecks(
+  getFilteredClioChecks(
     request: CheckDataRequest
   ): Observable<CheckDataResults> {
     return this.http

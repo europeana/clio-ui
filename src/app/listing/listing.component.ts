@@ -82,7 +82,9 @@ export class ListingComponent {
           'dataset_ids'
         ) as UntypedFormGroup;
 
-        const list = this.clioInfo().list;
+        const clioInfoValue = this.clioInfo();
+        const list = clioInfoValue.list;
+
         list.forEach((check: ClioCheck) => {
           const fName = `${check.checkId}`;
           const ctrlRun = this.form.get(fName);
@@ -99,7 +101,10 @@ export class ListingComponent {
         this.setClioCheckFormValues(true);
 
         this.currentPage = 0;
-        this.totalPages = list.length / this.MAX_IN_VIEWPORT;
+
+        this.totalPages =
+          Object.keys(clioInfoValue.datasetChecks).length /
+          this.MAX_IN_VIEWPORT;
       }
     });
   }

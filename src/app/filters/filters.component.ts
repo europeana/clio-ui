@@ -309,7 +309,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     this.error = undefined;
     this.subs.push(
       this.api
-        .getFiltereClioChecks(this.getDataServerDataRequest())
+        .getFilteredClioChecks(this.getDataServerDataRequest())
         .pipe(
           catchError((err: HttpErrorResponse) => {
             this.error = err;

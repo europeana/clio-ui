@@ -25,9 +25,9 @@ export class MockAPIService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   getDownload(_: CheckDataRequest): void {}
 
-  getFiltereClioChecks(_: CheckDataRequest): Observable<CheckDataResults> {
+  getFilteredClioChecks(_: CheckDataRequest): Observable<CheckDataResults> {
     if (this.errorMode) {
-      return this.getError('mock getFiltereClioChecks throws error');
+      return this.getError('mock getFilteredClioChecks throws error');
     }
     return of({
       filteringOptions: {},

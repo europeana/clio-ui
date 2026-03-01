@@ -293,7 +293,7 @@
   }
 
   <li>
-    <span style="grid-column: 1 / -1; display: flex; justify-content: flex-end">
+    <span class="pagination">
       <a
         [attr.tabindex]="currentPage === 0 ? -1 : 0"
         [attr.disabled]="currentPage === 0 ? 'disabled' : null"
@@ -313,7 +313,7 @@
       >
         &gt;</a
       >
-      &nbsp; of
+      &nbsp;<i>of</i>&nbsp;
       {{ totalPages }}
     </span>
   </li>

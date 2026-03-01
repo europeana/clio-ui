@@ -41,21 +41,18 @@ export class CheckboxComponent implements ControlValueAccessor {
   @Output() keySelectionMade: EventEmitter<InputDescription> =
     new EventEmitter();
 
-  writeValue(): void {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  writeValue(): void {}
 
   registerOnChange(fn: () => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(): void {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  registerOnTouched(): void {}
 
-  setParent(): void {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setParent(): void {}
 
   onChange(): void {
     this.valueChanged.emit();

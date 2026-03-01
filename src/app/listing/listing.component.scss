@@ -233,6 +233,16 @@ $cell-height: 2.25em;
   }
 }
 
+.pagination {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+
+  a[disabled] {
+    opacity: 0.2;
+  }
+}
+
 .header-section {
   background-color: colours.$white;
   position: sticky;

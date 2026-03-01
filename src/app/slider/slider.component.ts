@@ -26,10 +26,13 @@ export class SliderComponent implements ControlValueAccessor {
 
   value = 0;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onChange(): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onTouched(): void {}
 
-  updateChanges() {
+  updateChanges(): void {
     this.onChange();
   }
 
@@ -42,7 +45,6 @@ export class SliderComponent implements ControlValueAccessor {
     this.onChange = fn;
   }
 
-  registerOnTouched(): void {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  registerOnTouched(): void {}
 }
