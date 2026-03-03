@@ -147,7 +147,7 @@ export const dataSets: Array<Dataset> = new Array(100)
   });
 
 // Factory of all checks
-const numChecks = 2500;
+const numChecks = 1000;
 const checks: Array<ClioCheck> = new Array(numChecks)
   .fill(null)
   .map((_: unknown, index: number) => {

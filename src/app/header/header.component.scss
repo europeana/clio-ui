@@ -11,8 +11,7 @@ a:focus {
   outline: 1px solid variables.$focus-highlight-colour;
 }
 
-.header,
-.logo {
+.header {
   display: flex;
   flex-direction: row;
 }
@@ -33,61 +32,13 @@ a:focus {
 }
 
 .logo {
+  background-image: icon_urls.svg-url-icon-europeana();
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+  height: 54px;
   margin-left: 21px;
-
-  .icon {
-    align-self: center;
-    background: icon_urls.svg-url-icon-europeana(
-        variables.$clio-highlight-colour
-      )
-      center no-repeat;
-    height: 48px;
-    transform: translateX(4px);
-    width: 39px;
-    z-index: 1;
-  }
-
-  .icon-wrapper {
-    align-content: center;
-    color: colours.$white;
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    width: 73px;
-    background-color: colours.$white;
-
-    border-right: 1.125px solid variables.$clio-colour;
-    border-bottom: 1.125px solid variables.$clio-colour;
-
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-
-    &::after,
-    &::before {
-      content: '';
-      display: block;
-      position: absolute;
-    }
-
-    &::after {
-      top: 0;
-      right: 0;
-      width: 49px;
-      height: 0.7px;
-      background: colours.$mid-grey;
-    }
-
-    &::before {
-      border-right: 0.75px solid #b47da7;
-      transform: rotate(23deg);
-      width: 1px;
-      height: 132px;
-      transform: rotate(23deg);
-      top: -16px;
-      left: 0.125px;
-    }
-  }
+  width: 270px;
 
   .text,
   & + .text {
