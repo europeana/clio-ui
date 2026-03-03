@@ -1,5 +1,6 @@
 import { Component, HostListener, inject, ViewChild } from '@angular/core';
 
+import { apiSettings } from '../environments/apisettings';
 import { ClioCheck, DownloadRequest } from './_models';
 import { APIService, ClickService } from './_services';
 import { HeaderComponent } from './header';
@@ -15,6 +16,7 @@ export class AppComponent {
   title = 'Clio UI';
   private readonly api = inject(APIService);
   private readonly clickService = inject(ClickService);
+  public apiSettings = apiSettings;
 
   @ViewChild('listing', { static: false }) listing: ListingComponent;
   @ViewChild('filters', { static: false }) filters: FiltersComponent;

@@ -2,18 +2,8 @@
 @use '../../scss/colours';
 @use '../../scss/variables';
 
-@font-face {
-  font-family: Chevin-Medium;
-  src: url('/assets/fonts/chevin/ChevinMedium.otf') format('opentype');
-}
-
 a:focus {
   outline: 1px solid variables.$focus-highlight-colour;
-}
-
-.header {
-  display: flex;
-  flex-direction: row;
 }
 
 .header {
@@ -21,6 +11,8 @@ a:focus {
   background: colours.$offwhite;
   border-top: 2px solid colours.$mid-grey;
   border-bottom: 2px solid colours.$mid-grey;
+  display: flex;
+  flex-direction: row;
   padding: 4px 0;
 }
 
@@ -39,19 +31,4 @@ a:focus {
   height: 54px;
   margin-left: 21px;
   width: 270px;
-
-  .text,
-  & + .text {
-    color: variables.$clio-colour;
-    font-family: Chevin-Medium, serif;
-    font-weight: bold;
-    margin-left: 14px;
-  }
-
-  .text {
-    display: flex;
-    flex-direction: column;
-    font-size: 25px;
-    line-height: 30px;
-  }
 }

@@ -5,5 +5,6 @@ const getEnvVar = (key: string): string | null => {
 };
 
 export const apiSettings = {
-  serverAPI: getEnvVar('serverAPI') as string
+  serverAPI: getEnvVar('serverAPI') as string,
+  dataspaceURL: getEnvVar('dataspaceURL') as string
 };
