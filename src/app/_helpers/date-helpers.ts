@@ -1,9 +1,9 @@
 export function toInputSafeName(s: string): string {
-  return s.replace(/\./g, '_____');
+  return s.replace(/\./g, '_____'); // NOSONAR
 }
 
 export function fromInputSafeName(s: string): string {
-  return s.replace(/_____/g, '.');
+  return s.replace(/_____/g, '.'); // NOSONAR
 }
 
 /** fromCSL

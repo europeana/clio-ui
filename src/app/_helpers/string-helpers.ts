@@ -28,7 +28,7 @@ export const DiacriticsMap: { [key: string]: string } = {
 };
 
 const sanitationRegex = /[.*+?^${}()|[\]\\]/g;
-const sanitationReplace = '\\$&';
+const sanitationReplace = '\\$&'; // NOSONAR
 
 /** replaceDiacritics
 /* @param {string} source - the source string

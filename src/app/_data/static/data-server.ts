@@ -216,7 +216,7 @@ export function dataServerRequest(
       } else if (fName === 'datasetName') {
         res = false;
         filter.forEach((val: string) => {
-          if (check.datasetName.indexOf(val) > -1) {
+          if (check.datasetName.includes(val)) {
             res = true;
           }
         });
@@ -233,7 +233,7 @@ export function dataServerRequest(
           res = false;
         }
       } else if (fName === 'percentInOperation') {
-        const scoreParam = parseInt(filter[0]);
+        const scoreParam = Number.parseInt(filter[0]);
         const checkScore = check.percentInOperation;
         if (checkScore < scoreParam) {
           res = false;
@@ -243,11 +243,11 @@ export function dataServerRequest(
           res = false;
         }
       } else if (
-        !filter.includes((check as unknown as { [key: string]: string })[fName])
+        filter.includes((check as unknown as { [key: string]: string })[fName])
       ) {
-        res = false;
-      } else {
         filterproof.push(fName);
+      } else {
+        res = false;
       }
     });
     return res;
