@@ -9,7 +9,7 @@ This repository is a front-end for europeana clio.
 
 ## Getting started
 
-Make sure you have `node` version 20.19 and `npm` version 10.2.4:
+Make sure you have `node` version 24.x and `npm` version 11.x:
 
     node --version
     npm --version
