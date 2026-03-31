@@ -2,10 +2,9 @@ import { createServer, IncomingMessage, ServerResponse } from 'http';
 import {
   CheckDataRequest,
   CheckDataResults
-} from '../src/app/_models';
+} from './src-copy/api-request.mjs';
 
-import { ExportCSVService } from '../src/app/_helpers/export-csv';
-import { dataServerRequest } from '../src/app/_data/static/data-server';
+import { dataServerRequest } from './data-server.mjs';
 
 new (class {
   serverName = 'Clio';
@@ -73,9 +72,12 @@ new (class {
         if(route.match(/\/download/)) {
           this.headerText(response);
           const data = dataServerRequest(br).results;
+          /*
           const srv = new ExportCSVService();
           const csvData = srv.csvFromClioChecks(data);
           response.end(csvData);
+          */
+          response.end(data);
         }
         else if(route.match(/\/checks/)) {
           this.handleCheckDataRequest(response, br);

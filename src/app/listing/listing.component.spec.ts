@@ -125,8 +125,6 @@ describe('ListingComponent', () => {
         }
       }
     });
-    TestBed.flushEffects();
-
     expect(component.clioInfo().datasetChecks['1']?.opened).toBeTruthy();
     component.clickOutside();
     expect(component.clioInfo().datasetChecks['1']?.opened).toBeFalsy();

@@ -1,9 +1,9 @@
 import {
   CheckDataRequest,
   CheckDataResults,
+  ClioCheck, Dataset,
   FilterParameterName
-} from '../../_models';
-import { ClioCheck, Dataset } from '../../_models';
+} from './src-copy/api-request.mjs';
 
 export const today = new Date().toISOString().split('T')[0];
 export const yearZero = new Date(Date.parse('20 Nov 2008 12:00:00 GMT'));
