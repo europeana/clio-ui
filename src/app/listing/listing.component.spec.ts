@@ -74,7 +74,7 @@ describe('ListingComponent', () => {
       component.clioInfo = model(structuredClone(clioInfo));
     });
 
-    TestBed.flushEffects();
+    TestBed.tick();
     fixture.detectChanges();
   };
 
