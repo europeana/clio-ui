@@ -1,5 +1,7 @@
 import { ClioCheck } from '../_models';
 
+type TupleType = string | number | undefined;
+
 export class ExportCSVService {
   headersCheck: Array<string> = [
     'id',
@@ -26,10 +28,7 @@ export class ExportCSVService {
     return `"${str}"`;
   }
 
-  pushToTuple(
-    arr: Array<string | number | undefined>,
-    val: string | number | undefined
-  ): void {
+  pushToTuple(arr: Array<TupleType>, val: TupleType): void {
     val = val && typeof val === 'string' ? this.sanitiseVal(val) : val;
     arr.push(val);
   }

@@ -2,7 +2,7 @@
   @let filter = modelClioInfo().filterOps;
 
   @if (error) {
-    <span style="colour: red">
+    <span style="color: red">
       {{ error | json }}
     </span>
   }
@@ -72,11 +72,13 @@
         (keyUp.enter)="updatePageUrl()"
       />
       <a
+        aria-label="filter dataset label"
         class="search-icon-solid"
         tabindex="0"
         (click)="updatePageUrl()"
         (keyUp.enter)="updatePageUrl()"
-      ></a>
+        ><!-- //NOSONAR --></a
+      >
     </span>
 
     <span class="filter-label">Dataset Name</span>
@@ -88,11 +90,13 @@
         (keyUp.enter)="updatePageUrl()"
       />
       <a
+        aria-label="filter dataset name"
         class="search-icon-solid"
         tabindex="0"
         (click)="updatePageUrl()"
         (keyUp.enter)="updatePageUrl()"
-      ></a>
+        ><!-- //NOSONAR --></a
+      >
     </span>
 
     <span class="filter-label">From</span>
@@ -104,11 +108,13 @@
         (change)="updatePageUrl()"
       />
       <a
+        aria-label="filter date"
         class="search-icon-solid"
         tabindex="0"
         (click)="updatePageUrl()"
         (keyUp.enter)="updatePageUrl()"
-      ></a>
+        ><!-- //NOSONAR --></a
+      >
     </span>
 
     <span class="filter-label">To</span>
@@ -120,11 +126,13 @@
         (change)="updatePageUrl()"
       />
       <a
+        aria-label="filter date"
         class="search-icon-solid"
         tabindex="0"
         (click)="updatePageUrl()"
         (keyUp.enter)="updatePageUrl()"
-      ></a>
+        ><!-- //NOSONAR --></a
+      >
     </span>
   </div>
 </div>

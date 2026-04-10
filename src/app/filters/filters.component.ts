@@ -171,27 +171,31 @@ export class FiltersComponent implements OnInit, OnDestroy {
       });
 
       if (key === 'dateFrom') {
-        res.push({
-          label: `from`
-        });
-        res.push({
-          label: `${values[0]}`,
-          fn: () => {
-            this.form.patchValue({ dateFrom: '' });
-            this.updatePageUrl();
+        res.push(
+          {
+            label: `from`
+          },
+          {
+            label: `${values[0]}`,
+            fn: () => {
+              this.form.patchValue({ dateFrom: '' });
+              this.updatePageUrl();
+            }
           }
-        });
+        );
       } else if (key === 'dateTo') {
-        res.push({
-          label: `until`
-        });
-        res.push({
-          label: `${values[0]}`,
-          fn: () => {
-            this.form.patchValue({ dateTo: '' });
-            this.updatePageUrl();
+        res.push(
+          {
+            label: `until`
+          },
+          {
+            label: `${values[0]}`,
+            fn: () => {
+              this.form.patchValue({ dateTo: '' });
+              this.updatePageUrl();
+            }
           }
-        });
+        );
       } else if (key === 'datasetId') {
         const label = 'Dataset Id';
         if (index > 0) {

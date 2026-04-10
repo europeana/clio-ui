@@ -83,7 +83,7 @@ export class APIService {
     anchor.download = downloadName;
     document.body.appendChild(anchor);
     anchor.click();
-    document.body.removeChild(anchor);
+    anchor.remove();
   }
 
   getDownload(request: DownloadRequest): void {
