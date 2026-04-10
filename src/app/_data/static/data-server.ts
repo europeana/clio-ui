@@ -201,13 +201,13 @@ export function dataServerRequest(
 ): CheckDataResults {
   const filterproof: Array<string> = [];
   const specifiedFilterNames = Object.keys(
-    dataRequest.filters
+    dataRequest.filterOptions
   ) as Array<FilterParameterName>;
   const filteredRuns = structuredClone(allChecks).filter((check: ClioCheck) => {
     let res = true;
 
     specifiedFilterNames.forEach((fName: FilterParameterName) => {
-      const filter = dataRequest.filters[fName];
+      const filter = dataRequest.filterOptions[fName];
 
       if (fName === 'datasetId') {
         if (!filter.includes(check.datasetId)) {
@@ -232,7 +232,7 @@ export function dataServerRequest(
         if (checkDate > dateParam) {
           res = false;
         }
-      } else if (fName === 'percentInOperation') {
+      } else if (fName === 'percentLinksInOperationFrom') {
         const scoreParam = Number.parseInt(filter[0]);
         const checkScore = check.percentInOperation;
         if (checkScore < scoreParam) {
@@ -268,7 +268,7 @@ export function dataServerRequest(
   );
 
   return {
-    filteringOptions: filterOptions,
+    filterOptions: filterOptions,
     results: filteredRuns
   };
 }

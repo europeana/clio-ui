@@ -55,7 +55,7 @@ describe('API Service', () => {
   it('should get the filtered reports', () => {
     service
       .getFilteredClioChecks({
-        filters: {}
+        filterOptions: {}
       } as CheckDataRequest)
       .subscribe((data: unknown) => {
         expect(data).toBeTruthy();
@@ -63,9 +63,9 @@ describe('API Service', () => {
   });
 
   it('should get the download', () => {
-    const url = `${apiSettings.serverAPI}/download`;
+    const url = `${apiSettings.serverAPI}/reports`;
     service.getDownload({
-      filters: {},
+      filterOptions: {},
       excluded_check_ids: []
     } as unknown as DownloadRequest);
     const req = httpTesting.expectOne(url, 'post...');

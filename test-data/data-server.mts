@@ -201,15 +201,21 @@ export function dataServerRequest(
 ): CheckDataResults {
   const filterproof: Array<string> = [];
   const specifiedFilterNames = Object.keys(
-    dataRequest.filters
+    dataRequest.filterOptions
   ) as Array<FilterParameterName>;
   const filteredRuns = structuredClone(allChecks).filter((check: ClioCheck) => {
     let res = true;
 
     specifiedFilterNames.forEach((fName: FilterParameterName) => {
-      const filter = dataRequest.filters[fName];
+      const filter = dataRequest.filterOptions[fName];
 
-      if (fName === 'datasetId') {
+      if (fName === 'offset') {
+        //
+      }
+      else if (fName === 'limit') {
+        //
+      }
+      else if (fName === 'datasetId') {
         if (!filter.includes(check.datasetId)) {
           res = false;
         }
@@ -232,21 +238,29 @@ export function dataServerRequest(
         if (checkDate > dateParam) {
           res = false;
         }
-      } else if (fName === 'percentInOperation') {
-        const scoreParam = Number.parseInt(filter[0]);
+      } else if (fName === 'percentLinksInOperationFrom') {
+        const scoreParam = Number.parseInt(filter.toString());
         const checkScore = check.percentInOperation;
         if (checkScore < scoreParam) {
           res = false;
         }
-      } else if (fName === 'checkId') {
+      }else if (fName === 'percentLinksInOperationTo') {
+        const scoreParam = Number.parseInt(filter.toString());
+        const checkScore = check.percentInOperation;
+        if (checkScore > scoreParam) {
+          res = false;
+        }
+      }
+       else if (fName === 'checkId') {
         if (!filter.includes(`${check.checkId}`)) {
           res = false;
         }
       } else if (
-        filter.includes((check as unknown as { [key: string]: string })[fName])
+        filter.includes && filter.includes((check as unknown as { [key: string]: string })[fName])
       ) {
         filterproof.push(fName);
       } else {
+        console.log('unknow filter option: ' + fName);
         res = false;
       }
     });
@@ -268,7 +282,7 @@ export function dataServerRequest(
   );
 
   return {
-    filteringOptions: filterOptions,
+    filterOptions,
     results: filteredRuns
   };
 }

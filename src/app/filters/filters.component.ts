@@ -270,9 +270,16 @@ export class FiltersComponent implements OnInit, OnDestroy {
   }
 
   getDataServerDataRequest(): CheckDataRequest {
-    const dataRequest = { filters: {} } as CheckDataRequest;
+    const dataRequest = {
+      filterOptions: {
+        percentLinksInOperationFrom: 0,
+        percentLinksInOperationTo: 100,
+        offset: 0,
+        limit: 5
+      }
+    } as unknown as CheckDataRequest;
     Object.keys(this.queryParams).forEach((key: string) => {
-      dataRequest.filters[key as FilterParameterName] = this.queryParams[
+      dataRequest.filterOptions[key as FilterParameterName] = this.queryParams[
         key
       ].map((paramName: FilterParameterName) => {
         return fromInputSafeName(paramName);
@@ -282,7 +289,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const valDatasetId = this.form.value.datasetId;
 
     if (valDatasetId) {
-      dataRequest.filters['datasetId'] = fromCSL(valDatasetId);
+      dataRequest.filterOptions['datasetId'] = fromCSL(valDatasetId);
     }
 
     return dataRequest;
@@ -303,6 +310,15 @@ export class FiltersComponent implements OnInit, OnDestroy {
     });
   }
 
+  isFilter(key: string): boolean {
+    return ![
+      'limit',
+      'offset',
+      'percentLinksInOperationFrom',
+      'percentLinksInOperationTo'
+    ].includes(key);
+  }
+
   /** loadData
    **/
   loadData(): void {
@@ -315,16 +331,20 @@ export class FiltersComponent implements OnInit, OnDestroy {
             this.error = err;
             return of({
               results: [],
-              filteringOptions: {}
+              filterOptions: {}
             });
           })
         )
         .subscribe((CheckDataResults: CheckDataResults) => {
           const list = CheckDataResults.results;
-          const filterOps = CheckDataResults.filteringOptions;
+          const filterOps = CheckDataResults.filterOptions;
 
           Object.keys(filterOps).forEach((key: string) => {
-            this.addOrUpdateFilterControls(key, filterOps[key]);
+            if (this.isFilter(key)) {
+              if (filterOps[key]) {
+                this.addOrUpdateFilterControls(key, filterOps[key]);
+              }
+            }
           });
 
           const averageScore = Math.floor(
@@ -366,7 +386,14 @@ export class FiltersComponent implements OnInit, OnDestroy {
       (filterName: string) => {
         const filterVals = this.getSetCheckboxValues(filterName);
         if (filterVals.length > 0) {
-          qp[filterName] = filterVals;
+          if (
+            ![
+              'percentLinksInOperationFrom',
+              'percentLinksInOperationTo'
+            ].includes(filterName)
+          ) {
+            qp[filterName] = filterVals;
+          }
         }
       }
     );
@@ -390,7 +417,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
       qp['datasetName'] = datasetName;
     }
     if (percentInOperation) {
-      qp['percentInOperation'] = percentInOperation;
+      qp['percentLinksInOperationFrom'] = percentInOperation;
     }
 
     this.router.navigate([''], {

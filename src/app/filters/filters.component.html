@@ -6,11 +6,10 @@
       {{ error | json }}
     </span>
   }
-
   <ng-container *ngFor="let field of filter | keyvalue">
     <span class="checkbox-filter">
       <span class="filter-label">{{ field.key | renameFilter }}</span>
-      @if (field.value.length > 5) {
+      @if (field.value && field.value.length > 5) {
         <span class="search-icon"></span>
         <input
           class="checkbox-filter-input"

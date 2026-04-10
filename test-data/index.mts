@@ -79,7 +79,7 @@ new (class {
           */
           response.end(data);
         }
-        else if(route.match(/\/checks/)) {
+        else if(route.match(/\/runs\/summary/)) {
           this.handleCheckDataRequest(response, br);
         }
       });

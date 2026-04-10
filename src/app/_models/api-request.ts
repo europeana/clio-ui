@@ -6,10 +6,14 @@ export type FilterParameterName =
   | 'dateFrom'
   | 'dateTo'
   | 'checkId'
-  | 'percentInOperation';
+  // TODO: these are not actually arrays...
+  | 'offset'
+  | 'limit'
+  | 'percentLinksInOperationFrom'
+  | 'percentLinksInOperationTo';
 
 export interface CheckDataRequest {
-  filters: {
+  filterOptions: {
     [details in FilterParameterName]: Array<string>;
   };
 }
@@ -19,7 +23,7 @@ export interface DownloadRequest extends CheckDataRequest {
 }
 
 export interface CheckDataResults {
-  filteringOptions: { [key: string]: Array<string> };
+  filterOptions: { [key: string]: Array<string> };
   results: Array<ClioCheck>;
 }
 

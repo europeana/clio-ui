@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-
+import { catchError, map } from 'rxjs/operators';
 import {
   CheckDataRequest,
   CheckDataResults,
@@ -10,7 +9,6 @@ import {
   ClioCheck,
   DownloadRequest
 } from '../_models';
-import { dataServerRequest } from '../_data/static/data-server';
 import { apiSettings } from '../../environments/apisettings';
 
 @Injectable({ providedIn: 'root' })
@@ -53,15 +51,24 @@ export class APIService {
     request: CheckDataRequest
   ): Observable<CheckDataResults> {
     return this.http
-      .post<CheckDataResults>(`${apiSettings.serverAPI}/checks`, request)
+      .post<CheckDataResults>(`${apiSettings.serverAPI}/runs/summary`, request)
       .pipe(
-        catchError(() => {
-          const fakeResult = dataServerRequest(request);
-          console.log(
-            'Server Failed: send static data = ',
-            JSON.stringify(fakeResult, null, 4)
-          );
-          return of(fakeResult);
+        map((cdr: CheckDataResults) => {
+          const {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            limit: _,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            offset: __,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            percentLinksInOperationFrom: ___,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            percentLinksInOperationTo: ____,
+            ...realFilters
+          } = cdr.filterOptions;
+          return {
+            filterOptions: realFilters,
+            results: cdr.results
+          };
         })
       );
   }
@@ -85,7 +92,7 @@ export class APIService {
       'text/plain; charset=utf-8'
     );
     this.http
-      .post(`${apiSettings.serverAPI}/download`, request, {
+      .post(`${apiSettings.serverAPI}/reports`, request, {
         headers: headers,
         responseType: 'text'
       })

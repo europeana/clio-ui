@@ -88,6 +88,7 @@ export function appendDiacriticEquivalents(source: string): string {
  **/
 export function sanitiseSearchTerm(filterString: string): string {
   if (
+    !filterString ||
     filterString.length === 0 ||
     filterString.replace(sanitationRegex, '').length === 0
   ) {
@@ -131,7 +132,7 @@ export function filterList<T>(
   filterString: string,
   filterables: Array<T>
 ): Array<T> {
-  if (filterString.length === 0) {
+  if (!filterString || filterString.length === 0) {
     return filterables;
   }
 

@@ -30,7 +30,7 @@ export class MockAPIService {
       return this.getError('mock getFilteredClioChecks throws error');
     }
     return of({
-      filteringOptions: {},
+      filterOptions: {},
       results: []
     } as CheckDataResults);
   }

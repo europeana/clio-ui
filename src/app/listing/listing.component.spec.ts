@@ -73,8 +73,6 @@ describe('ListingComponent', () => {
     TestBed.runInInjectionContext(() => {
       component.clioInfo = model(structuredClone(clioInfo));
     });
-
-    TestBed.tick();
     fixture.detectChanges();
   };
 
