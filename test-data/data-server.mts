@@ -209,13 +209,7 @@ export function dataServerRequest(
     specifiedFilterNames.forEach((fName: FilterParameterName) => {
       const filter = dataRequest.filterOptions[fName];
 
-      if (fName === 'offset') {
-        //
-      }
-      else if (fName === 'limit') {
-        //
-      }
-      else if (fName === 'datasetId') {
+      if (fName === 'datasetId') {
         if (!filter.includes(check.datasetId)) {
           res = false;
         }
@@ -244,7 +238,7 @@ export function dataServerRequest(
         if (checkScore < scoreParam) {
           res = false;
         }
-      }else if (fName === 'percentLinksInOperationTo') {
+      } else if (fName === 'percentLinksInOperationTo') {
         const scoreParam = Number.parseInt(filter.toString());
         const checkScore = check.percentInOperation;
         if (checkScore > scoreParam) {
@@ -259,8 +253,8 @@ export function dataServerRequest(
         filter.includes && filter.includes((check as unknown as { [key: string]: string })[fName])
       ) {
         filterproof.push(fName);
-      } else {
-        console.log('unknow filter option: ' + fName);
+      } else if(!['offset', 'limit'].includes(fName)){
+        console.log('unknowm filter option: ' + fName);
         res = false;
       }
     });

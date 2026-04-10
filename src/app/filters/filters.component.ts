@@ -302,21 +302,12 @@ export class FiltersComponent implements OnInit, OnDestroy {
       const fName = toInputSafeName(option);
       const ctrl = this.form.get(`${name}.${fName}`);
       const defaultValue = `${this.queryParams[name]}`.includes(fName);
-      if (!ctrl) {
-        checkboxes.addControl(fName, new FormControl(defaultValue));
-      } else {
+      if (ctrl) {
         ctrl.setValue(defaultValue);
+      } else {
+        checkboxes.addControl(fName, new FormControl(defaultValue));
       }
     });
-  }
-
-  isFilter(key: string): boolean {
-    return ![
-      'limit',
-      'offset',
-      'percentLinksInOperationFrom',
-      'percentLinksInOperationTo'
-    ].includes(key);
   }
 
   /** loadData
@@ -340,10 +331,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
           const filterOps = CheckDataResults.filterOptions;
 
           Object.keys(filterOps).forEach((key: string) => {
-            if (this.isFilter(key)) {
-              if (filterOps[key]) {
-                this.addOrUpdateFilterControls(key, filterOps[key]);
-              }
+            if (filterOps[key]) {
+              this.addOrUpdateFilterControls(key, filterOps[key]);
             }
           });
 
@@ -386,14 +375,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
       (filterName: string) => {
         const filterVals = this.getSetCheckboxValues(filterName);
         if (filterVals.length > 0) {
-          if (
-            ![
-              'percentLinksInOperationFrom',
-              'percentLinksInOperationTo'
-            ].includes(filterName)
-          ) {
-            qp[filterName] = filterVals;
-          }
+          qp[filterName] = filterVals;
         }
       }
     );
