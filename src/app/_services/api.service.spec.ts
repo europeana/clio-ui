@@ -55,7 +55,7 @@ describe('API Service', () => {
   it('should get the filtered reports', () => {
     service
       .getFilteredClioChecks({
-        filterOptions: {}
+        filters: {}
       } as CheckDataRequest)
       .subscribe((data: unknown) => {
         expect(data).toBeTruthy();

@@ -202,13 +202,13 @@ export function dataServerRequest(
 ): CheckDataResults {
   const filterproof: Array<string> = [];
   const specifiedFilterNames = Object.keys(
-    dataRequest.filterOptions
+    dataRequest.filters
   ) as Array<FilterParameterName>;
   const filteredRuns = structuredClone(allChecks).filter((check: ClioCheck) => {
     let res = true;
 
     specifiedFilterNames.forEach((fName: FilterParameterName) => {
-      const filter = dataRequest.filterOptions[fName];
+      const filter = dataRequest.filters[fName];
 
       if (fName === 'datasetId') {
         if (!filter.includes(check.datasetId)) {

@@ -13,7 +13,7 @@ export type FilterParameterName =
   | 'percentLinksInOperationTo';
 
 export interface CheckDataRequest {
-  filterOptions: {
+  filters: {
     [details in FilterParameterName]: Array<string>;
   };
 }

@@ -17,7 +17,7 @@ export class MockFiltersComponent {
 
   getDataServerDataRequest(): CheckDataRequest {
     return {
-      filterOptions: {}
+      filters: {}
     } as unknown as CheckDataRequest;
   }
 }

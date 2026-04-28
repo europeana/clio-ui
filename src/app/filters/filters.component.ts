@@ -275,7 +275,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
   getDataServerDataRequest(): CheckDataRequest {
     const dataRequest = {
-      filterOptions: {
+      filters: {
         percentLinksInOperationFrom: 0,
         percentLinksInOperationTo: 100,
         offset: 0,
@@ -283,7 +283,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
       }
     } as unknown as CheckDataRequest;
     Object.keys(this.queryParams).forEach((key: string) => {
-      dataRequest.filterOptions[key as FilterParameterName] = this.queryParams[
+      dataRequest.filters[key as FilterParameterName] = this.queryParams[
         key
       ].map((paramName: FilterParameterName) => {
         return fromInputSafeName(paramName);
@@ -293,7 +293,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const valDatasetId = this.form.value.datasetId;
 
     if (valDatasetId) {
-      dataRequest.filterOptions['datasetId'] = fromCSL(valDatasetId);
+      dataRequest.filters['datasetId'] = fromCSL(valDatasetId);
     }
 
     return dataRequest;
