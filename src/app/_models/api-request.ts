@@ -36,18 +36,18 @@ export interface Dataset {
 
 export interface ClioCheck {
   id: number;
-  createdDate: string;
+  date: string;
   datasetId: string;
   datasetName: string;
   provider: string;
   dataProvider: string;
-  percentInOperation: number;
+  percentLinksInOperation: number;
 }
 
 export interface CheckGroup {
   list: Array<ClioCheck>;
   opened: boolean;
-  percentInOperation: number;
+  percentLinksInOperation: number;
 }
 
 export interface ClioInfo {

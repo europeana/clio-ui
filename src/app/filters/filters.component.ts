@@ -85,7 +85,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     provider: new UntypedFormGroup({}),
     dateFrom: new FormControl(),
     dateTo: new FormControl(),
-    percentInOperation: new FormControl(),
+    percentLinksInOperation: new FormControl(),
     datasetName: new FormControl(),
     datasetId: new FormControl(),
     datasetIds: new UntypedFormGroup({})
@@ -113,7 +113,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
       .subscribe((queryParams) => {
         const datasetId = queryParams['datasetId'];
         const datasetName = queryParams['datasetName'];
-        const percentInOperation = queryParams['percentInOperation'];
+        const percentLinksInOperation = queryParams['percentLinksInOperation'];
 
         if (datasetId) {
           const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
@@ -133,8 +133,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
         this.form.controls.datasetName.setValue(
           datasetName ? datasetName[0] : ''
         );
-        this.form.controls.percentInOperation.setValue(
-          percentInOperation ? percentInOperation[0] : ''
+        this.form.controls.percentLinksInOperation.setValue(
+          percentLinksInOperation ? percentLinksInOperation[0] : ''
         );
         this.loadData();
       });
@@ -224,7 +224,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
             this.updatePageUrl();
           }
         });
-      } else if (key === 'percentInOperation') {
+      } else if (key === 'percentLinksInOperation') {
         const label = 'Percent In Operation';
         if (index > 0) {
           res.push({
@@ -234,7 +234,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         res.push({
           label: `${label} >= ${values[0]}%`,
           fn: () => {
-            this.form.patchValue({ percentInOperation: '' });
+            this.form.patchValue({ percentLinksInOperation: '' });
             this.updatePageUrl();
           }
         });
@@ -335,13 +335,16 @@ export class FiltersComponent implements OnInit, OnDestroy {
           const filterOps = CheckDataResults.filterOptions;
 
           Object.keys(filterOps).forEach((key: string) => {
+            delete filterOps['datasetId'];
+            delete filterOps['datasetName'];
+
             if (filterOps[key]) {
               this.addOrUpdateFilterControls(key, filterOps[key]);
             }
           });
 
           const averageScore = Math.floor(
-            list.reduce((sum, obj) => sum + obj.percentInOperation, 0) /
+            list.reduce((sum, obj) => sum + obj.percentLinksInOperation, 0) /
               list.length
           );
           const listAverageScore = Math.floor(averageScore / 20);
@@ -388,7 +391,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const datasetName = this.form.value.datasetName;
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
-    const percentInOperation = this.form.value.percentInOperation;
+    const percentLinksInOperation = this.form.value.percentLinksInOperation;
 
     if (valFrom) {
       qp['dateFrom'] = this.getDateAsISOString(new Date(valFrom));
@@ -402,8 +405,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
     if (datasetName) {
       qp['datasetName'] = datasetName;
     }
-    if (percentInOperation) {
-      qp['percentLinksInOperationFrom'] = percentInOperation;
+    if (percentLinksInOperation) {
+      qp['percentLinksInOperationFrom'] = percentLinksInOperation;
     }
 
     this.router.navigate([''], {

@@ -36,17 +36,17 @@ describe('API Service', () => {
       {
         id: 1,
         datasetId: '1',
-        percentInOperation: 10
+        percentLinksInOperation: 10
       },
       {
         id: 1,
         datasetId: '1',
-        percentInOperation: 10
+        percentLinksInOperation: 10
       },
       {
         id: 1,
         datasetId: '2',
-        percentInOperation: 10
+        percentLinksInOperation: 10
       }
     ] as unknown as Array<ClioCheck>);
     expect(grouped).toBeTruthy();

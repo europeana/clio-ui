@@ -17,10 +17,10 @@ export class ExportCSVService {
     'id',
     'datasetId',
     'datasetName',
-    'createdDate',
+    'date',
     'dataProvider',
     'provider',
-    'percentInOperation'
+    'percentLinksInOperation'
   ];
 
   sanitiseVal(str: string): string {

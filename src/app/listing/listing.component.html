@@ -163,7 +163,7 @@
             <ng-container
               [ngTemplateOutlet]="bar"
               [ngTemplateOutletContext]="{
-                score: group.percentInOperation,
+                score: group.percentLinksInOperation,
                 fnCancel: cancelGraphMode.bind(this)
               }"
             >
@@ -174,7 +174,7 @@
             <ng-container
               [ngTemplateOutlet]="stateLink"
               [ngTemplateOutletContext]="{
-                score: group.percentInOperation,
+                score: group.percentLinksInOperation,
                 fnToggle: toggleGraphMode.bind(this)
               }"
             >
@@ -232,7 +232,7 @@
           <ng-container
             [ngTemplateOutlet]="dateCheckbox"
             [ngTemplateOutletContext]="{
-              time: group.list[0].createdDate,
+              time: group.list[0].date,
               id: group.list[0].id + '',
               isTopTime: true,
               datasetId: dsId,
@@ -252,14 +252,14 @@
                     <ng-container
                       [ngTemplateOutlet]="stateLink"
                       [ngTemplateOutletContext]="{
-                        score: entry.percentInOperation
+                        score: entry.percentLinksInOperation
                       }"
                     >
                     </ng-container>
                     <ng-container
                       [ngTemplateOutlet]="bar"
                       [ngTemplateOutletContext]="{
-                        score: entry.percentInOperation
+                        score: entry.percentLinksInOperation
                       }"
                     >
                     </ng-container>
@@ -278,7 +278,7 @@
                   <ng-container
                     [ngTemplateOutlet]="dateCheckbox"
                     [ngTemplateOutletContext]="{
-                      time: entry.createdDate,
+                      time: entry.date,
                       id: entry.id + ''
                     }"
                   >

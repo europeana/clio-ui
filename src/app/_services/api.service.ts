@@ -17,7 +17,7 @@ export class APIService {
 
   /** groupChecksByDatasetId
    *  maps array entries - keys by dataset id,
-   *  initialises the opened and percentInOperation fields
+   *  initialises the opened and percentLinksInOperation fields
    **/
   groupChecksByDatasetId(results: Array<ClioCheck>): {
     [key: string]: CheckGroup;
@@ -35,13 +35,14 @@ export class APIService {
 
     Object.keys(mapped).forEach((id: string) => {
       const list = mapped[id];
-      const percentInOperation = Math.floor(
-        list.reduce((sum, obj) => sum + obj.percentInOperation, 0) / list.length
+      const percentLinksInOperation = Math.floor(
+        list.reduce((sum, obj) => sum + obj.percentLinksInOperation, 0) /
+          list.length
       );
       res[id] = {
         list,
         opened: false,
-        percentInOperation
+        percentLinksInOperation
       };
     });
     return res;

@@ -25,31 +25,31 @@ describe('ListingComponent', () => {
         list: [
           {
             id: 1,
-            createdDate: '',
+            date: '',
             datasetId: '1',
             datasetName: '1',
             dataProvider: '',
             provider: '',
-            percentInOperation: 0
+            percentLinksInOperation: 0
           }
         ],
         opened: true,
-        percentInOperation: 0
+        percentLinksInOperation: 0
       },
       '2': {
         list: [
           {
             id: 2,
-            createdDate: '',
+            date: '',
             datasetId: '2',
             datasetName: '2',
             dataProvider: '',
             provider: '',
-            percentInOperation: 0
+            percentLinksInOperation: 0
           }
         ],
         opened: true,
-        percentInOperation: 0
+        percentLinksInOperation: 0
       }
     },
     listLength: 2,
@@ -110,16 +110,16 @@ describe('ListingComponent', () => {
           list: [
             {
               id: 0,
-              createdDate: '',
+              date: '',
               datasetId: '1',
               datasetName: '1',
               dataProvider: '',
               provider: '',
-              percentInOperation: 0
+              percentLinksInOperation: 0
             }
           ],
           opened: true,
-          percentInOperation: 0
+          percentLinksInOperation: 0
         }
       }
     });

@@ -185,7 +185,7 @@ describe('FiltersComponent', () => {
         datasetName: ['MyDataset'],
         dateFrom: ['Dec 12th'],
         dateTo: ['June 10th'],
-        percentInOperation: ['60']
+        percentLinksInOperation: ['60']
       };
       markup = component.generateTitleMarkup();
       expect(markup.map((m) => m.label).join(' ')).toEqual(

@@ -157,19 +157,19 @@ const checks: Array<ClioCheck> = new Array(numChecks)
     const datasetName = dataset.datasetName;
     const dataProvider = dataset.dataProvider;
     const provider = dataset.provider;
-    const percentInOperation = 100 - Math.floor((index * 17.6) % 100);
-    const createdDate = new Date(today);
+    const percentLinksInOperation = 100 - Math.floor((index * 17.6) % 100);
+    const date = new Date(today);
 
-    createdDate.setDate(yearZero.getDate() - index);
+    date.setDate(yearZero.getDate() - index);
 
     return {
       id,
-      createdDate: createdDate.toISOString(),
+      date: date.toISOString(),
       datasetId,
       datasetName,
       dataProvider,
       provider,
-      percentInOperation
+      percentLinksInOperation
     };
   });
 
@@ -222,25 +222,25 @@ export function dataServerRequest(
         });
       } else if (fName === 'dateFrom') {
         const dateParam = Date.parse(filter[0]);
-        const checkDate = Date.parse(check['createdDate']);
+        const checkDate = Date.parse(check['date']);
         if (checkDate < dateParam) {
           res = false;
         }
       } else if (fName === 'dateTo') {
         const dateParam = Date.parse(filter[0]);
-        const checkDate = Date.parse(check['createdDate']);
+        const checkDate = Date.parse(check['date']);
         if (checkDate > dateParam) {
           res = false;
         }
       } else if (fName === 'percentLinksInOperationFrom') {
         const scoreParam = Number.parseInt(filter.toString());
-        const checkScore = check.percentInOperation;
+        const checkScore = check.percentLinksInOperation;
         if (checkScore < scoreParam) {
           res = false;
         }
       } else if (fName === 'percentLinksInOperationTo') {
         const scoreParam = Number.parseInt(filter.toString());
-        const checkScore = check.percentInOperation;
+        const checkScore = check.percentLinksInOperation;
         if (checkScore > scoreParam) {
           res = false;
         }

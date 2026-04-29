@@ -12,19 +12,19 @@ describe('ExportCSVService', () => {
       id: 2,
       datasetId: '11',
       datasetName: 'dataset_11',
-      createdDate: timestamp,
+      date: timestamp,
       dataProvider: dataProvider,
       provider: 'Daguerreobase',
-      percentInOperation: 14
+      percentLinksInOperation: 14
     },
     {
       id: 1,
       datasetId: '12',
       datasetName: 'dataset_12',
-      createdDate: timestamp,
+      date: timestamp,
       dataProvider: dataProvider,
       provider: 'Daguerreobase',
-      percentInOperation: 81
+      percentLinksInOperation: 81
     }
   ];
 
