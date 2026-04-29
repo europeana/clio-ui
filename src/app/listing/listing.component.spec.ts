@@ -12,11 +12,11 @@ describe('ListingComponent', () => {
     filterOps: {},
     list: [
       {
-        checkId: 1,
+        id: 1,
         datasetId: '1'
       },
       {
-        checkId: 2,
+        id: 2,
         datasetId: '2'
       }
     ] as unknown as Array<ClioCheck>,
@@ -24,7 +24,7 @@ describe('ListingComponent', () => {
       '1': {
         list: [
           {
-            checkId: 1,
+            id: 1,
             createdDate: '',
             datasetId: '1',
             datasetName: '1',
@@ -39,7 +39,7 @@ describe('ListingComponent', () => {
       '2': {
         list: [
           {
-            checkId: 2,
+            id: 2,
             createdDate: '',
             datasetId: '2',
             datasetName: '2',
@@ -109,7 +109,7 @@ describe('ListingComponent', () => {
         '1': {
           list: [
             {
-              checkId: 0,
+              id: 0,
               createdDate: '',
               datasetId: '1',
               datasetName: '1',

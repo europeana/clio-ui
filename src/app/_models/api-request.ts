@@ -5,7 +5,7 @@ export type FilterParameterName =
   | 'datasetName'
   | 'dateFrom'
   | 'dateTo'
-  | 'checkId'
+  | 'id'
   // TODO: these are not actually arrays...
   | 'offset'
   | 'limit'
@@ -35,7 +35,7 @@ export interface Dataset {
 }
 
 export interface ClioCheck {
-  checkId: number;
+  id: number;
   createdDate: string;
   datasetId: string;
   datasetName: string;

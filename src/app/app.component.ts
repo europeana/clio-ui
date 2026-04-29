@@ -35,7 +35,7 @@ export class AppComponent {
   downloadCheck(id: number): void {
     this.api.getDownload({
       filters: {
-        checkId: [`${id}`]
+        id: [`${id}`]
       }
     } as DownloadRequest);
   }
@@ -44,7 +44,7 @@ export class AppComponent {
     const runIdsForDatasetId = this.listing
       .clioInfo()
       .datasetChecks[id].list.map((run: ClioCheck) => {
-        return `${run.checkId}`;
+        return `${run.id}`;
       });
 
     const exclusionMap = this.listing.form.value['check_ids'];

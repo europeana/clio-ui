@@ -14,7 +14,7 @@ export class ExportCSVService {
   ];
 
   fieldNamesRun = [
-    'checkId',
+    'id',
     'datasetId',
     'datasetName',
     'createdDate',

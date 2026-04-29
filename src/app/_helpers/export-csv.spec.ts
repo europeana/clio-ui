@@ -9,7 +9,7 @@ describe('ExportCSVService', () => {
 
   const testRuns = [
     {
-      checkId: 2,
+      id: 2,
       datasetId: '11',
       datasetName: 'dataset_11',
       createdDate: timestamp,
@@ -18,7 +18,7 @@ describe('ExportCSVService', () => {
       percentInOperation: 14
     },
     {
-      checkId: 1,
+      id: 1,
       datasetId: '12',
       datasetName: 'dataset_12',
       createdDate: timestamp,

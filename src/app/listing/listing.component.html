@@ -1,7 +1,7 @@
 <ng-template
   #dateCheckbox
   let-time="time"
-  let-checkId="checkId"
+  let-id="id"
   let-isTopTime="isTopTime"
   let-datasetId="datasetId"
   let-datasetList="datasetList"
@@ -14,7 +14,7 @@
       </span>
       <app-checkbox
         [form]="form"
-        [controlName]="checkId + ''"
+        [controlName]="id + ''"
         [title]="'include in export'"
         [group]="'check_ids'"
         (valueChanged)="updateIds()"
@@ -233,7 +233,7 @@
             [ngTemplateOutlet]="dateCheckbox"
             [ngTemplateOutletContext]="{
               time: group.list[0].createdDate,
-              checkId: group.list[0].checkId + '',
+              id: group.list[0].id + '',
               isTopTime: true,
               datasetId: dsId,
               datasetList: group.list,
@@ -270,8 +270,8 @@
                       class="csv-download"
                       target="_blank"
                       title="export check data"
-                      (click)="requestDownloadCheck.emit(entry.checkId)"
-                      (keyUp.enter)="requestDownloadCheck.emit(entry.checkId)"
+                      (click)="requestDownloadCheck.emit(entry.id)"
+                      (keyUp.enter)="requestDownloadCheck.emit(entry.id)"
                     ></a>
                   </span>
 
@@ -279,7 +279,7 @@
                     [ngTemplateOutlet]="dateCheckbox"
                     [ngTemplateOutletContext]="{
                       time: entry.createdDate,
-                      checkId: entry.checkId + ''
+                      id: entry.id + ''
                     }"
                   >
                   </ng-container>

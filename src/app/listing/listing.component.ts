@@ -86,7 +86,7 @@ export class ListingComponent {
         const list = clioInfoValue.list;
 
         list.forEach((check: ClioCheck) => {
-          const fName = `${check.checkId}`;
+          const fName = `${check.id}`;
           const ctrlRun = this.form.get(fName);
           if (!ctrlRun) {
             runFormGroup.addControl(fName, new FormControl(true, []));
@@ -129,7 +129,7 @@ export class ListingComponent {
   getSelectedRunCount(list: Array<ClioCheck>): number {
     return list
       .map((run: ClioCheck) => {
-        return run.checkId;
+        return run.id;
       })
       .filter((id: number) => {
         return this.form.value['check_ids'][id];
@@ -161,7 +161,7 @@ export class ListingComponent {
       const ctrl = this.form.get('check_ids.' + key) as FormControl;
       if (val) {
         const arrVisible = this.clioInfo().list.map((item: ClioCheck) => {
-          return `${item.checkId}`;
+          return `${item.id}`;
         });
         if (arrVisible.includes(key)) {
           ctrl.setValue(val);
@@ -175,7 +175,7 @@ export class ListingComponent {
   checkAll(datasetId: string, groupList: Array<ClioCheck>): void {
     const val = this.formDatasets.value['dataset_ids'][datasetId];
     groupList.forEach((run: ClioCheck) => {
-      const ctrl = this.form.get('check_ids.' + run.checkId) as FormControl;
+      const ctrl = this.form.get('check_ids.' + run.id) as FormControl;
       ctrl.setValue(val);
     });
     this.updateIds();

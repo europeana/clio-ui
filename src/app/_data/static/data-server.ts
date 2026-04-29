@@ -152,7 +152,7 @@ const numChecks = 1000;
 const checks: Array<ClioCheck> = new Array(numChecks)
   .fill(null)
   .map((_: unknown, index: number) => {
-    const checkId = index;
+    const id = index;
     const dataset = dataSets[index % dataSets.length];
     const datasetId = `${dataset.id}`;
     const datasetName = dataset.datasetName;
@@ -164,7 +164,7 @@ const checks: Array<ClioCheck> = new Array(numChecks)
     createdDate.setDate(yearZero.getDate() - index);
 
     return {
-      checkId,
+      id,
       createdDate: createdDate.toISOString(),
       datasetId,
       datasetName,
@@ -239,8 +239,8 @@ export function dataServerRequest(
         if (checkScore < scoreParam) {
           res = false;
         }
-      } else if (fName === 'checkId') {
-        if (!filter.includes(`${check.checkId}`)) {
+      } else if (fName === 'id') {
+        if (!filter.includes(`${check.id}`)) {
           res = false;
         }
       } else if (

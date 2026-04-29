@@ -34,17 +34,17 @@ describe('API Service', () => {
   it('should group the runs by dataset id', () => {
     const grouped = service.groupChecksByDatasetId([
       {
-        checkId: 1,
+        id: 1,
         datasetId: '1',
         percentInOperation: 10
       },
       {
-        checkId: 1,
+        id: 1,
         datasetId: '1',
         percentInOperation: 10
       },
       {
-        checkId: 1,
+        id: 1,
         datasetId: '2',
         percentInOperation: 10
       }
