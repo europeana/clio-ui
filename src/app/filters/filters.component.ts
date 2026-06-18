@@ -85,7 +85,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     provider: new UntypedFormGroup({}),
     dateFrom: new FormControl(),
     dateTo: new FormControl(),
-    percentLinksInOperation: new FormControl(),
+    percentLinksInOperationFrom: new FormControl(),
     datasetName: new FormControl(),
     datasetId: new FormControl(),
     datasetIds: new UntypedFormGroup({})
@@ -113,7 +113,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
       .subscribe((queryParams) => {
         const datasetId = queryParams['datasetId'];
         const datasetName = queryParams['datasetName'];
-        const percentLinksInOperation = queryParams['percentLinksInOperation'];
+        const percentLinksInOperationFrom =
+          queryParams['percentLinksInOperationFrom'];
 
         if (datasetId) {
           const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
@@ -133,8 +134,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
         this.form.controls.datasetName.setValue(
           datasetName ? datasetName[0] : ''
         );
-        this.form.controls.percentLinksInOperation.setValue(
-          percentLinksInOperation ? percentLinksInOperation[0] : ''
+        this.form.controls.percentLinksInOperationFrom.setValue(
+          percentLinksInOperationFrom ? percentLinksInOperationFrom[0] : ''
         );
         this.loadData();
       });
@@ -224,7 +225,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
             this.updatePageUrl();
           }
         });
-      } else if (key === 'percentLinksInOperation') {
+      } else if (key === 'percentLinksInOperationFrom') {
         const label = 'Percent In Operation';
         if (index > 0) {
           res.push({
@@ -234,7 +235,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         res.push({
           label: `${label} >= ${values[0]}%`,
           fn: () => {
-            this.form.patchValue({ percentLinksInOperation: '' });
+            this.form.patchValue({ percentLinksInOperationFrom: '' });
             this.updatePageUrl();
           }
         });
@@ -277,16 +278,16 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const dataRequest = {
       filters: {
         percentLinksInOperationFrom: 0,
-        percentLinksInOperationTo: 100,
         offset: 0,
         limit: 5
       }
     } as unknown as CheckDataRequest;
+
     Object.keys(this.queryParams).forEach((key: string) => {
       dataRequest.filters[key as FilterParameterName] = this.queryParams[
         key
-      ].map((paramName: FilterParameterName) => {
-        return fromInputSafeName(paramName);
+      ].map((paramVal: FilterParameterName) => {
+        return fromInputSafeName(paramVal);
       });
     });
 
@@ -296,12 +297,23 @@ export class FiltersComponent implements OnInit, OnDestroy {
       dataRequest.filters['datasetId'] = fromCSL(valDatasetId);
     }
 
+    const valDateFrom = this.form.value.dateFrom;
+    const valDateTo = this.form.value.dateTo;
+
+    const valpercentLinksInOperationFrom =
+      this.form.value.percentLinksInOperationFrom;
+
+    dataRequest.filters['percentLinksInOperationFrom'] =
+      valpercentLinksInOperationFrom;
+
+    dataRequest.filters['dateFrom'] = valDateFrom;
+    dataRequest.filters['dateTo'] = valDateTo;
+
     return dataRequest;
   }
 
   addOrUpdateFilterControls(name: string, options: Array<string>): void {
     const checkboxes = this.form.get(name) as UntypedFormGroup;
-
     options.forEach((option: string) => {
       const fName = toInputSafeName(option);
       const ctrl = this.form.get(`${name}.${fName}`);
@@ -340,17 +352,26 @@ export class FiltersComponent implements OnInit, OnDestroy {
             delete filterOps['dateFrom'];
             delete filterOps['dateTo'];
             delete filterOps['excludedCheckId'];
+            delete filterOps['percentLinksInOperationTo'];
+            delete filterOps['percentLinksInOperationFrom'];
 
             if (filterOps[key]) {
               this.addOrUpdateFilterControls(key, filterOps[key]);
             }
+            const percentLinksInOperationFrom =
+              this.route.snapshot.queryParamMap.get(
+                'percentLinksInOperationFrom'
+              );
+            this.form.controls.percentLinksInOperationFrom.setValue(
+              percentLinksInOperationFrom ?? 0
+            );
           });
 
           const averageScore = Math.floor(
             list.reduce((sum, obj) => sum + obj.percentLinksInOperation, 0) /
               list.length
           );
-          const listAverageScore = Math.floor(averageScore / 20);
+          const listAverageScore = Math.floor(averageScore / 20) - 1;
           const datasetChecks = this.api.groupChecksByDatasetId(list);
           const titleMarkup = this.generateTitleMarkup();
 
@@ -394,7 +415,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const datasetName = this.form.value.datasetName;
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
-    const percentLinksInOperation = this.form.value.percentLinksInOperation;
+    const percentLinksInOperationFrom =
+      this.form.value.percentLinksInOperationFrom;
 
     if (valFrom) {
       qp['dateFrom'] = this.getDateAsISOString(new Date(valFrom));
@@ -408,8 +430,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
     if (datasetName) {
       qp['datasetName'] = datasetName;
     }
-    if (percentLinksInOperation) {
-      qp['percentLinksInOperationFrom'] = percentLinksInOperation;
+    if (percentLinksInOperationFrom) {
+      qp['percentLinksInOperationFrom'] = percentLinksInOperationFrom;
     }
 
     this.router.navigate([''], {

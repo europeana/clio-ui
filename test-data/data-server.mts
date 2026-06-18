@@ -215,7 +215,7 @@ export function dataServerRequest(
         }
       } else if (fName === 'datasetName') {
         res = false;
-        filter.forEach((val: string) => {
+        (filter as Array<string>).forEach((val: string) => {
           if (check.datasetName.includes(val)) {
             res = true;
           }
@@ -236,12 +236,6 @@ export function dataServerRequest(
         const scoreParam = Number.parseInt(filter.toString());
         const checkScore = check.percentLinksInOperation;
         if (checkScore < scoreParam) {
-          res = false;
-        }
-      } else if (fName === 'percentLinksInOperationTo') {
-        const scoreParam = Number.parseInt(filter.toString());
-        const checkScore = check.percentLinksInOperation;
-        if (checkScore > scoreParam) {
           res = false;
         }
       }

@@ -6,15 +6,13 @@ export type FilterParameterName =
   | 'dateFrom'
   | 'dateTo'
   | 'id'
-  // TODO: these are not actually arrays...
   | 'offset'
   | 'limit'
-  | 'percentLinksInOperationFrom'
-  | 'percentLinksInOperationTo';
+  | 'percentLinksInOperationFrom';
 
 export interface CheckDataRequest {
   filters: {
-    [details in FilterParameterName]: Array<string>;
+    [details in FilterParameterName]: Array<string> | string;
   };
 }
 

@@ -62,8 +62,6 @@ export class APIService {
             offset: __,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             percentLinksInOperationFrom: ___,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            percentLinksInOperationTo: ____,
             ...realFilters
           } = cdr.filterOptions;
           return {

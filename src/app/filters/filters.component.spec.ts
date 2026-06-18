@@ -185,8 +185,9 @@ describe('FiltersComponent', () => {
         datasetName: ['MyDataset'],
         dateFrom: ['Dec 12th'],
         dateTo: ['June 10th'],
-        percentLinksInOperation: ['60']
+        percentLinksInOperationFrom: ['60']
       };
+
       markup = component.generateTitleMarkup();
       expect(markup.map((m) => m.label).join(' ')).toEqual(
         `${clause1} and ${clause2} and ${clause3} and ${clause4} ${clause5} ${clause6} and ${clause7}`
