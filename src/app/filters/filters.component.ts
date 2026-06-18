@@ -337,6 +337,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
           Object.keys(filterOps).forEach((key: string) => {
             delete filterOps['datasetId'];
             delete filterOps['datasetName'];
+            delete filterOps['dateFrom'];
+            delete filterOps['dateTo'];
+            delete filterOps['excludedCheckId'];
 
             if (filterOps[key]) {
               this.addOrUpdateFilterControls(key, filterOps[key]);
