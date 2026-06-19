@@ -2,12 +2,14 @@ import { JsonPipe, KeyValuePipe, NgFor } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
+  DestroyRef,
   inject,
   model,
   ModelSignal,
   OnDestroy,
   OnInit
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormControl,
   FormsModule,
@@ -58,6 +60,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(APIService);
+  private readonly destroyRef = inject(DestroyRef);
 
   public filterList = filterList;
   public toInputSafeName = toInputSafeName;
@@ -88,7 +91,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
     percentLinksInOperationFrom: new FormControl(),
     datasetName: new FormControl(),
     datasetId: new FormControl(),
-    datasetIds: new UntypedFormGroup({})
+    datasetIds: new UntypedFormGroup({}),
+    limit: new FormControl(),
+    offset: new FormControl()
   });
 
   error?: HttpErrorResponse;
@@ -127,16 +132,25 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
         const dateFrom = this.queryParams['dateFrom'];
         const dateTo = this.queryParams['dateTo'];
+        const limit = this.queryParams['limit']
+          ? Number.parseInt(queryParams['limit'][0], 10)
+          : 25;
+        const offset = this.queryParams['offset']
+          ? Number.parseInt(queryParams['offset'][0], 10)
+          : 0;
 
-        this.form.controls.dateFrom.setValue(dateFrom ? dateFrom[0] : '');
-        this.form.controls.dateTo.setValue(dateTo ? dateTo[0] : '');
-        this.form.controls.datasetId.setValue(datasetId ? datasetId[0] : '');
-        this.form.controls.datasetName.setValue(
-          datasetName ? datasetName[0] : ''
-        );
-        this.form.controls.percentLinksInOperationFrom.setValue(
-          percentLinksInOperationFrom ? percentLinksInOperationFrom[0] : ''
-        );
+        this.form.patchValue({
+          dateFrom: dateFrom ? dateFrom[0] : '',
+          dateTo: dateTo ? dateTo[0] : '',
+          datasetId: datasetId ? datasetId[0] : '',
+          datasetName: datasetName ? datasetName[0] : '',
+          percentLinksInOperationFrom: percentLinksInOperationFrom
+            ? percentLinksInOperationFrom[0]
+            : '',
+          // Set extracted pagination parameters safely
+          limit: !isNaN(limit) ? limit : 25,
+          offset: !isNaN(offset) ? offset : 0
+        });
         this.loadData();
       });
   }
@@ -274,12 +288,24 @@ export class FiltersComponent implements OnInit, OnDestroy {
     return res;
   }
 
+  bumpPage(): void {
+    const offset = Number(this.form.value.offset ?? 0);
+    const limit = Number(this.form.value.limit ?? 25);
+    this.form.patchValue({ offset: offset + limit });
+  }
+
+  dropPage(): void {
+    const offset = Number(this.form.value.offset ?? 0);
+    const limit = Number(this.form.value.limit ?? 25);
+    this.form.patchValue({ offset: offset - limit });
+  }
+
   getDataServerDataRequest(): CheckDataRequest {
     const dataRequest = {
       filters: {
         percentLinksInOperationFrom: 0,
-        offset: 0,
-        limit: 5
+        offset: Number(this.form.value.offset ?? 0),
+        limit: Number(this.form.value.limit ?? 25)
       }
     } as unknown as CheckDataRequest;
 
@@ -340,7 +366,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
               results: [],
               filterOptions: {}
             });
-          })
+          }),
+          takeUntilDestroyed(this.destroyRef)
         )
         .subscribe((CheckDataResults: CheckDataResults) => {
           const list = CheckDataResults.results;
@@ -367,10 +394,13 @@ export class FiltersComponent implements OnInit, OnDestroy {
             );
           });
 
-          const averageScore = Math.floor(
-            list.reduce((sum, obj) => sum + obj.percentLinksInOperation, 0) /
-              list.length
-          );
+          let averageScore = 0;
+          if (list.length) {
+            averageScore = Math.floor(
+              list.reduce((sum, obj) => sum + obj.percentLinksInOperation, 0) /
+                list.length
+            );
+          }
           const listAverageScore = Math.floor(averageScore / 20) - 1;
           const datasetChecks = this.api.groupChecksByDatasetId(list);
           const titleMarkup = this.generateTitleMarkup();
@@ -411,12 +441,15 @@ export class FiltersComponent implements OnInit, OnDestroy {
       }
     );
 
-    const datasetId = this.form.value.datasetId;
-    const datasetName = this.form.value.datasetName;
-    const valFrom = this.form.value.dateFrom;
-    const valTo = this.form.value.dateTo;
-    const percentLinksInOperationFrom =
-      this.form.value.percentLinksInOperationFrom;
+    const {
+      datasetId,
+      datasetName,
+      valFrom,
+      valTo,
+      percentLinksInOperationFrom,
+      limit,
+      offset
+    } = this.form.value;
 
     if (valFrom) {
       qp['dateFrom'] = this.getDateAsISOString(new Date(valFrom));
@@ -433,9 +466,23 @@ export class FiltersComponent implements OnInit, OnDestroy {
     if (percentLinksInOperationFrom) {
       qp['percentLinksInOperationFrom'] = percentLinksInOperationFrom;
     }
+    if (limit) {
+      qp['limit'] = limit;
+    }
+    if (offset !== undefined && offset !== null) {
+      qp['offset'] = offset;
+    }
 
     this.router.navigate([''], {
       queryParams: qp
     });
+  }
+
+  goToPage(pageIndex: number): void {
+    const currentLimit = this.form.value.limit ?? 25;
+    const targetOffset = pageIndex * currentLimit;
+
+    this.form.patchValue({ offset: targetOffset });
+    this.updatePageUrl();
   }
 }

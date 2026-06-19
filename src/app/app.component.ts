@@ -71,4 +71,30 @@ export class AppComponent {
       excluded_check_ids: exclusionList
     });
   }
+
+  pageString(): string {
+    if (!this.filters?.form) {
+      return '0 - 0';
+    }
+    const offset = Number.parseInt(this.filters.form.value.offset ?? 0);
+    const limit = Number.parseInt(this.filters.form.value.limit ?? 0);
+
+    return offset + ' - ' + (offset + limit);
+  }
+
+  canLoadPrevPage(): boolean {
+    return (
+      this.filters && this.filters.form && !!this.filters.form.value.offset
+    );
+  }
+
+  loadPrevPage(): void {
+    this.filters.dropPage();
+    this.filters.loadData();
+  }
+
+  loadNextPage(): void {
+    this.filters.bumpPage();
+    this.filters.loadData();
+  }
 }

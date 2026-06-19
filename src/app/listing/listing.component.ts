@@ -46,10 +46,6 @@ export class ListingComponent {
   public DATE_CONCISE_FMT = DATE_CONCISE_FMT;
   private readonly fb = inject(UntypedFormBuilder);
 
-  MAX_IN_VIEWPORT = 50;
-  currentPage = 0;
-  totalPages = 0;
-
   listSelectionCount = 0;
   graphMode = false;
   requestDownloadCheck = output<number>();
@@ -99,12 +95,6 @@ export class ListingComponent {
         });
         this.listSelectionCount = list.length;
         this.setClioCheckFormValues(true);
-
-        this.currentPage = 0;
-
-        this.totalPages =
-          Object.keys(clioInfoValue.datasetChecks).length /
-          this.MAX_IN_VIEWPORT;
       }
     });
   }
@@ -134,24 +124,6 @@ export class ListingComponent {
       .filter((id: number) => {
         return this.form.value['check_ids'][id];
       }).length;
-  }
-
-  getPage(): { [key: string]: CheckGroup } {
-    const clioInfoValue = this.clioInfo();
-    const startIndex = this.currentPage * this.MAX_IN_VIEWPORT;
-    const endIndex = startIndex + this.MAX_IN_VIEWPORT;
-
-    const keyList = Object.keys(clioInfoValue.datasetChecks).slice(
-      startIndex,
-      Math.min(endIndex, clioInfoValue.list.length)
-    );
-
-    return keyList.reduce((map: { [key: string]: CheckGroup }, key: string) => {
-      if (!map[key]) {
-        map[key] = clioInfoValue.datasetChecks[key];
-      }
-      return map;
-    }, {});
   }
 
   setClioCheckFormValues(val: boolean): void {

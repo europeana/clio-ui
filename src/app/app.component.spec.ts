@@ -26,9 +26,15 @@ describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
   let api: APIService;
 
-  const configureTestbed = (errorMode = false): void => {
-    console.log('errorMode = ' + errorMode + ', api ' + api);
+  const formVals = {
+    value: {
+      check_ids: ['1'],
+      offset: 0,
+      limit: 5
+    }
+  } as unknown as FormGroup;
 
+  const configureTestbed = (errorMode = false): void => {
     TestBed.configureTestingModule({
       imports: [AppComponent, RouterTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -44,7 +50,6 @@ describe('AppComponent', () => {
         add: { imports: [MockFiltersComponent] }
       })
       .compileComponents();
-
     api = TestBed.inject(APIService);
     clicks = TestBed.inject(ClickService);
   };
@@ -84,7 +89,9 @@ describe('AppComponent', () => {
       app.listing = {
         form: {
           value: {
-            check_ids: ['1']
+            check_ids: ['1'],
+            offset: 0,
+            limit: 5
           }
         } as unknown as FormGroup,
         clioInfo: () => {
@@ -105,16 +112,14 @@ describe('AppComponent', () => {
 
     it('should download all', () => {
       jest.spyOn(api, 'getDownload');
+
       app.listing = {
-        form: {
-          value: {
-            check_ids: ['1']
-          }
-        } as unknown as FormGroup
+        form: formVals
       } as unknown as ListingComponent;
 
       app.filters = {
-        getDataServerDataRequest: jest.fn()
+        getDataServerDataRequest: jest.fn(),
+        form: formVals
       } as unknown as FiltersComponent;
 
       app.downloadAll();

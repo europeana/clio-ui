@@ -147,12 +147,7 @@
     }
   </li>
 
-  <!--
   @for (dsRun of clioInfo().datasetChecks | keyvalue; track dsRun.key) {
-  @if($index < MAX_IN_VIEWPORT) {
-  @for (dsRun of clioInfo().datasetChecks | keyvalue; track dsRun.key) {
-  -->
-  @for (dsRun of getPage() | keyvalue; track dsRun.key) {
     @let group = dsRun.value;
     @let dsId = dsRun.key;
 
@@ -291,30 +286,4 @@
       </ul>
     </li>
   }
-
-  <li>
-    <span class="pagination">
-      <a
-        [attr.tabindex]="currentPage === 0 ? -1 : 0"
-        [attr.disabled]="currentPage === 0 ? 'disabled' : null"
-        (click)="currentPage = currentPage - 1"
-        (keyUp.enter)="currentPage = currentPage - 1"
-      >
-        &lt;</a
-      >
-      &nbsp;
-      {{ currentPage + 1 }}
-      &nbsp;
-      <a
-        [attr.tabindex]="currentPage + 1 < totalPages ? 0 : -1"
-        [attr.disabled]="currentPage + 1 < totalPages ? null : 'disabled'"
-        (keyUp.enter)="currentPage = currentPage + 1"
-        (click)="currentPage = currentPage + 1"
-      >
-        &gt;</a
-      >
-      &nbsp;<i>of</i>&nbsp;
-      {{ totalPages }}
-    </span>
-  </li>
 </ul>

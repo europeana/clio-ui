@@ -13,6 +13,21 @@
         (requestDownloadAll)="downloadAll()"
         [clioInfo]="filters.modelClioInfo"
       ></app-listing>
+
+      <a
+        (click)="loadPrevPage()"
+        (keyUp.enter)="loadPrevPage()"
+        [attr.tabindex]="!canLoadPrevPage() ? -1 : 0"
+        [attr.disabled]="!canLoadPrevPage() ? 'disabled' : null"
+      >
+        &lt;&lt;
+      </a>
+
+      &nbsp;
+      {{ pageString() }}
+      &nbsp;
+
+      <a (click)="loadNextPage()" (keyUp.enter)="loadNextPage()"> &gt;&gt; </a>
     </div>
   </div>
 
