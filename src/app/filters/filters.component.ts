@@ -174,7 +174,9 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
   generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
     const res: Array<{ label: string; fn?: () => void }> = [];
-    const queryKeys = Object.keys(this.queryParams);
+    const queryKeys = Object.keys(this.queryParams).filter((key: string) => {
+      return !['offset', 'limit'].includes(key);
+    });
 
     if (!queryKeys || queryKeys.length === 0) {
       res.push({ label: 'All checks' });
@@ -309,13 +311,17 @@ export class FiltersComponent implements OnInit, OnDestroy {
       }
     } as unknown as CheckDataRequest;
 
-    Object.keys(this.queryParams).forEach((key: string) => {
-      dataRequest.filters[key as FilterParameterName] = this.queryParams[
-        key
-      ].map((paramVal: FilterParameterName) => {
-        return fromInputSafeName(paramVal);
+    Object.keys(this.queryParams)
+      .filter((key: string) => {
+        return !['offset', 'limit'].includes(key);
+      })
+      .forEach((key: string) => {
+        dataRequest.filters[key as FilterParameterName] = this.queryParams[
+          key
+        ].map((paramVal: FilterParameterName) => {
+          return fromInputSafeName(paramVal);
+        });
       });
-    });
 
     const valDatasetId = this.form.value.datasetId;
 
