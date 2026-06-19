@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
@@ -86,13 +86,8 @@ export class APIService {
   }
 
   getDownload(request: DownloadRequest): void {
-    const headers = new HttpHeaders().set(
-      'Content-Type',
-      'text/plain; charset=utf-8'
-    );
     this.http
-      .post(`${apiSettings.serverAPI}/reports`, request, {
-        headers: headers,
+      .post(`${apiSettings.serverAPI}/runs/links/export`, request, {
         responseType: 'text'
       })
       .pipe(

@@ -22,7 +22,7 @@ import {
 
 import { DATE_CONCISE_FMT } from '../_data/static/date-formats';
 import { ClickAwareDirective } from '../_directives';
-import { CheckGroup, ClioCheck, ClioInfo } from '../_models';
+import { ClioCheck, ClioInfo } from '../_models';
 import { RenameFilterPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
 

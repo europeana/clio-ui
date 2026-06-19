@@ -63,12 +63,12 @@ describe('API Service', () => {
   });
 
   it('should get the download', () => {
-    const url = `${apiSettings.serverAPI}/reports`;
+    const url = `${apiSettings.serverAPI}/runs/links/export`;
     service.getDownload({
       filterOptions: {},
       excluded_check_ids: []
     } as unknown as DownloadRequest);
-    const req = httpTesting.expectOne(url, 'post...');
+    const req = httpTesting.expectOne(url);
     req.flush('csv');
     httpTesting.verify();
   });
