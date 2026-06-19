@@ -195,7 +195,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
           {
             label: `${values[0]}`,
             fn: () => {
-              this.form.patchValue({ dateFrom: '' });
+              this.form.patchValue({ dateFrom: '', offset: 0 });
               this.updatePageUrl();
             }
           }
@@ -208,7 +208,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
           {
             label: `${values[0]}`,
             fn: () => {
-              this.form.patchValue({ dateTo: '' });
+              this.form.patchValue({ dateTo: '', offset: 0 });
               this.updatePageUrl();
             }
           }
@@ -223,7 +223,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         res.push({
           label: `${label} (${values[0]})`,
           fn: () => {
-            this.form.patchValue({ datasetId: '' });
+            this.form.patchValue({ datasetId: '', offset: 0 });
             this.updatePageUrl();
           }
         });
@@ -237,7 +237,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         res.push({
           label: `${label} "${values[0]}"`,
           fn: () => {
-            this.form.patchValue({ datasetName: '' });
+            this.form.patchValue({ datasetName: '', offset: 0 });
             this.updatePageUrl();
           }
         });
@@ -251,7 +251,10 @@ export class FiltersComponent implements OnInit, OnDestroy {
         res.push({
           label: `${label} >= ${values[0]}%`,
           fn: () => {
-            this.form.patchValue({ percentLinksInOperationFrom: '' });
+            this.form.patchValue({
+              percentLinksInOperationFrom: '',
+              offset: 0
+            });
             this.updatePageUrl();
           }
         });
@@ -274,7 +277,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
             fn: () => {
               const currVal = this.form.value[key];
               delete currVal[toInputSafeName(values[indexInner])];
-              this.form.patchValue({ key: currVal });
+              this.form.patchValue({ key: currVal, offset: 0 });
               this.updatePageUrl();
             }
           });
@@ -435,7 +438,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
   /** updatePageUrl
   /* Navigate to url according to form state
   */
-  updatePageUrl(): void {
+  updatePageUrl(clearPagination = false): void {
     const qp: Params = {};
 
     Object.keys(this.modelClioInfo().filterOps).forEach(
@@ -446,6 +449,10 @@ export class FiltersComponent implements OnInit, OnDestroy {
         }
       }
     );
+
+    if (clearPagination) {
+      this.form.patchValue({ offset: 0 });
+    }
 
     const {
       datasetId,

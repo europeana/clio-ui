@@ -42,7 +42,7 @@
             [controlName]="toInputSafeName(option)"
             [labelText]="option"
             [group]="field.key"
-            (valueChanged)="updatePageUrl()"
+            (valueChanged)="updatePageUrl(true)"
             title="Test"
           ></app-checkbox>
         </li>
@@ -54,7 +54,7 @@
     <span class="filter-label">Percent In Operation</span>
     <span class="input-wrapper">
       <app-slider
-        (change)="updatePageUrl()"
+        (change)="updatePageUrl(true)"
         [form]="form"
         [controlName]="'percentLinksInOperationFrom'"
       >
@@ -69,14 +69,14 @@
         data-e2e="dataset-id"
         placeholder="dataset id"
         formControlName="datasetId"
-        (keyUp.enter)="updatePageUrl()"
+        (keyUp.enter)="updatePageUrl(true)"
       />
       <a
         aria-label="filter dataset label"
         class="search-icon-solid"
         tabindex="0"
-        (click)="updatePageUrl()"
-        (keyUp.enter)="updatePageUrl()"
+        (click)="updatePageUrl(true)"
+        (keyUp.enter)="updatePageUrl(true)"
         ><!-- //NOSONAR --></a
       >
     </span>
@@ -87,14 +87,14 @@
         data-e2e="dataset-name"
         placeholder="dataset name"
         formControlName="datasetName"
-        (keyUp.enter)="updatePageUrl()"
+        (keyUp.enter)="updatePageUrl(true)"
       />
       <a
         aria-label="filter dataset name"
         class="search-icon-solid"
         tabindex="0"
-        (click)="updatePageUrl()"
-        (keyUp.enter)="updatePageUrl()"
+        (click)="updatePageUrl(true)"
+        (keyUp.enter)="updatePageUrl(true)"
         ><!-- //NOSONAR --></a
       >
     </span>
@@ -105,14 +105,14 @@
         type="date"
         data-e2e="date-from"
         formControlName="dateFrom"
-        (change)="updatePageUrl()"
+        (change)="updatePageUrl(true)"
       />
       <a
         aria-label="filter date"
         class="search-icon-solid"
         tabindex="0"
-        (click)="updatePageUrl()"
-        (keyUp.enter)="updatePageUrl()"
+        (click)="updatePageUrl(true)"
+        (keyUp.enter)="updatePageUrl(true)"
         ><!-- //NOSONAR --></a
       >
     </span>
@@ -123,14 +123,14 @@
         type="date"
         data-e2e="date-to"
         formControlName="dateTo"
-        (change)="updatePageUrl()"
+        (change)="updatePageUrl(true)"
       />
       <a
         aria-label="filter date"
         class="search-icon-solid"
         tabindex="0"
-        (click)="updatePageUrl()"
-        (keyUp.enter)="updatePageUrl()"
+        (click)="updatePageUrl(true)"
+        (keyUp.enter)="updatePageUrl(true)"
         ><!-- //NOSONAR --></a
       >
     </span>
