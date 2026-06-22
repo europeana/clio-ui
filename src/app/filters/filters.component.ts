@@ -410,7 +410,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
                 list.length
             );
           }
-          const listAverageScore = Math.floor(averageScore / 20) - 1;
+          const listAverageScore = Math.floor(averageScore / 20);
           const datasetChecks = this.api.groupChecksByDatasetId(list);
           const titleMarkup = this.generateTitleMarkup();
 

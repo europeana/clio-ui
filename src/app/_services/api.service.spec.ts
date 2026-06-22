@@ -53,13 +53,21 @@ describe('API Service', () => {
   });
 
   it('should get the filtered reports', () => {
-    service
-      .getFilteredClioChecks({
-        filters: {}
-      } as CheckDataRequest)
-      .subscribe((data: unknown) => {
-        expect(data).toBeTruthy();
-      });
+    const param = {
+      filters: {
+        limit: '5',
+        offset: '0'
+      }
+    } as CheckDataRequest;
+
+    service.getFilteredClioChecks(param).subscribe((data: unknown) => {
+      expect(data).toBeTruthy();
+    });
+
+    const url = `${apiSettings.serverAPI}/runs/summary`;
+    const req = httpTesting.expectOne(url);
+    req.flush({ filterOptions: {} });
+    httpTesting.verify();
   });
 
   it('should get the download', () => {
@@ -70,6 +78,22 @@ describe('API Service', () => {
     } as unknown as DownloadRequest);
     const req = httpTesting.expectOne(url);
     req.flush('csv');
+    httpTesting.verify();
+  });
+
+  it('should get the download (error)', () => {
+    const url = `${apiSettings.serverAPI}/runs/links/export`;
+    const mockRequest = {
+      filterOptions: {},
+      excluded_check_ids: []
+    } as unknown as DownloadRequest;
+    const downloadSpy = jest
+      .spyOn(service, 'download')
+      .mockResolvedValue(undefined);
+    service.getDownload(mockRequest);
+    const req = httpTesting.expectOne(url);
+    req.flush('Server Error', { status: 500, statusText: 'Server Error' });
+    expect(downloadSpy).toHaveBeenCalledWith('CSV_DOWNLOAD', 'clio_report');
     httpTesting.verify();
   });
 });
