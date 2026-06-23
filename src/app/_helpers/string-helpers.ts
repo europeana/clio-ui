@@ -110,11 +110,11 @@ export function sanitiseSearchTerm(filterString: string): string {
   );
 
   if (modifierStart && modifierEnd) {
-    filter = `^${filter}$|\\^${filter}$|^${filter}\\$|\\^${filter}\\$`;
+    filter = String.raw`^${filter}$|\^${filter}$|^${filter}\$|\^${filter}\$`;
   } else if (modifierStart) {
-    filter = `^${filter}|\\^${filter}`;
+    filter = String.raw`^${filter}|\^${filter}`;
   } else if (modifierEnd) {
-    filter = `${filter}$|${filter}\\$`;
+    filter = String.raw`${filter}$|${filter}\$`;
   }
 
   return filter;

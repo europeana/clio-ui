@@ -49,7 +49,7 @@ export class AppComponent {
 
     const exclusionMap = this.listing.form.value['check_ids'];
     const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
-      return !exclusionMap[key] && runIdsForDatasetId.includes(key);
+      return !exclusionMap[key] && new Set(runIdsForDatasetId).has(key);
     });
     const downloadRequest = this.filters.getDataServerDataRequest();
 
