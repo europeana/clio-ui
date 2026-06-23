@@ -302,7 +302,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
   dropPage(): void {
     const offset = Number(this.form.value.offset ?? 0);
     const limit = Number(this.form.value.limit ?? 25);
-    this.form.patchValue({ offset: offset - limit });
+    this.form.patchValue({ offset: Math.max(0, offset - limit) });
   }
 
   getDataServerDataRequest(): CheckDataRequest {
@@ -492,8 +492,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
   }
 
   goToPage(pageIndex: number): void {
-    const currentLimit = this.form.value.limit ?? 25;
-    const targetOffset = pageIndex * currentLimit;
+    const currentLimit = Number(this.form.value.limit ?? 25);
+    const targetOffset = Math.max(0, pageIndex * currentLimit);
 
     this.form.patchValue({ offset: targetOffset });
     this.updatePageUrl();

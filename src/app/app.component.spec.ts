@@ -126,5 +126,64 @@ describe('AppComponent', () => {
       expect(app.filters.getDataServerDataRequest).toHaveBeenCalled();
       expect(api.getDownload).toHaveBeenCalled();
     });
+
+    it('should download all', () => {
+      jest.spyOn(api, 'getDownload');
+      app.downloadCheck(1);
+      expect(api.getDownload).toHaveBeenCalled();
+    });
+
+    it('should drop the page configuration and reload data', () => {
+      app.filters = {
+        dropPage: jest.fn(),
+        loadData: jest.fn()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      app.loadPrevPage();
+      expect(app.filters.dropPage).toHaveBeenCalledTimes(1);
+      expect(app.filters.loadData).toHaveBeenCalledTimes(1);
+    });
+
+    it('should bump the page configuration and reload data', () => {
+      app.filters = {
+        bumpPage: jest.fn(),
+        loadData: jest.fn()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      app.loadNextPage();
+      expect(app.filters.bumpPage).toHaveBeenCalledTimes(1);
+      expect(app.filters.loadData).toHaveBeenCalledTimes(1);
+    });
+
+    it('should determine if can load prev page', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      app.filters = { form: undefined } as any;
+      expect(app.canLoadPrevPage()).toBeFalsy();
+      app.filters = {
+        form: {
+          value: { offset: '50', limit: '10' }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      expect(app.canLoadPrevPage()).toBeTruthy();
+      app.filters = {
+        form: {
+          value: { offset: '0', limit: '100' }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      expect(app.canLoadPrevPage()).toBeFalsy();
+    });
+
+    it('should get the page string', () => {
+      expect(app.pageString()).toBe('0 - 0');
+      app.filters = {
+        form: {
+          value: { offset: '50', limit: '10' }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      expect(app.pageString()).toBe('50 - 60');
+    });
   });
 });

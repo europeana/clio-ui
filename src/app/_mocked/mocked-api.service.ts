@@ -30,7 +30,10 @@ export class MockAPIService {
       return this.getError('mock getFilteredClioChecks throws error');
     }
     return of({
-      filterOptions: {},
+      filterOptions: {
+        datasetId: [''],
+        datasetName: ['']
+      },
       results: []
     } as CheckDataResults);
   }

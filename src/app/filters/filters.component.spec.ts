@@ -29,7 +29,12 @@ describe('FiltersComponent', () => {
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: { params: {}, queryParams }
+          useValue: {
+            params: {},
+            queryParams,
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            snapshot: { queryParamMap: { get: (): void => {} } }
+          }
         },
         {
           provide: APIService,
@@ -51,6 +56,36 @@ describe('FiltersComponent', () => {
 
     it('should create', () => {
       expect(component).toBeTruthy();
+    });
+
+    it('should get the date as an ISO string', () => {
+      const inputDate = new Date('2026-06-24T12:00:00');
+      const result = component.getDateAsISOString(inputDate);
+      expect(result).toBe('2026-06-24');
+    });
+
+    it('should decrement offset by the limit value', () => {
+      component.dropPage();
+      expect(component.form.value.offset).toBe(0);
+      component.form.patchValue({ offset: 50, limit: 25 });
+      component.dropPage();
+      expect(component.form.value.offset).toBe(25);
+    });
+
+    it('should go to the page', () => {
+      jest.spyOn(component, 'updatePageUrl');
+      component.form.patchValue({ offset: 50, limit: 25 });
+      component.goToPage(2);
+      expect(component.updatePageUrl).toHaveBeenCalled();
+    });
+
+    it('should increment offset by the limit value', () => {
+      component.bumpPage();
+      expect(component.form.value.offset).toBe(25);
+
+      component.form.patchValue({ offset: 25, limit: 25 });
+      component.bumpPage();
+      expect(component.form.value.offset).toBe(50);
     });
 
     it('should update the page location', () => {
