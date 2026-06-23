@@ -83,11 +83,7 @@ export class AppComponent {
   }
 
   canLoadPrevPage(): boolean {
-    return (
-      this.filters &&
-      this.filters.form &&
-      !!Number.parseInt(this.filters.form.value.offset ?? '')
-    );
+    return !!Number.parseInt(this.filters?.form?.value?.offset ?? '');
   }
 
   loadPrevPage(): void {

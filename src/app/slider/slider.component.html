@@ -1,5 +1,6 @@
 <span *ngIf="form" [formGroup]="form" style="display: flex">
   <input
+    id="range"
     type="range"
     min="0"
     max="80"
@@ -10,7 +11,8 @@
   />
 
   @let actualScore = form.value['percentLinksInOperation'];
-  <span
+  <label
+    for="range"
     class="clio-state"
     [ngClass]="{
       'clio-state-0': actualScore === '0',
@@ -20,5 +22,5 @@
       'clio-state-4': actualScore === '80'
     }"
   >
-  </span>
+  </label>
 </span>

@@ -148,8 +148,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
             ? percentLinksInOperationFrom[0]
             : '',
           // Set extracted pagination parameters safely
-          limit: !isNaN(limit) ? limit : 25,
-          offset: !isNaN(offset) ? offset : 0
+          limit: Number.isNaN(limit) ? 25 : limit,
+          offset: Number.isNaN(offset) ? 0 : offset
         });
         this.loadData();
       });

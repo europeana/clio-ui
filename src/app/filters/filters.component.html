@@ -8,10 +8,14 @@
   }
   <ng-container *ngFor="let field of filter | keyvalue">
     <span class="checkbox-filter">
-      <span class="filter-label">{{ field.key | renameFilter }}</span>
+      <span [id]="field.key + '-title'" class="filter-label">{{
+        field.key | renameFilter
+      }}</span>
       @if (field.value && field.value.length > 5) {
         <span class="search-icon"></span>
         <input
+          [id]="field.key"
+          [attr.aria-labelledby]="field.key + '-title'"
           class="checkbox-filter-input"
           #filterEntries
           placeholder="Search ({{ field.value.length }} entries)"
