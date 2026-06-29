@@ -1,0 +1,309 @@
+@use '../../scss/colours';
+@use '../../scss/variables';
+@use '../../scss/functions/mixins';
+@use '../../scss/functions/icon_urls';
+
+$cell-height: 2.25em;
+
+.align-centre {
+  text-align: center;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.score-display {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+
+  .bar-inner,
+  .bar-outer {
+    align-self: center;
+    display: flex;
+    margin-right: auto;
+    height: 1em;
+  }
+
+  .bar-label {
+    min-width: 3em;
+    &[disabled],
+    &:not(:hover) {
+      font-weight: normal;
+    }
+  }
+
+  .bar-outer {
+    border: 1px solid colours.$offwhite;
+    box-sizing: content-box;
+    margin: 0 0.5em;
+    min-width: 5em;
+  }
+
+  .bar-inner {
+    background: variables.$clio-highlight-colour;
+    width: 60%;
+  }
+}
+
+.list-empty {
+  @include mixins.empty-list();
+}
+
+.listing {
+  border-top: 1px solid colours.$mid-grey;
+  display: grid;
+  grid-template-columns: 2em repeat(5, auto);
+  grid-column-gap: 1em;
+  padding: 0;
+  position: relative;
+
+  a,
+  .list-header {
+    font-weight: bold;
+  }
+
+  &:has(.opener.opened)
+    .sublisting:not(.run-list, :has(.opener.opened))
+    > li:not(:hover) {
+    position: relative;
+    opacity: 0.7;
+    &::after {
+      content: '';
+      display: block;
+      height: $cell-height;
+      position: absolute;
+      top: 0;
+      opacity: 0.4;
+      width: 100%;
+    }
+  }
+
+  .sublisting {
+    border-top: 1px solid transparent;
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    position: relative;
+
+    .time-all,
+    .time {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+
+    &:not(:has(.opener.opened)) {
+      border-right: 1px solid transparent;
+      .top-time .time-all {
+        display: none;
+      }
+    }
+    &:has(.opener.opened) {
+      border-image: linear-gradient(
+          to right,
+          colours.$white 0px,
+          colours.$mid-grey 72px
+        )
+        1 / 1px 0 0 0;
+      .top-time .time {
+        display: none;
+      }
+      & > * {
+        border-right: 1px solid colours.$mid-grey;
+      }
+    }
+
+    * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .opener :first-child {
+      overflow: visible;
+    }
+
+    .clio-state {
+      display: flex;
+      justify-self: flex-end;
+      align-self: center;
+      transform: scale(0.75);
+    }
+
+    .csv-download-block {
+      height: $cell-height;
+      justify-content: center;
+      transform: scale(0.75);
+
+      &.asterisked::before {
+        font-size: 24px;
+      }
+    }
+
+    .run-list {
+      li > :first-child {
+        margin-right: auto;
+        margin-left: 0.5em;
+        grid-column: 1 / 5;
+        display: flex;
+        align-items: center;
+      }
+      .clio-state {
+        transform: scale(0.5);
+      }
+      .score-display .bar-inner {
+        background: colours.$offwhite;
+        border: 2px solid variables.$clio-highlight-colour;
+      }
+    }
+  }
+
+  li {
+    background-color: colours.$white;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+
+    * {
+      line-height: $cell-height;
+    }
+  }
+
+  .list-header {
+    background-color: colours.$white;
+    padding: 0.4em 0;
+    white-space: nowrap;
+  }
+
+  &.extra-col {
+    grid-template-columns: repeat(7, auto);
+
+    .summary-bar + .list-header {
+      grid-column: 1 / 4;
+    }
+
+    .sublisting .run-list li > :first-child {
+      grid-column: 1 / 6;
+    }
+  }
+}
+
+.last-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.25em;
+}
+
+.opener {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+
+  &::after {
+    content: '\25b6';
+    display: block;
+    font-weight: bold;
+    height: 1em;
+    line-height: 1em;
+    position: absolute;
+    transform: translateX(-1em) rotate(0deg) scale(0.75);
+    transform-origin: center;
+    transition: transform 0.3s linear;
+    width: 1em;
+    right: -1em;
+  }
+  &.opened::after {
+    transform: translate(-0.875em, 0) rotate(90deg) scale(0.75);
+  }
+
+  :first-child {
+    margin-right: 0.75em;
+  }
+
+  .opener-content {
+    margin-right: 1.5em;
+  }
+}
+
+.header-section {
+  background-color: colours.$white;
+  position: sticky;
+  top: 4rem;
+  z-index: 1;
+
+  a {
+    line-height: 1.7em;
+  }
+
+  &.group-header {
+    top: 10.25rem;
+    .run-list {
+      margin-left: 1em;
+      border-left: 1px solid colours.$mid-grey;
+      border-bottom: 1px solid colours.$mid-grey;
+    }
+  }
+}
+
+.summary-bar {
+  align-items: center;
+  background: colours.$white;
+  border-bottom: 1px solid colours.$mid-grey;
+  display: flex;
+  font-weight: bold;
+  grid-column: 1 / -1;
+  min-height: 3rem;
+  padding: 0.5rem 0;
+  text-align: left;
+
+  & + .list-header {
+    grid-column: 1 / 3;
+    padding-left: 2rem;
+  }
+
+  .clio-state {
+    min-width: 2em;
+  }
+
+  .csv-download-block {
+    margin: 0 0 0 auto;
+    white-space: nowrap;
+    &::after {
+      margin-left: 0.75em;
+    }
+    &:before {
+      left: unset;
+      right: -0.5em;
+      width: 0.4em;
+    }
+  }
+
+  .title {
+    overflow-wrap: break-word;
+    margin-left: 1rem;
+    text-transform: capitalize;
+
+    a {
+      color: variables.$clio-highlight-colour;
+      &:focus-visible,
+      &:hover {
+        color: variables.$text-colour;
+      }
+      & + span {
+        padding: 0 0.4em;
+      }
+    }
+
+    :first-child {
+      padding-right: 0.4em;
+    }
+  }
+}

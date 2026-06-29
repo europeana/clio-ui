@@ -1,0 +1,501 @@
+import { JsonPipe, KeyValuePipe, NgFor } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  model,
+  ModelSignal,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormGroup
+} from '@angular/forms';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+
+import { of, Subscription } from 'rxjs';
+import { catchError, debounceTime, map } from 'rxjs/operators';
+
+import { RenameFilterPipe } from '../_translate';
+import { APIService } from '../_services';
+import {
+  fromCSL,
+  fromInputSafeName,
+  toInputSafeName
+} from '../_helpers/date-helpers';
+import { filterList } from '../_helpers/string-helpers';
+
+import {
+  CheckDataRequest,
+  CheckDataResults,
+  ClioInfo,
+  FilterParameterName
+} from '../_models';
+import { CheckboxComponent } from '../checkbox';
+import { SliderComponent } from '../slider';
+
+@Component({
+  selector: 'app-filters',
+  templateUrl: './filters.component.html',
+  styleUrls: ['./filters.component.scss'],
+  imports: [
+    NgFor,
+    CheckboxComponent,
+    JsonPipe,
+    KeyValuePipe,
+    FormsModule,
+    ReactiveFormsModule,
+    RenameFilterPipe,
+    SliderComponent
+  ]
+})
+export class FiltersComponent implements OnInit, OnDestroy {
+  private readonly fb = inject(UntypedFormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly api = inject(APIService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  public filterList = filterList;
+  public toInputSafeName = toInputSafeName;
+
+  subs: Array<Subscription> = [];
+  queryParams: Params = {};
+  titleMarkup: Array<{ label: string; fn?: () => void }> = [];
+
+  modelClioInfo: ModelSignal<ClioInfo> = model({
+    datasetChecks: {},
+    list: [],
+    listLength: -1,
+    listAverageScore: -1,
+    filterOps: {},
+    titleMarkup: []
+  } as ClioInfo);
+
+  optionFilters: { [key: string]: string } = {
+    provider: '',
+    dataProvider: ''
+  };
+
+  form = new UntypedFormGroup({
+    dataProvider: new UntypedFormGroup({}),
+    provider: new UntypedFormGroup({}),
+    dateFrom: new FormControl(),
+    dateTo: new FormControl(),
+    percentLinksInOperationFrom: new FormControl(),
+    datasetName: new FormControl(),
+    datasetId: new FormControl(),
+    datasetIds: new UntypedFormGroup({}),
+    limit: new FormControl(),
+    offset: new FormControl()
+  });
+
+  error?: HttpErrorResponse;
+
+  ngOnInit(): void {
+    // parse the url param values into the form
+    this.route.queryParams
+      .pipe(
+        debounceTime(0),
+        map((qp) => {
+          const qpValArrays: Params = {};
+          Object.keys(qp).forEach((paramName: string) => {
+            qpValArrays[paramName] = (
+              Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
+            ).map((qpValue: string) => {
+              return toInputSafeName(qpValue);
+            });
+          });
+          return qpValArrays;
+        })
+      )
+      .subscribe((queryParams) => {
+        const datasetId = queryParams['datasetId'];
+        const datasetName = queryParams['datasetName'];
+        const percentLinksInOperationFrom =
+          queryParams['percentLinksInOperationFrom'];
+
+        if (datasetId) {
+          const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
+          `${datasetId}`.split(',').forEach((part: string) => {
+            datasetIds.addControl(part.trim(), new FormControl(part));
+          });
+        }
+
+        this.queryParams = queryParams;
+
+        const dateFrom = this.queryParams['dateFrom'];
+        const dateTo = this.queryParams['dateTo'];
+        const limit = this.queryParams['limit']
+          ? Number.parseInt(queryParams['limit'][0], 10)
+          : 25;
+        const offset = this.queryParams['offset']
+          ? Number.parseInt(queryParams['offset'][0], 10)
+          : 0;
+
+        this.form.patchValue({
+          dateFrom: dateFrom ? dateFrom[0] : '',
+          dateTo: dateTo ? dateTo[0] : '',
+          datasetId: datasetId ? datasetId[0] : '',
+          datasetName: datasetName ? datasetName[0] : '',
+          percentLinksInOperationFrom: percentLinksInOperationFrom
+            ? percentLinksInOperationFrom[0]
+            : '',
+          // Set extracted pagination parameters safely
+          limit: Number.isNaN(limit) ? 25 : limit,
+          offset: Number.isNaN(offset) ? 0 : offset
+        });
+        this.loadData();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach((sub: Subscription | undefined) => {
+      if (sub) {
+        sub.unsubscribe();
+      }
+    });
+    this.subs = [];
+  }
+
+  getDateAsISOString(localDate: Date): string {
+    const date = new Date(localDate.toISOString());
+    const dateUTC = new Date(
+      date.getTime() - localDate.getTimezoneOffset() * 60000
+    );
+    return dateUTC.toISOString().split('T')[0];
+  }
+
+  generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
+    const res: Array<{ label: string; fn?: () => void }> = [];
+    const queryKeys = Object.keys(this.queryParams).filter((key: string) => {
+      return !['offset', 'limit'].includes(key);
+    });
+
+    if (!queryKeys || queryKeys.length === 0) {
+      res.push({ label: 'All checks' });
+    }
+
+    queryKeys.forEach((key: string, index: number) => {
+      const values = this.queryParams[key].map((paramName: string) => {
+        return fromInputSafeName(paramName);
+      });
+
+      if (key === 'dateFrom') {
+        res.push(
+          {
+            label: `from`
+          },
+          {
+            label: `${values[0]}`,
+            fn: () => {
+              this.form.patchValue({ dateFrom: '', offset: 0 });
+              this.updatePageUrl();
+            }
+          }
+        );
+      } else if (key === 'dateTo') {
+        res.push(
+          {
+            label: `until`
+          },
+          {
+            label: `${values[0]}`,
+            fn: () => {
+              this.form.patchValue({ dateTo: '', offset: 0 });
+              this.updatePageUrl();
+            }
+          }
+        );
+      } else if (key === 'datasetId') {
+        const label = 'Dataset Id';
+        if (index > 0) {
+          res.push({
+            label: 'and'
+          });
+        }
+        res.push({
+          label: `${label} (${values[0]})`,
+          fn: () => {
+            this.form.patchValue({ datasetId: '', offset: 0 });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'datasetName') {
+        const label = 'Dataset Name';
+        if (index > 0) {
+          res.push({
+            label: 'and'
+          });
+        }
+        res.push({
+          label: `${label} "${values[0]}"`,
+          fn: () => {
+            this.form.patchValue({ datasetName: '', offset: 0 });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'percentLinksInOperationFrom') {
+        const label = 'Percent In Operation';
+        if (index > 0) {
+          res.push({
+            label: 'and'
+          });
+        }
+        res.push({
+          label: `${label} >= ${values[0]}%`,
+          fn: () => {
+            this.form.patchValue({
+              percentLinksInOperationFrom: '',
+              offset: 0
+            });
+            this.updatePageUrl();
+          }
+        });
+      } else {
+        this.queryParams[key].forEach((valPart: string, indexInner: number) => {
+          if (indexInner === 0) {
+            if (index > 0) {
+              res.push({
+                label: 'and ' + key
+              });
+            } else {
+              res.push({
+                label: key
+              });
+            }
+          }
+
+          res.push({
+            label: `${values[indexInner]}`,
+            fn: () => {
+              const currVal = this.form.value[key];
+              delete currVal[toInputSafeName(values[indexInner])];
+              this.form.patchValue({ key: currVal, offset: 0 });
+              this.updatePageUrl();
+            }
+          });
+
+          if (indexInner !== this.queryParams[key].length - 1) {
+            res.push({
+              label: 'or'
+            });
+          }
+        });
+      }
+    });
+    return res;
+  }
+
+  bumpPage(): void {
+    const offset = Number(this.form.value.offset ?? 0);
+    const limit = Number(this.form.value.limit ?? 25);
+    this.form.patchValue({ offset: offset + limit });
+  }
+
+  dropPage(): void {
+    const offset = Number(this.form.value.offset ?? 0);
+    const limit = Number(this.form.value.limit ?? 25);
+    this.form.patchValue({ offset: Math.max(0, offset - limit) });
+  }
+
+  getDataServerDataRequest(): CheckDataRequest {
+    const dataRequest = {
+      filters: {
+        percentLinksInOperationFrom: 0,
+        offset: Number(this.form.value.offset ?? 0),
+        limit: Number(this.form.value.limit ?? 25)
+      }
+    } as unknown as CheckDataRequest;
+
+    Object.keys(this.queryParams)
+      .filter((key: string) => {
+        return !['offset', 'limit'].includes(key);
+      })
+      .forEach((key: string) => {
+        dataRequest.filters[key as FilterParameterName] = this.queryParams[
+          key
+        ].map((paramVal: FilterParameterName) => {
+          return fromInputSafeName(paramVal);
+        });
+      });
+
+    const valDatasetId = this.form.value.datasetId;
+
+    if (valDatasetId) {
+      dataRequest.filters['datasetId'] = fromCSL(valDatasetId);
+    }
+
+    const valDateFrom = this.form.value.dateFrom;
+    const valDateTo = this.form.value.dateTo;
+
+    const valpercentLinksInOperationFrom =
+      this.form.value.percentLinksInOperationFrom;
+
+    dataRequest.filters['percentLinksInOperationFrom'] =
+      valpercentLinksInOperationFrom;
+
+    dataRequest.filters['dateFrom'] = valDateFrom;
+    dataRequest.filters['dateTo'] = valDateTo;
+
+    return dataRequest;
+  }
+
+  addOrUpdateFilterControls(name: string, options: Array<string>): void {
+    const checkboxes = this.form.get(name) as UntypedFormGroup;
+    options.forEach((option: string) => {
+      const fName = toInputSafeName(option);
+      const ctrl = this.form.get(`${name}.${fName}`);
+      const defaultValue = `${this.queryParams[name]}`.includes(fName);
+      if (ctrl) {
+        ctrl.setValue(defaultValue);
+      } else {
+        checkboxes.addControl(fName, new FormControl(defaultValue));
+      }
+    });
+  }
+
+  /** loadData
+   **/
+  loadData(): void {
+    this.error = undefined;
+    this.subs.push(
+      this.api
+        .getFilteredClioChecks(this.getDataServerDataRequest())
+        .pipe(
+          catchError((err: HttpErrorResponse) => {
+            this.error = err;
+            return of({
+              results: [],
+              filterOptions: {}
+            });
+          }),
+          takeUntilDestroyed(this.destroyRef)
+        )
+        .subscribe((CheckDataResults: CheckDataResults) => {
+          const list = CheckDataResults.results;
+          const filterOps = CheckDataResults.filterOptions;
+
+          Object.keys(filterOps).forEach((key: string) => {
+            delete filterOps['datasetId'];
+            delete filterOps['datasetName'];
+            delete filterOps['dateFrom'];
+            delete filterOps['dateTo'];
+            delete filterOps['excludedCheckId'];
+            delete filterOps['percentLinksInOperationTo'];
+            delete filterOps['percentLinksInOperationFrom'];
+
+            if (filterOps[key]) {
+              this.addOrUpdateFilterControls(key, filterOps[key]);
+            }
+            const percentLinksInOperationFrom =
+              this.route.snapshot.queryParamMap.get(
+                'percentLinksInOperationFrom'
+              );
+            this.form.controls.percentLinksInOperationFrom.setValue(
+              percentLinksInOperationFrom ?? 0
+            );
+          });
+
+          let averageScore = 0;
+          if (list.length) {
+            averageScore = Math.floor(
+              list.reduce((sum, obj) => sum + obj.percentLinksInOperation, 0) /
+                list.length
+            );
+          }
+          const listAverageScore = Math.floor(averageScore / 20);
+          const datasetChecks = this.api.groupChecksByDatasetId(list);
+          const titleMarkup = this.generateTitleMarkup();
+
+          this.modelClioInfo.set({
+            filterOps,
+            datasetChecks,
+            list,
+            listLength: list.length,
+            listAverageScore,
+            titleMarkup
+          });
+        })
+    );
+  }
+
+  getSetCheckboxValues(filterName: string): Array<string> {
+    const vals = this.form.value[filterName];
+    return vals
+      ? Object.keys(vals).filter((key: string) => {
+          return vals[key];
+        })
+      : [];
+  }
+
+  /** updatePageUrl
+  /* Navigate to url according to form state
+  */
+  updatePageUrl(clearPagination = false): void {
+    const qp: Params = {};
+
+    Object.keys(this.modelClioInfo().filterOps).forEach(
+      (filterName: string) => {
+        const filterVals = this.getSetCheckboxValues(filterName);
+        if (filterVals.length > 0) {
+          qp[filterName] = filterVals;
+        }
+      }
+    );
+
+    if (clearPagination) {
+      this.form.patchValue({ offset: 0 });
+    }
+
+    const {
+      datasetId,
+      datasetName,
+      valFrom,
+      valTo,
+      percentLinksInOperationFrom,
+      limit,
+      offset
+    } = this.form.value;
+
+    if (valFrom) {
+      qp['dateFrom'] = this.getDateAsISOString(new Date(valFrom));
+    }
+    if (valTo) {
+      qp['dateTo'] = this.getDateAsISOString(new Date(valTo));
+    }
+    if (datasetId) {
+      qp['datasetId'] = datasetId;
+    }
+    if (datasetName) {
+      qp['datasetName'] = datasetName;
+    }
+    if (percentLinksInOperationFrom) {
+      qp['percentLinksInOperationFrom'] = percentLinksInOperationFrom;
+    }
+    if (limit) {
+      qp['limit'] = limit;
+    }
+    if (offset !== undefined && offset !== null) {
+      qp['offset'] = offset;
+    }
+
+    this.router.navigate([''], {
+      queryParams: qp
+    });
+  }
+
+  goToPage(pageIndex: number): void {
+    const currentLimit = Number(this.form.value.limit ?? 25);
+    const targetOffset = Math.max(0, pageIndex * currentLimit);
+
+    this.form.patchValue({ offset: targetOffset });
+    this.updatePageUrl();
+  }
+}

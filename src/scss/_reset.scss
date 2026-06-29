@@ -1,5 +1,3 @@
-/* RESET */
-
 * {
   box-sizing: border-box;
 }
@@ -11,7 +9,8 @@ h1,
 header,
 footer,
 nav,
-section {
+section,
+ul {
   margin: 0;
   padding: 0;
 }
@@ -22,6 +21,14 @@ nav,
 section,
 main {
   display: block;
+}
+
+input {
+  outline: none;
+}
+
+select {
+  border: none;
 }
 
 ul {

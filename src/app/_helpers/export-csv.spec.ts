@@ -1,0 +1,65 @@
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { ExportCSVService } from './export-csv';
+
+describe('ExportCSVService', () => {
+  let service: ExportCSVService;
+  const timestamp = new Date().toISOString();
+  const dataProvider =
+    'Institute for Bulgarian Language of the Bulgarian Academy of Science';
+
+  const testRuns = [
+    {
+      id: 2,
+      datasetId: '11',
+      datasetName: 'dataset_11',
+      date: timestamp,
+      dataProvider: dataProvider,
+      provider: 'Daguerreobase',
+      percentLinksInOperation: 14
+    },
+    {
+      id: 1,
+      datasetId: '12',
+      datasetName: 'dataset_12',
+      date: timestamp,
+      dataProvider: dataProvider,
+      provider: 'Daguerreobase',
+      percentLinksInOperation: 81
+    }
+  ];
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      providers: [ExportCSVService]
+    }).compileComponents();
+    service = TestBed.inject(ExportCSVService);
+  }));
+
+  it('should sanitise the value', () => {
+    expect(service.sanitiseVal('"')).toEqual('""""');
+  });
+
+  it('should convert', () => {
+    const res = service.csvFromClioChecks(testRuns);
+    expect(res).toBeTruthy();
+
+    const line1 =
+      'id,dataset-id,dataset-name,creation-time,data-provider,provider,percent-in-operation';
+    const line2 = `2,"11","dataset_11","${timestamp}","${dataProvider}","Daguerreobase",14`;
+    const line3 = `1,"12","dataset_12","${timestamp}","${dataProvider}","Daguerreobase",81`;
+
+    expect(res).toEqual(`${line1}\n\r${line2}\n${line3}`);
+  });
+
+  it('should get the tuple', () => {
+    expect(service.getTuple(3).length).toEqual(3);
+  });
+
+  /*
+  it('should download', () => {
+    jest.spyOn(window.URL, 'createObjectURL');
+    expect(service.download('', '')).toBeTruthy();
+    expect(window.URL.createObjectURL).toHaveBeenCalled();
+  });
+  */
+});

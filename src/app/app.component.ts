@@ -1,108 +1,98 @@
-import { DatePipe, JsonPipe, NgIf, NgTemplateOutlet } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { AvailableReport, BatchItem } from './_models';
-import { APIService, ExportCSVService } from './_services';
+import { Component, HostListener, inject, ViewChild } from '@angular/core';
+
+import { apiSettings } from '../environments/apisettings';
+import { ClioCheck, DownloadRequest } from './_models';
+import { APIService, ClickService } from './_services';
 import { HeaderComponent } from './header';
+import { FiltersComponent } from './filters';
+import { ListingComponent } from './listing';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  imports: [DatePipe, HeaderComponent, JsonPipe, NgIf, NgTemplateOutlet]
+  imports: [FiltersComponent, HeaderComponent, ListingComponent]
 })
 export class AppComponent {
   title = 'Clio UI';
-  api = inject(APIService);
-  exportCSV = inject(ExportCSVService);
+  private readonly api = inject(APIService);
+  private readonly clickService = inject(ClickService);
+  public apiSettings = apiSettings;
 
-  data?: string;
-  error?: HttpErrorResponse;
+  @ViewChild('listing', { static: false }) listing: ListingComponent;
+  @ViewChild('filters', { static: false }) filters: FiltersComponent;
 
-  batches: Array<BatchItem>;
+  /**
+   * documentClick
+   * - global document click handler
+   * - push the clicked element to the clickService
+   * - (picked up by the click-aware directive)
+   **/
+  @HostListener('document:click', ['$event'])
+  documentClick(event: { target: HTMLElement }): boolean | void {
+    this.clickService.documentClickedTarget.next(event.target);
+  }
 
-  @ViewChild('batchId') batchId: ElementRef;
-  @ViewChild('maxResults') maxResults: ElementRef;
-  @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
-
-  loadReportByBatchId(download = false): void {
-    this.error = undefined;
-    const param = this.batchId.nativeElement.value;
-    this.api.reportByBatchId(param).subscribe(
-      (data: string) => {
-        this.data = data;
-        if (download) {
-          this.exportCSV.download(data, `batch-id-${param}`);
-        }
-      },
-      (err: HttpErrorResponse) => {
-        this.error = err;
+  downloadCheck(id: number): void {
+    this.api.getDownload({
+      filters: {
+        id: [`${id}`]
       }
-    );
+    } as DownloadRequest);
   }
 
-  downloadReportByBatchId(): void {
-    this.loadReportByBatchId(true);
+  downloadDataset(id: string): void {
+    const runIdsForDatasetId = this.listing
+      .clioInfo()
+      .datasetChecks[id].list.map((run: ClioCheck) => {
+        return `${run.id}`;
+      });
+
+    const exclusionMap = this.listing.form.value['check_ids'];
+    const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
+      return !exclusionMap[key] && new Set(runIdsForDatasetId).has(key);
+    });
+    const downloadRequest = this.filters.getDataServerDataRequest();
+
+    downloadRequest.filters['datasetId'] = [id];
+
+    this.api.getDownload({
+      ...downloadRequest,
+      excluded_check_ids: exclusionList
+    });
   }
 
-  loadLatestReport(download = false): void {
-    this.error = undefined;
-    this.api.latestReport().subscribe(
-      (data: string) => {
-        this.data = data;
-        if (download) {
-          this.exportCSV.download(data, 'latest-report');
-        }
-      },
-      (err: HttpErrorResponse) => {
-        this.error = err;
-      }
-    );
+  downloadAll(): void {
+    const exclusionMap = this.listing.form.value['check_ids'];
+    const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
+      return !exclusionMap[key];
+    });
+    this.api.getDownload({
+      ...this.filters.getDataServerDataRequest(),
+      excluded_check_ids: exclusionList
+    });
   }
 
-  downloadLatestReport(): void {
-    this.loadLatestReport(true);
+  pageString(): string {
+    if (!this.filters?.form) {
+      return '0 - 0';
+    }
+    const offset = Number.parseInt(this.filters.form.value.offset ?? 0);
+    const limit = Number.parseInt(this.filters.form.value.limit ?? 0);
+
+    return offset + ' - ' + (offset + limit);
   }
 
-  loadBatches(download = false): void {
-    this.error = undefined;
-    const param = this.maxResults.nativeElement.value ?? 1;
-    this.api.batches(param).subscribe(
-      (data: Array<BatchItem>) => {
-        this.batches = data;
-        this.data = JSON.stringify(data);
-        if (download) {
-          const fileData = this.exportCSV.csvFromBatchItem(data);
-          this.exportCSV.download(fileData, 'recent-batches');
-        }
-      },
-      (err: HttpErrorResponse) => {
-        this.error = err;
-      }
-    );
+  canLoadPrevPage(): boolean {
+    return !!Number.parseInt(this.filters?.form?.value?.offset ?? '');
   }
 
-  downloadBatches(): void {
-    this.loadBatches(true);
+  loadPrevPage(): void {
+    this.filters.dropPage();
+    this.filters.loadData();
   }
 
-  loadAvailableReports(download = false): void {
-    this.error = undefined;
-    this.api.availableReports().subscribe(
-      (data: Array<AvailableReport>) => {
-        this.data = JSON.stringify(data);
-        if (download) {
-          const fileData = this.exportCSV.csvFromAvailableReport(data);
-          this.exportCSV.download(fileData, 'available-reports');
-        }
-      },
-      (err: HttpErrorResponse) => {
-        this.error = err;
-      }
-    );
-  }
-
-  downloadAvailableReports(): void {
-    this.loadAvailableReports(true);
+  loadNextPage(): void {
+    this.filters.bumpPage();
+    this.filters.loadData();
   }
 }

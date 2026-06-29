@@ -5,5 +5,6 @@ export default class FixJsDomEnvironment extends JSDOMEnvironment {
     super(...args);
     this.global.URL.createObjectURL = (_) => '';
     this.global.URL.revokeObjectURL = (_) => {}
+    this.global.structuredClone = structuredClone;
   }
 }

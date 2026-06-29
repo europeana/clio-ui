@@ -5,16 +5,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.inputs.tag_name || github.event.pull_request.head.ref }}
       - name: Get Project LCOV
         uses: actions/download-artifact@master
         with:
           name: appLcov
-          path: ./lcov.info
+          path: .
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@v7.1.0
         env:
           SONAR_TOKEN: ${{ secrets.METIS_FRONTEND_SONAR_TOKEN }}
         with:
@@ -25,4 +25,4 @@ jobs:
             -Dsonar.test.inclusions=**/*.spec.ts
             -Dsonar.sources=src/app
             -Dsonar.exclusions=src/**/_mocked/**
-            -Dsonar.javascript.lcov.reportPaths=./lcov.info/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=./lcov.info

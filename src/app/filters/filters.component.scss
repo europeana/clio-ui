@@ -1,0 +1,160 @@
+@use '../../scss/colours';
+@use '../../scss/variables';
+@use '../../scss/functions/icon_urls';
+@use '../../scss/functions/mixins';
+
+h4 {
+  margin: 0.5em 0 0 1em;
+}
+
+input {
+  padding: 0.25em 0.4em;
+  width: 9em;
+}
+
+select {
+  background-color: colours.$white;
+  border: 1px solid variables.$clio-colour;
+  color: variables.$text-colour;
+  padding: 0.25em;
+
+  &:focus-visible {
+    outline: 1px solid variables.$clio-highlight-colour;
+  }
+  & + .clio-state {
+    margin-left: 0.5rem;
+    transform: scale(0.75);
+  }
+}
+
+.input-wrapper {
+  align-items: center;
+  display: flex;
+  margin: 0.5em 0 1.5em 0.5em;
+
+  input {
+    display: block;
+    margin-left: 4px;
+    outline: 1px solid transparent;
+    width: 10em;
+
+    &:focus-visible {
+      border-color: transparent;
+      outline-color: variables.$clio-highlight-colour;
+    }
+  }
+
+  .search-icon-solid {
+    background-image: icon_urls.svg-url-icon-search(colours.$white);
+    background-repeat: no-repeat;
+    background-color: variables.$text-colour;
+    background-position: 3px 3px;
+    background-size: 80%;
+    border: 1px solid colours.$white;
+    border-radius: 50%;
+    display: block;
+    height: 1.125em;
+    margin-left: 8px;
+    width: 1.125em;
+    outline: 0.5px solid variables.$text-colour;
+
+    &:focus-visible,
+    &:hover {
+      background-color: variables.$clio-highlight-colour;
+      outline-color: variables.$clio-highlight-colour;
+    }
+  }
+}
+
+.filters {
+  padding-top: 0.75em;
+  border-top: 1px solid colours.$mid-grey;
+  margin-bottom: 4em;
+}
+
+.filter {
+  background-color: colours.$white;
+  border-bottom: 1px solid transparent;
+  border-right: 1px solid transparent;
+
+  &:not(:hover) {
+    max-width: 100%;
+    overflow: hidden;
+    padding-right: 1.5em;
+  }
+
+  &:has(:hover) {
+    max-height: 270px;
+    overflow-y: auto;
+  }
+
+  &:empty {
+    min-height: 4em;
+
+    &:after {
+      content: 'no entries available';
+      @include mixins.empty-list();
+    }
+  }
+}
+
+.filter-wrapper {
+  $filter-max-height: 11em;
+
+  background: colours.$white;
+  max-height: $filter-max-height;
+  margin: 0 0 1.5em 0.5em;
+  position: relative;
+
+  .filter-height-maintainer {
+    border-bottom: 1px solid transparent;
+    display: none;
+    font-size: 14px;
+  }
+
+  &:not(:hover) {
+    overflow: hidden;
+  }
+
+  &:hover .filter-height-maintainer {
+    display: block;
+  }
+}
+
+.filter-label {
+  font-weight: bold;
+}
+
+.checkbox-filter {
+  align-items: center;
+  display: flex;
+  padding-bottom: 0.5em;
+
+  .checkbox-filter-input {
+    border-radius: 9px;
+    color: variables.$text-colour;
+    margin: 0 0.5em;
+
+    &:focus::placeholder {
+      color: transparent;
+    }
+  }
+
+  .filter-label {
+    text-transform: capitalize;
+  }
+
+  .search-icon {
+    background-image: icon_urls.svg-url-icon-search(variables.$text-colour);
+    background-repeat: no-repeat;
+    display: block;
+    height: 1em;
+    margin-left: 1em;
+    width: 1em;
+    min-width: 1em;
+
+    &:has(+ input:focus-visible) {
+      background-image: icon_urls.svg-url-icon-search(variables.$clio-colour);
+    }
+  }
+}

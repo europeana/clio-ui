@@ -1,0 +1,289 @@
+<ng-template
+  #dateCheckbox
+  let-time="time"
+  let-id="id"
+  let-isTopTime="isTopTime"
+  let-datasetId="datasetId"
+  let-datasetList="datasetList"
+  let-datasetCount="datasetCount"
+>
+  <span class="last-cell" [ngClass]="{ 'top-time': isTopTime }">
+    <span class="time">
+      <span>
+        {{ time | date: DATE_CONCISE_FMT }}
+      </span>
+      <app-checkbox
+        [form]="form"
+        [controlName]="id + ''"
+        [title]="'include in export'"
+        [group]="'check_ids'"
+        (valueChanged)="updateIds()"
+      ></app-checkbox>
+    </span>
+
+    @if (isTopTime) {
+      <span class="time-all">
+        <span>all ({{ datasetCount }})</span>
+        <app-checkbox
+          [form]="formDatasets"
+          [controlName]="datasetId + ''"
+          [attr.title]="
+            (formDatasets.value['dataset_ids'][datasetId]
+              ? 'uncheck'
+              : 'check') + ' all'
+          "
+          [group]="'dataset_ids'"
+          (valueChanged)="checkAll(datasetId, datasetList)"
+        ></app-checkbox>
+      </span>
+    }
+  </span>
+</ng-template>
+
+<ng-template #stateLink let-score="score" let-fnToggle="fnToggle">
+  <a
+    [attr.disabled]="!!fnToggle ? null : 'disabled'"
+    (click)="fnToggle ? fnToggle() : undefined"
+    (keyUp.enter)="fnToggle ? fnToggle() : undefined"
+    tabindex="!!fnToggle ? 0 : -1"
+    [ngClass]="getClioClass(score)"
+    class="clio-state"
+    title="links in operation: {{ score }}%"
+  ></a>
+</ng-template>
+
+<ng-template #bar let-score="score" let-fnCancel="fnCancel">
+  <span class="score-display">
+    <a
+      class="bar-label"
+      [attr.disabled]="!!fnCancel ? null : 'disabled'"
+      (click)="fnCancel ? fnCancel() : undefined"
+    >
+      {{ score }}%
+    </a>
+    <a
+      class="bar-outer"
+      [attr.disabled]="!!fnCancel ? null : 'disabled'"
+      (click)="fnCancel ? fnCancel() : undefined"
+    >
+      <span
+        class="bar-inner"
+        title="links in operation: {{ score }}%"
+        [ngStyle]="{
+          width: score + '%'
+        }"
+      >
+      </span>
+    </a>
+  </span>
+</ng-template>
+
+<ul
+  class="align-right listing"
+  [ngClass]="{
+    'extra-col': graphMode
+  }"
+  libClickAware
+  (clickOutside)="clickOutside()"
+  [ignoreClasses]="['clio-state', 'download-anchor', 'score-display']"
+>
+  <li class="header-section">
+    @let clioInfoValue = clioInfo();
+    @if (clioInfoValue) {
+      <span class="summary-bar">
+        <a
+          tabindex="0"
+          (click)="graphMode = !graphMode"
+          (keyUp.enter)="graphMode = !graphMode"
+          title="average: {{ clioInfoValue.listAverageScore }}"
+          class="clio-state clio-state-{{ clioInfoValue.listAverageScore }}"
+        ></a>
+        @if (clioInfo().titleMarkup) {
+          @let titleMarkup = clioInfo().titleMarkup;
+          <span class="title">
+            @for (x of titleMarkup; track x) {
+              @if (x.fn) {
+                <a
+                  (click)="x.fn()"
+                  (keyUp.enter)="x.fn()"
+                  tabindex="0"
+                  title="remove"
+                  >{{ x.label }}</a
+                >
+              } @else {
+                <span>{{ x.label | renameFilter }}</span>
+              }
+            }
+            <ng-container *ngFor="let x of titleMarkup"> </ng-container>
+          </span>
+        }
+
+        @let count = listSelectionCount;
+        @let text = 'export ' + count + ' check' + (count !== 1 ? 's' : '');
+        <a
+          class="csv-download-block"
+          [ngClass]="{
+            asterisked: listSelectionCount !== clioInfo().listLength
+          }"
+          [attr.title]="text"
+          tabindex="0"
+          (click)="requestDownloadAll.emit()"
+          (keyUp.enter)="requestDownloadAll.emit()"
+          [attr.label]="text"
+        >
+          {{ text }}
+        </a>
+      </span>
+
+      @if (clioInfoValue.listLength) {
+        <span class="list-header align-left">Dataset Id / Name</span>
+        <span class="list-header">Data Provider</span>
+        <span class="list-header">Provider</span>
+        <span class="list-header align-centre">Export</span>
+        <span class="list-header align-left">Check Date</span>
+      } @else {
+        <span class="list-empty">no checks available</span>
+      }
+    }
+  </li>
+
+  @for (dsRun of clioInfo().datasetChecks | keyvalue; track dsRun.key) {
+    @let group = dsRun.value;
+    @let dsId = dsRun.key;
+
+    <li class="group-header" [ngClass]="{ 'header-section': group.opened }">
+      <ul class="sublisting">
+        <li>
+          @if (graphMode) {
+            <ng-container
+              [ngTemplateOutlet]="bar"
+              [ngTemplateOutletContext]="{
+                score: group.percentLinksInOperation,
+                fnCancel: cancelGraphMode.bind(this)
+              }"
+            >
+            </ng-container>
+          }
+
+          <span class="state-display">
+            <ng-container
+              [ngTemplateOutlet]="stateLink"
+              [ngTemplateOutletContext]="{
+                score: group.percentLinksInOperation,
+                fnToggle: toggleGraphMode.bind(this)
+              }"
+            >
+            </ng-container>
+          </span>
+
+          <a
+            tabindex="0"
+            class="opener"
+            [ngClass]="{ opened: group.opened }"
+            (click)="group.opened = !group.opened"
+            (keyUp.enter)="group.opened = !group.opened"
+          >
+            <span>
+              {{ dsId }}
+            </span>
+            <span class="opener-content">
+              {{ group.list[0].datasetName }}
+            </span>
+          </a>
+
+          <span>
+            {{ group.list[0].dataProvider }}
+          </span>
+
+          <span>
+            {{ group.list[0].provider }}
+          </span>
+
+          @let selectedRunCount = getSelectedRunCount(group.list);
+
+          <span class="centre">
+            @let disabled = selectedRunCount === 0;
+            @let asterisked = selectedRunCount !== group.list.length;
+            @let selectedCountText =
+              asterisked ? ' (of ' + group.list.length + ')' : '';
+            <a
+              class="csv-download-block"
+              target="_blank"
+              [attr.tabindex]="disabled ? -1 : 0"
+              [ngClass]="{ disabled: disabled, asterisked }"
+              [attr.title]="
+                'export ' +
+                selectedRunCount +
+                selectedCountText +
+                ' checks for dataset \'' +
+                dsId +
+                '\''
+              "
+              (click)="requestDownloadDataset.emit(dsId)"
+              (keyUp.enter)="requestDownloadDataset.emit(dsId)"
+            ></a>
+          </span>
+
+          <ng-container
+            [ngTemplateOutlet]="dateCheckbox"
+            [ngTemplateOutletContext]="{
+              time: group.list[0].date,
+              id: group.list[0].id + '',
+              isTopTime: true,
+              datasetId: dsId,
+              datasetList: group.list,
+              datasetCount: selectedRunCount
+            }"
+          >
+          </ng-container>
+        </li>
+
+        @if (group.opened) {
+          <li>
+            <ul class="sublisting run-list">
+              @for (entry of group.list; track entry) {
+                <li>
+                  <span>
+                    <ng-container
+                      [ngTemplateOutlet]="stateLink"
+                      [ngTemplateOutletContext]="{
+                        score: entry.percentLinksInOperation
+                      }"
+                    >
+                    </ng-container>
+                    <ng-container
+                      [ngTemplateOutlet]="bar"
+                      [ngTemplateOutletContext]="{
+                        score: entry.percentLinksInOperation
+                      }"
+                    >
+                    </ng-container>
+                  </span>
+
+                  <span class="centre">
+                    <a
+                      class="csv-download"
+                      target="_blank"
+                      title="export check data"
+                      (click)="requestDownloadCheck.emit(entry.id)"
+                      (keyUp.enter)="requestDownloadCheck.emit(entry.id)"
+                    ></a>
+                  </span>
+
+                  <ng-container
+                    [ngTemplateOutlet]="dateCheckbox"
+                    [ngTemplateOutletContext]="{
+                      time: entry.date,
+                      id: entry.id + ''
+                    }"
+                  >
+                  </ng-container>
+                </li>
+              }
+            </ul>
+          </li>
+        }
+      </ul>
+    </li>
+  }
+</ul>

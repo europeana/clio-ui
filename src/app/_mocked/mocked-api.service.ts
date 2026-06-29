@@ -1,7 +1,11 @@
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-
-import { AvailableReport, BatchItem } from '../_models';
+import {
+  CheckDataRequest,
+  CheckDataResults,
+  CheckGroup,
+  ClioCheck
+} from '../_models';
 
 export class MockAPIService {
   errorMode = false;
@@ -14,30 +18,24 @@ export class MockAPIService {
     );
   }
 
-  reportByBatchId(_: string): Observable<string> {
-    if (this.errorMode) {
-      return this.getError('mock getDebiasReport throws error');
-    }
-    return of('');
+  groupChecksByDatasetId(_: Array<ClioCheck>): { [key: string]: CheckGroup } {
+    return {} as { [key: string]: CheckGroup };
   }
 
-  latestReport(): Observable<string> {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  getDownload(_: CheckDataRequest): void {}
+
+  getFilteredClioChecks(_: CheckDataRequest): Observable<CheckDataResults> {
     if (this.errorMode) {
-      return this.getError('mock getDebiasReport throws error');
+      return this.getError('mock getFilteredClioChecks throws error');
     }
-    return of('');
-  }
-  batches(): Observable<Array<BatchItem>> {
-    if (this.errorMode) {
-      return this.getError('mock getDebiasReport throws error');
-    }
-    return of([{} as unknown as BatchItem]);
-  }
-  availableReports(): Observable<Array<AvailableReport>> {
-    if (this.errorMode) {
-      return this.getError('mock getDebiasReport throws error');
-    }
-    return of([{} as unknown as AvailableReport]);
+    return of({
+      filterOptions: {
+        datasetId: [''],
+        datasetName: ['']
+      },
+      results: []
+    } as CheckDataResults);
   }
 }
 

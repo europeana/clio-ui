@@ -1,13 +1,16 @@
 @use 'functions/_icon_urls';
+@use 'colours';
 @use 'variables';
 
 body {
-  background: variables.$offwhite;
-  color: variables.$textcolour_body;
+  background: colours.$white;
+  color: variables.$text-colour;
   font: 16px / 1.6 variables.$font-primary;
   -webkit-text-size-adjust: 100%;
-  word-break: normal;
-  word-wrap: break-word;
+}
+
+input {
+  border: 1px solid variables.$text-colour;
 }
 
 .bold {
@@ -36,5 +39,62 @@ body {
 
     max-width: variables.$max-width;
     width: 80%;
+  }
+}
+
+.columns {
+  $col-w: 20em;
+  display: flex;
+  margin-top: 2em;
+  max-width: 100%;
+  min-height: calc(100vh - 12em);
+
+  .right-col {
+    margin-left: auto;
+    width: calc(100% - $col-w);
+    min-width: calc(100% - $col-w);
+    max-width: calc(100% - $col-w);
+    min-height: calc(100vh - 30em);
+  }
+
+  .left-col {
+    min-width: $col-w;
+    max-width: calc($col-w - 0.5em);
+
+    &:hover {
+      z-index: 3;
+      .filter-wrapper:hover {
+        z-index: 1;
+        .filter:not(:empty) {
+          border-bottom-color: variables.$clio-colour;
+          border-right-color: variables.$clio-colour;
+          position: absolute;
+          top: 0;
+        }
+      }
+    }
+
+    .checkbox-filter:not(:hover, :has(+ :hover)) .checkbox-filter-input {
+      opacity: 0;
+    }
+  }
+}
+
+.footer {
+  border-bottom: 1px solid colours.$mid-grey;
+  border-top: 1px solid colours.$mid-grey;
+  line-height: 2.25em;
+  margin-top: 2.25em;
+  display: flex;
+  width: 100%;
+
+  .flag {
+    background-image: url('../assets/images/eu-flag.svg');
+    background-position: 0 center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 7em;
+    max-height: 7em;
+    width: 33em;
   }
 }

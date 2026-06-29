@@ -1,156 +1,47 @@
 <app-header></app-header>
 
-<a #downloadAnchor tabindex="-1"></a>
-
-<ng-template
-  #endpointConnection
-  let-endpoint="endpoint"
-  let-desc="desc"
-  let-action="action"
-  let-inputBatchId="inputBatchId"
-  let-inputMaxResults="inputMaxResults"
-  let-download="download"
->
-  <li>
-    <a class="go" (click)="action()">go</a>
-  </li>
-  <li class="parameter-field">
-    @if (inputBatchId) {
-      <input (keydown.enter)="loadReportByBatchId()" #batchId />
-    }
-    @if (inputMaxResults) {
-      <input (keydown.enter)="loadBatches()" #maxResults value="1" />
-    }
-  </li>
-  <li class="path" (click)="action()">
-    {{ endpoint }}
-  </li>
-  <li class="download">
-    @if (download) {
-      <a class="csv" (click)="download()">csv</a>
-    }
-  </li>
-  <li class="desc">
-    {{ desc }}
-  </li>
-</ng-template>
-
 <div class="fit-to-page">
-  <ul class="end-points">
-    <!-- batchid needed -->
-    <ng-container
-      *ngTemplateOutlet="
-        endpointConnection;
-        context: {
-          action: loadReportByBatchId.bind(this),
-          download: downloadReportByBatchId.bind(this),
-          endpoint: '/report-by-batch-id',
-          inputBatchId: true,
-          desc: 'Get a report by creation timestamp'
-        }
-      "
-    ></ng-container>
+  <div class="columns">
+    <div class="left-col">
+      <app-filters #filters> </app-filters>
+    </div>
+    <div class="right-col">
+      <app-listing
+        #listing
+        (requestDownloadCheck)="downloadCheck($event)"
+        (requestDownloadDataset)="downloadDataset($event)"
+        (requestDownloadAll)="downloadAll()"
+        [clioInfo]="filters.modelClioInfo"
+      ></app-listing>
 
-    <ng-container
-      *ngTemplateOutlet="
-        endpointConnection;
-        context: {
-          action: loadLatestReport.bind(this),
-          download: downloadLatestReport.bind(this),
-          endpoint: '/latest-report',
-          desc: 'Get full report with the the latest link checking results'
-        }
-      "
-    ></ng-container>
+      <a
+        (click)="loadPrevPage()"
+        (keyUp.enter)="loadPrevPage()"
+        [attr.tabindex]="!canLoadPrevPage() ? -1 : 0"
+        [attr.disabled]="!canLoadPrevPage() ? 'disabled' : null"
+      >
+        &lt;&lt;
+      </a>
 
-    <ng-container
-      *ngTemplateOutlet="
-        endpointConnection;
-        context: {
-          action: loadBatches.bind(this),
-          download: downloadBatches.bind(this),
-          endpoint: '/batches',
-          inputMaxResults: true,
-          desc: 'Get a historic overview of the most recent link checking batches'
-        }
-      "
-    ></ng-container>
+      &nbsp;
+      {{ pageString() }}
+      &nbsp;
 
-    <ng-container
-      *ngTemplateOutlet="
-        endpointConnection;
-        context: {
-          action: loadAvailableReports.bind(this),
-          download: downloadAvailableReports.bind(this),
-          endpoint: '/available-reports',
-          desc: 'Get all available report details'
-        }
-      "
-    ></ng-container>
-  </ul>
+      <a (click)="loadNextPage()" (keyUp.enter)="loadNextPage()"> &gt;&gt; </a>
+    </div>
+  </div>
 
-  <br />
-
-  <pre>
-    {{ data | json }}
-  </pre>
-
-  <ng-template #tmpBatch let-batch="batch">
-    <ul class="batch-item">
-      <li>
-        <b>Creation Time:</b
-        ><span>{{ batch.creationTime | date: 'dd/MM/yyyy - HH:mm' }}</span>
-      </li>
-      <li>
-        <b>Last Update Time In Solr:</b
-        ><span>{{
-          batch.lastUpdateTimeInSolr | date: 'dd/MM/yyyy - HH:mm'
-        }}</span>
-      </li>
-      <li>
-        <b>Last Update Time In Metis Core:</b
-        ><span>{{
-          batch.lastUpdateTimeInMetisCore | date: 'dd/MM/yyyy - HH:mm'
-        }}</span>
-      </li>
-      <li>
-        <b>Datasets Excluded Already Running:</b
-        ><span>{{ batch.datasetsExcludedAlreadyRunning }}</span>
-      </li>
-      <li>
-        <b>Datasets Excluded Not Indexed:</b
-        ><span>{{ batch.datasetsExcludedNotIndexed }}</span>
-      </li>
-      <li>
-        <b>Datasets Excluded Without Links:</b
-        ><span>{{ batch.datasetsExcludedWithoutLinks }}</span>
-      </li>
-      <li>
-        <b>Datasets Processed:</b><span>{{ batch.datasetsProcessed }}</span>
-      </li>
-      <li>
-        <b>Datasets Pending:</b><span>{{ batch.datasetsPending }}</span>
-      </li>
-    </ul>
-  </ng-template>
-
-  <ul *ngIf="batches" class="batch-list">
-    @for (batch of batches; track batch) {
-      <li>
-        <ng-container
-          *ngTemplateOutlet="tmpBatch; context: { batch }"
-        ></ng-container>
-      </li>
-    }
-  </ul>
-
-  <ul *ngIf="error" class="error">
-    <li>{{ error.status }} / {{ error.statusText }}</li>
+  <ul class="footer">
     <li>
-      {{ error.message }}
+      <a
+        class="dataspace-logo"
+        href="{{ apiSettings.dataspaceURL }}"
+        rel="noopener"
+        target="_blank"
+        aria-label="Download file"
+        aria-hidden="true"
+      ></a>
     </li>
-    <li *ngIf="error.error; let errInner">
-      {{ errInner.text }}
-    </li>
+    <li class="flag" alt="EU flag logo"></li>
   </ul>
 </div>

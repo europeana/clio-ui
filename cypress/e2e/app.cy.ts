@@ -1,7 +1,10 @@
 describe('Clio UI', () => {
 
-  it('passes', () => {
+  beforeEach(() => {
     cy.visit('/');
+  });
+
+  it('loads', () => {
     cy.get('.logo').should('exist');
   })
 })

@@ -1,58 +1,99 @@
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { apiSettings } from '../../environments/apisettings';
+import {
+  HttpTestingController,
+  provideHttpClientTesting
+} from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { APIService } from './';
 import {
   provideHttpClient,
   withInterceptorsFromDi
 } from '@angular/common/http';
 
+import { CheckDataRequest, ClioCheck, DownloadRequest } from '../_models';
+import { APIService } from './';
+
 describe('API Service', () => {
   let service: APIService;
+  let httpTesting: HttpTestingController;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [
-        APIService,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
       ]
     }).compileComponents();
     service = TestBed.inject(APIService);
+    httpTesting = TestBed.inject(HttpTestingController);
   }));
 
-  it('should load availableReports', () => {
-    const spyLoadAvailableReports = jest.spyOn(service, 'availableReports');
-    const sub = service.availableReports().subscribe((res) => {
-      expect(res).toBeTruthy();
-      sub.unsubscribe();
-    });
-    expect(spyLoadAvailableReports).toHaveBeenCalled();
+  it('should create', () => {
+    expect(service).toBeTruthy();
   });
 
-  it('should load batches', () => {
-    const spyBatches = jest.spyOn(service, 'batches');
-    const sub = service.batches().subscribe((res) => {
-      expect(res).toBeTruthy();
-      sub.unsubscribe();
-    });
-    expect(spyBatches).toHaveBeenCalled();
+  it('should group the runs by dataset id', () => {
+    const grouped = service.groupChecksByDatasetId([
+      {
+        id: 1,
+        datasetId: '1',
+        percentLinksInOperation: 10
+      },
+      {
+        id: 1,
+        datasetId: '1',
+        percentLinksInOperation: 10
+      },
+      {
+        id: 1,
+        datasetId: '2',
+        percentLinksInOperation: 10
+      }
+    ] as unknown as Array<ClioCheck>);
+    expect(grouped).toBeTruthy();
   });
 
-  it('should load the latest report', () => {
-    const spyLatestReport = jest.spyOn(service, 'latestReport');
-    const sub = service.latestReport().subscribe((res) => {
-      expect(res).toBeTruthy();
-      sub.unsubscribe();
+  it('should get the filtered reports', () => {
+    const param = {
+      filters: {
+        limit: '5',
+        offset: '0'
+      }
+    } as CheckDataRequest;
+
+    service.getFilteredClioChecks(param).subscribe((data: unknown) => {
+      expect(data).toBeTruthy();
     });
-    expect(spyLatestReport).toHaveBeenCalled();
+
+    const url = `${apiSettings.serverAPI}/runs/summary`;
+    const req = httpTesting.expectOne(url);
+    req.flush({ filterOptions: {} });
+    httpTesting.verify();
   });
 
-  it('should load the report by batch id', () => {
-    const spyReportByBatchId = jest.spyOn(service, 'reportByBatchId');
-    const sub = service.reportByBatchId('x').subscribe((res) => {
-      expect(res).toBeTruthy();
-      sub.unsubscribe();
-    });
-    expect(spyReportByBatchId).toHaveBeenCalled();
+  it('should get the download', () => {
+    const url = `${apiSettings.serverAPI}/runs/links/export`;
+    service.getDownload({
+      filterOptions: {},
+      excluded_check_ids: []
+    } as unknown as DownloadRequest);
+    const req = httpTesting.expectOne(url);
+    req.flush('csv');
+    httpTesting.verify();
+  });
+
+  it('should get the download (error)', () => {
+    const url = `${apiSettings.serverAPI}/runs/links/export`;
+    const mockRequest = {
+      filterOptions: {},
+      excluded_check_ids: []
+    } as unknown as DownloadRequest;
+    const downloadSpy = jest
+      .spyOn(service, 'download')
+      .mockResolvedValue(undefined);
+    service.getDownload(mockRequest);
+    const req = httpTesting.expectOne(url);
+    req.flush('Server Error', { status: 500, statusText: 'Server Error' });
+    expect(downloadSpy).toHaveBeenCalledWith('CSV_DOWNLOAD', 'clio_report');
+    httpTesting.verify();
   });
 });

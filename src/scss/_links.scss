@@ -1,0 +1,108 @@
+@use './functions/icon_urls';
+@use './colours';
+@use './variables';
+
+a {
+  color: variables.$clio-colour;
+  text-decoration: none;
+
+  &[disabled] {
+    pointer-events: none;
+  }
+
+  &:not([disabled]) {
+    cursor: pointer;
+    &:focus-visible,
+    &:hover {
+      color: variables.$clio-highlight-colour;
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &.external-link {
+    align-items: center;
+    display: flex;
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 1em;
+      padding: 0 0.2em;
+      height: 1em;
+      background-image: icon_urls.svg-url-icon-external(variables.$clio-colour);
+      background-repeat: no-repeat;
+      background-position: center 0.1em;
+    }
+  }
+}
+
+.csv-download {
+  background-image: icon_urls.svg-url-icon-download(variables.$clio-colour);
+  display: block;
+  height: 1.25em;
+  margin: 0.5em auto 0 auto;
+  width: 1.25em;
+
+  &:focus-visible,
+  &:hover {
+    background-image: icon_urls.svg-url-icon-download(
+      variables.$clio-highlight-colour
+    );
+  }
+}
+
+.csv-download-block {
+  align-items: center;
+  display: flex;
+  position: relative;
+
+  &::after {
+    content: '';
+    border-radius: 4px;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: block;
+    background-color: variables.$clio-colour;
+    background-image: icon_urls.svg-url-icon-download(colours.$white);
+  }
+
+  &:focus-visible,
+  &:hover {
+    &::after {
+      background-color: variables.$clio-highlight-colour;
+    }
+  }
+  &:focus-visible {
+    color: variables.$clio-highlight-colour;
+    outline: none;
+  }
+
+  &.asterisked::before {
+    content: '*';
+    position: absolute;
+    top: 0;
+    font-size: 24px;
+    display: block;
+    left: 50%;
+    height: 1em;
+    width: 1em;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    &::after {
+      background-color: colours.$mid-grey;
+    }
+  }
+}
+
+.dataspace-logo {
+  background-image: url('/assets/images/dataspace.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 15em;
+  height: 5em;
+  margin: 0.5em 0;
+}

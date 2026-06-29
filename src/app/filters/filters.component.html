@@ -1,0 +1,142 @@
+<div class="filters">
+  @let filter = modelClioInfo().filterOps;
+
+  @if (error) {
+    <span style="color: red">
+      {{ error | json }}
+    </span>
+  }
+  <ng-container *ngFor="let field of filter | keyvalue">
+    <span class="checkbox-filter">
+      <span [id]="field.key + '-title'" class="filter-label">{{
+        field.key | renameFilter
+      }}</span>
+      @if (field.value && field.value.length > 5) {
+        <span class="search-icon"></span>
+        <input
+          [id]="field.key"
+          [attr.aria-labelledby]="field.key + '-title'"
+          class="checkbox-filter-input"
+          #filterEntries
+          placeholder="Search ({{ field.value.length }} entries)"
+          [(ngModel)]="optionFilters[field.key]"
+        />
+      }
+    </span>
+
+    <div class="filter-wrapper">
+      <ul class="filter-height-maintainer">
+        <li
+          *ngFor="
+            let option of filterList(optionFilters[field.key], field.value)
+          "
+        >
+          &nbsp;
+        </li>
+      </ul>
+
+      <ul class="filter">
+        <li
+          *ngFor="
+            let option of filterList(optionFilters[field.key], field.value)
+          "
+        >
+          <app-checkbox
+            [form]="form"
+            [controlName]="toInputSafeName(option)"
+            [labelText]="option"
+            [group]="field.key"
+            (valueChanged)="updatePageUrl(true)"
+            title="Test"
+          ></app-checkbox>
+        </li>
+      </ul>
+    </div>
+  </ng-container>
+
+  <span>
+    <span class="filter-label">Percent In Operation</span>
+    <span class="input-wrapper">
+      <app-slider
+        (change)="updatePageUrl(true)"
+        [form]="form"
+        [controlName]="'percentLinksInOperationFrom'"
+      >
+      </app-slider>
+    </span>
+  </span>
+
+  <div [formGroup]="form">
+    <span class="filter-label">Dataset Id(s)</span>
+    <span class="input-wrapper">
+      <input
+        data-e2e="dataset-id"
+        placeholder="dataset id"
+        formControlName="datasetId"
+        (keyUp.enter)="updatePageUrl(true)"
+      />
+      <a
+        aria-label="filter dataset label"
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl(true)"
+        (keyUp.enter)="updatePageUrl(true)"
+        ><!-- //NOSONAR --></a
+      >
+    </span>
+
+    <span class="filter-label">Dataset Name</span>
+    <span class="input-wrapper">
+      <input
+        data-e2e="dataset-name"
+        placeholder="dataset name"
+        formControlName="datasetName"
+        (keyUp.enter)="updatePageUrl(true)"
+      />
+      <a
+        aria-label="filter dataset name"
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl(true)"
+        (keyUp.enter)="updatePageUrl(true)"
+        ><!-- //NOSONAR --></a
+      >
+    </span>
+
+    <span class="filter-label">From</span>
+    <span class="input-wrapper">
+      <input
+        type="date"
+        data-e2e="date-from"
+        formControlName="dateFrom"
+        (change)="updatePageUrl(true)"
+      />
+      <a
+        aria-label="filter date"
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl(true)"
+        (keyUp.enter)="updatePageUrl(true)"
+        ><!-- //NOSONAR --></a
+      >
+    </span>
+
+    <span class="filter-label">To</span>
+    <span class="input-wrapper">
+      <input
+        type="date"
+        data-e2e="date-to"
+        formControlName="dateTo"
+        (change)="updatePageUrl(true)"
+      />
+      <a
+        aria-label="filter date"
+        class="search-icon-solid"
+        tabindex="0"
+        (click)="updatePageUrl(true)"
+        (keyUp.enter)="updatePageUrl(true)"
+        ><!-- //NOSONAR --></a
+      >
+    </span>
+  </div>
+</div>
