@@ -14,10 +14,10 @@
     "cypress": "cypress open",
     "cypress:ci": "run-p --race start:ci cypress:run",
     "cypress:run": "sleep 10 && cypress run --browser chrome --config '{\"component\": {},  \"e2e\": { \"excludeSpecPattern\": \"**/**a11y.cy.ts\"}}'",
-    "test:e2e": "npm run prep-test-data &&  tsc --project tsconfig.test-data.json && ((node  --use_strict ./out-tsc/app/test-data/index.mjs) & (npm run cypress:ci) ; fuser -k 3001/tcp)",
+    "test:e2e": "npm run prep-test-data && tsc --project tsconfig.test-data.json && ((node --use_strict ./out-tsc/test-data/index.mjs) & (npm run cypress:ci) ; fuser -k 3001/tcp)",
     "prep-test-data": "npm run clean && node tools/copy-source-files-to-ci.mjs ./",
     "start:ci": "ng serve --port 4280 --live-reload=false --configuration=e2e",
-    "start:ci-data": "npm run prep-test-data && tsc --project tsconfig.test-data.json && (node --use_strict ./out-tsc/app/test-data/index.mjs)",
+    "start:ci-data": "npm run prep-test-data && tsc --project tsconfig.test-data.json && (node --use_strict ./out-tsc/test-data/index.mjs)",
     "prettier": "prettier --write 'src/**/*.{ts,js,json,scss,html}' '*.{scss,js,json}'",
     "prettier:ci": "prettier --list-different 'src/**/*.{ts,js,json,scss,html}' '*.{js,json}'"
   },
