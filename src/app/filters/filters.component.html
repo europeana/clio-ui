@@ -51,7 +51,7 @@
                 [controlName]="toInputSafeName(option)"
                 [labelText]="option"
                 [group]="field.key"
-                (valueChanged)="updatePageUrl(true)"
+                (valueChanged)="onFilterCheckboxToggle(field.key, option)"
                 title="Test"
               ></app-checkbox>
             </li>

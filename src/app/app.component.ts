@@ -1,4 +1,7 @@
-import { Component, HostListener, inject, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, Signal, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 
 import { apiSettings } from '../environments/apisettings';
 import { ClioCheck, DownloadRequest } from './_models';
@@ -16,6 +19,7 @@ export class AppComponent {
   title = 'Clio UI';
   private readonly api = inject(APIService);
   private readonly clickService = inject(ClickService);
+  private readonly route = inject(ActivatedRoute);
   public apiSettings = apiSettings;
 
   @ViewChild('listing', { static: false }) listing: ListingComponent;
@@ -72,15 +76,16 @@ export class AppComponent {
     });
   }
 
-  pageString(): string {
-    if (!this.filters?.form) {
-      return '0 - 0';
-    }
-    const offset = Number(this.filters.form.value.offset ?? 0);
-    const limit = Number(this.filters.form.value.limit ?? 0);
-
-    return offset + ' - ' + (offset + limit);
-  }
+  public paginationText: Signal<string> = toSignal(
+    this.route.queryParams.pipe(
+      map(params => {
+        const offset = Number(params['offset'] ?? 0);
+        const limit = Number(params['limit'] ?? 25);
+        return `${offset} - ${offset + limit}`;
+      })
+    ),
+    { initialValue: '0 - 25' }
+  );
 
   canLoadPrevPage(): boolean {
     const offset = this.filters?.form?.value?.offset;
@@ -89,11 +94,9 @@ export class AppComponent {
 
   loadPrevPage(): void {
     this.filters.dropPage();
-    this.filters.loadData();
   }
 
   loadNextPage(): void {
     this.filters.bumpPage();
-    this.filters.loadData();
   }
 }

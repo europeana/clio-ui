@@ -1,13 +1,9 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormGroup } from '@angular/forms';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, Params } from '@angular/router';
 import { By } from '@angular/platform-browser';
+import { BehaviorSubject } from 'rxjs';
 
 import {
   MockAPIService,
@@ -25,6 +21,7 @@ describe('AppComponent', () => {
   let app: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let api: APIService;
+  let mockQueryParams$: BehaviorSubject<Params>;
 
   const formVals = {
     value: {
@@ -35,13 +32,21 @@ describe('AppComponent', () => {
   } as unknown as FormGroup;
 
   const configureTestbed = (errorMode = false): void => {
+    mockQueryParams$ = new BehaviorSubject<Params>({ offset: 0, limit: 25 });
+
     TestBed.configureTestingModule({
-      imports: [AppComponent, RouterTestingModule],
+      imports: [AppComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
           provide: APIService,
           useClass: errorMode ? MockAPIServiceErrors : MockAPIService
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            queryParams: mockQueryParams$
+          }
         }
       ]
     })
@@ -50,6 +55,7 @@ describe('AppComponent', () => {
         add: { imports: [MockFiltersComponent] }
       })
       .compileComponents();
+
     api = TestBed.inject(APIService);
     clicks = TestBed.inject(ClickService);
   };
@@ -74,6 +80,7 @@ describe('AppComponent', () => {
       el.nativeElement.click();
       tick(1);
       expect(clicks.documentClickedTarget.next).toHaveBeenCalled();
+
       app.documentClick({
         target: {
           nativeElement: { contains: () => false }
@@ -84,8 +91,13 @@ describe('AppComponent', () => {
     }));
 
     it('should download datasets', () => {
+      app.filters = {
+        getDataServerDataRequest: jest.fn().mockReturnValue({ filters: {} })
+      } as unknown as FiltersComponent;
+
       jest.spyOn(app.filters, 'getDataServerDataRequest');
       jest.spyOn(api, 'getDownload');
+
       app.listing = {
         form: {
           value: {
@@ -127,63 +139,55 @@ describe('AppComponent', () => {
       expect(api.getDownload).toHaveBeenCalled();
     });
 
-    it('should download all', () => {
+    it('should download checking records by precise single ID', () => {
       jest.spyOn(api, 'getDownload');
       app.downloadCheck(1);
       expect(api.getDownload).toHaveBeenCalled();
     });
 
-    it('should drop the page configuration and reload data', () => {
+    it('should drop the page configuration and let route sync handle loading', () => {
       app.filters = {
-        dropPage: jest.fn(),
-        loadData: jest.fn()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dropPage: jest.fn()
       } as any;
+
       app.loadPrevPage();
       expect(app.filters.dropPage).toHaveBeenCalledTimes(1);
-      expect(app.filters.loadData).toHaveBeenCalledTimes(1);
     });
 
-    it('should bump the page configuration and reload data', () => {
+    it('should bump the page configuration and let route sync handle loading', () => {
       app.filters = {
-        bumpPage: jest.fn(),
-        loadData: jest.fn()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        bumpPage: jest.fn()
       } as any;
+
       app.loadNextPage();
       expect(app.filters.bumpPage).toHaveBeenCalledTimes(1);
-      expect(app.filters.loadData).toHaveBeenCalledTimes(1);
     });
 
-    it('should determine if can load prev page', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    it('should determine if can load prev page based on child dynamic form state', () => {
       app.filters = { form: undefined } as any;
       expect(app.canLoadPrevPage()).toBeFalsy();
+
       app.filters = {
         form: {
           value: { offset: '50', limit: '10' }
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
       expect(app.canLoadPrevPage()).toBeTruthy();
+
       app.filters = {
         form: {
           value: { offset: '0', limit: '100' }
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
       expect(app.canLoadPrevPage()).toBeFalsy();
     });
 
-    it('should get the page string', () => {
-      expect(app.pageString()).toBe('0 - 0');
-      app.filters = {
-        form: {
-          value: { offset: '50', limit: '10' }
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any;
-      expect(app.pageString()).toBe('50 - 60');
-    });
+    it('should compute the correct visual page string text via the reactive query params stream', fakeAsync(() => {
+      expect(app.paginationText()).toBe('0 - 25');
+      mockQueryParams$.next({ offset: 50, limit: 10 });
+      tick(0);
+      fixture.detectChanges();
+      expect(app.paginationText()).toBe('50 - 60');
+    }));
   });
 });

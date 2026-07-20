@@ -272,7 +272,7 @@ export class FiltersComponent implements OnInit {
             fn: () => {
               const group = this.form.get(key) as FormGroup;
               if (group) {
-                group.removeControl(toInputSafeName(values[indexInner]));
+                group.removeControl(toInputSafeName(rawValues[indexInner]));
               }
               this.form.patchValue({ offset: 0 });
               this.updatePageUrl();
@@ -331,10 +331,8 @@ export class FiltersComponent implements OnInit {
     if (valDatasetId) {
       dataRequest.filters['datasetId'] = fromCSL(valDatasetId);
     }
-
     dataRequest.filters['dateFrom'] = this.form.value.dateFrom ?? '';
     dataRequest.filters['dateTo'] = this.form.value.dateTo ?? '';
-
     return dataRequest;
   }
 
@@ -462,18 +460,16 @@ export class FiltersComponent implements OnInit {
       offset
     } = this.form.value;
 
-    if (dateFrom) {
+    if (dateFrom)
       qp['dateFrom'] =
         typeof dateFrom === 'string'
           ? dateFrom
           : this.getDateAsISOString(new Date(dateFrom));
-    }
-    if (dateTo) {
+    if (dateTo)
       qp['dateTo'] =
         typeof dateTo === 'string'
           ? dateTo
           : this.getDateAsISOString(new Date(dateTo));
-    }
     if (datasetId) qp['datasetId'] = datasetId;
     if (datasetName) qp['datasetName'] = datasetName;
 
@@ -491,7 +487,7 @@ export class FiltersComponent implements OnInit {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: qp,
-      queryParamsHandling: 'merge'
+      queryParamsHandling: ''
     });
   }
 
@@ -500,6 +496,23 @@ export class FiltersComponent implements OnInit {
     const targetOffset = Math.max(0, pageIndex * currentLimit);
 
     this.form.patchValue({ offset: targetOffset });
+    this.updatePageUrl();
+  }
+
+  onFilterCheckboxToggle(filterName: string, option: string): void {
+    const group = this.form.get(filterName) as FormGroup;
+    const safeName = toInputSafeName(option);
+
+    // If the checkbox control doesn't exist yet, add it as true.
+    // Otherwise, leave it alone! The custom checkbox component has already flipped its value.
+    if (group && !group.contains(safeName)) {
+      group.addControl(safeName, this.fb.control(true));
+    }
+
+    // Always reset to the first page when changing filters
+    this.form.patchValue({ offset: 0 });
+
+    // Update browser URL query strings
     this.updatePageUrl();
   }
 }
