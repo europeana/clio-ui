@@ -1,4 +1,10 @@
-import { Component, HostListener, inject, Signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  inject,
+  Signal,
+  ViewChild
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
@@ -78,7 +84,7 @@ export class AppComponent {
 
   public paginationText: Signal<string> = toSignal(
     this.route.queryParams.pipe(
-      map(params => {
+      map((params) => {
         const offset = Number(params['offset'] ?? 0);
         const limit = Number(params['limit'] ?? 25);
         return `${offset} - ${offset + limit}`;

@@ -98,6 +98,67 @@ describe('FiltersComponent', () => {
       expect(component).toBeTruthy();
     });
 
+    it('should initialise', fakeAsync(() => {
+      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+      component.ngOnInit();
+
+      // trigger primitive conversions, array mapping configurations, and edge case parameters
+      queryParams$.next({
+        percentLinksInOperationFrom: ['85'], // Array of numeric string
+        limit: 50, // Direct primitive number
+        offset: NaN, // Faulty numeric mapping check pass
+        datasetId: '999, 888', // Multiple list values splitting path
+        dateFrom: undefined, // Void/Falsy object conditions
+        dateTo: ['2026-12-31'] // Array of standard string date
+      });
+      tick(0);
+      fixture.detectChanges();
+
+      const datasetIdsGroup = component.form.get('datasetIds') as FormGroup;
+      expect(datasetIdsGroup.contains('999')).toBe(true);
+      expect(datasetIdsGroup.contains('888')).toBe(true);
+      expect(component.loadData).toHaveBeenCalled();
+    }));
+
+    it('should cover the server request mapping data translation fallback branches', () => {
+      fixture.detectChanges();
+
+      // Force fallback conditions inside getDataServerDataRequest()
+      component.form.patchValue({
+        percentLinksInOperationFrom: null,
+        offset: null,
+        limit: null,
+        datasetId: '',
+        dateFrom: null,
+        dateTo: null
+      });
+      component.queryParams = { customFilter: 'value' };
+
+      const req = component.getDataServerDataRequest();
+      expect(req.filters.percentLinksInOperationFrom).toBe(0);
+      expect(req.filters.offset).toBe(0);
+      expect(req.filters.limit).toBe(25);
+    });
+
+    it('should updatePageUrl', () => {
+      fixture.detectChanges();
+      jest.spyOn(router, 'navigate').mockResolvedValue(true);
+
+      // Supply complex instance formats to evaluate every single typeof string verification check inside updatePageUrl
+      component.form.patchValue({
+        dateFrom: '2026-07-20',
+        dateTo: '2026-07-21',
+        datasetId: '321',
+        datasetName: 'TargetDataset',
+        percentLinksInOperationFrom: 0,
+        limit: 10,
+        offset: 5
+      });
+
+      component.updatePageUrl(false);
+      expect(router.navigate).toHaveBeenCalled();
+    });
+
     it('should get the date as an ISO string', () => {
       fixture.detectChanges();
       const inputDate = new Date('2026-06-24T12:00:00');
@@ -189,11 +250,14 @@ describe('FiltersComponent', () => {
       expect(component.getSetCheckboxValues('provider')).toEqual(['A']);
     });
 
-    it('should generate the title markup and trigger interactive filter removals with matched casing strings', () => {
+    it('should generate the title markup and trigger interactive filter removals including individual field edge cases', () => {
       fixture.detectChanges();
+
+      // 1. Verify empty query scenario
       let markup = component.generateTitleMarkup();
       expect(markup[0].label).toBe('All checks');
 
+      // 2. Test full multi-value query parameter map parsing layout
       component.queryParams = {
         provider: ['A', 'B'],
         dataProvider: ['C', 'D'],
@@ -218,6 +282,7 @@ describe('FiltersComponent', () => {
         'provider A or B and dataProvider C or D and Dataset Id (101) and Dataset Name "MyDataset" from Dec 12th until June 10th and Percent In Operation >= 60%'
       );
 
+      // 3. Spy on changes and trigger chip cleanup callback branches
       jest.spyOn(component.form, 'patchValue');
       jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
 
@@ -226,6 +291,48 @@ describe('FiltersComponent', () => {
       });
 
       expect(component.form.patchValue).toHaveBeenCalled();
+
+      // 4. Sequentially sweep remaining conditional branches to maximize condition metrics coverage
+      component.queryParams = { dateFrom: ['2026-01-01'] };
+      markup = component.generateTitleMarkup();
+      expect(markup.some((m) => m.label?.includes('from'))).toBe(true);
+
+      component.queryParams = { dateTo: ['2026-01-02'] };
+      markup = component.generateTitleMarkup();
+      expect(markup.some((m) => m.label?.includes('until'))).toBe(true);
+
+      component.queryParams = { datasetId: ['XYZ'] };
+      markup = component.generateTitleMarkup();
+      expect(markup.some((m) => m.label?.includes('Dataset Id'))).toBe(true);
+
+      component.queryParams = { percentLinksInOperationFrom: ['50'] };
+      markup = component.generateTitleMarkup();
+      expect(
+        markup.some((m) => m.label?.includes('Percent In Operation'))
+      ).toBe(true);
+    });
+
+    it('should evaluate title markup parsing edge cases for all individual fields', () => {
+      fixture.detectChanges();
+
+      // Test individual fields sequentially to hit solitary logic branches safely
+      component.queryParams = { dateFrom: ['2026-01-01'] };
+      let markup = component.generateTitleMarkup();
+      expect(markup.some((m) => m.label?.includes('from'))).toBe(true);
+
+      component.queryParams = { dateTo: ['2026-01-02'] };
+      markup = component.generateTitleMarkup();
+      expect(markup.some((m) => m.label?.includes('until'))).toBe(true);
+
+      component.queryParams = { datasetId: ['XYZ'] };
+      markup = component.generateTitleMarkup();
+      expect(markup.some((m) => m.label?.includes('Dataset Id'))).toBe(true);
+
+      component.queryParams = { percentLinksInOperationFrom: ['50'] };
+      markup = component.generateTitleMarkup();
+      expect(
+        markup.some((m) => m.label?.includes('Percent In Operation'))
+      ).toBe(true);
     });
   });
 
