@@ -76,14 +76,15 @@ export class AppComponent {
     if (!this.filters?.form) {
       return '0 - 0';
     }
-    const offset = Number.parseInt(this.filters.form.value.offset ?? 0);
-    const limit = Number.parseInt(this.filters.form.value.limit ?? 0);
+    const offset = Number(this.filters.form.value.offset ?? 0);
+    const limit = Number(this.filters.form.value.limit ?? 0);
 
     return offset + ' - ' + (offset + limit);
   }
 
   canLoadPrevPage(): boolean {
-    return !!Number.parseInt(this.filters?.form?.value?.offset ?? '');
+    const offset = this.filters?.form?.value?.offset;
+    return !!(offset && Number(offset) > 0);
   }
 
   loadPrevPage(): void {

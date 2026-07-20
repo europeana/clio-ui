@@ -1,12 +1,19 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  OnDestroy,
+  OnInit,
+  Output
+} from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 import {
   ControlValueAccessor,
-  FormsModule,
+  FormControl,
   NG_VALUE_ACCESSOR,
-  ReactiveFormsModule,
-  UntypedFormGroup
+  ReactiveFormsModule
 } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-slider',
@@ -18,33 +25,49 @@ import {
       multi: true
     }
   ],
-  imports: [FormsModule, NgClass, NgIf, ReactiveFormsModule]
+  imports: [NgClass, NgIf, ReactiveFormsModule]
 })
-export class SliderComponent implements ControlValueAccessor {
-  @Input() form: UntypedFormGroup;
-  @Input() controlName: string;
+export class SliderComponent
+  implements ControlValueAccessor, OnInit, OnDestroy
+{
+  @Output() change = new EventEmitter<number | null>();
 
-  value = 0;
+  internalControl = new FormControl<number | null>(null);
+  private destroy$ = new Subject<void>();
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onChange(): void {}
+  onChange: (_: number | null) => void = () => {};
+  onTouched: () => void = () => {};
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onTouched(): void {}
+  ngOnInit(): void {
+    this.internalControl.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((val) => {
+        const numValue = val !== null && val !== undefined ? Number(val) : null;
 
-  updateChanges(): void {
-    this.onChange();
+        // this fires the value back up to the parent formControlName wrapper cleanly
+        this.onChange(numValue);
+        this.change.emit(numValue);
+      });
   }
 
-  writeValue(value: number): void {
-    this.value = value;
-    this.updateChanges();
+  writeValue(value: number | null | string): void {
+    const numValue =
+      value !== null && value !== undefined && value !== ''
+        ? Number(value)
+        : null;
+    this.internalControl.setValue(numValue, { emitEvent: false });
   }
 
-  registerOnChange(fn: () => void): void {
+  registerOnChange(fn: (value: number | null) => void): void {
     this.onChange = fn;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  registerOnTouched(): void {}
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

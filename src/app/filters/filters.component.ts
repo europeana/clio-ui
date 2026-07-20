@@ -1,4 +1,4 @@
-import { JsonPipe, KeyValuePipe, NgFor } from '@angular/common';
+import { JsonPipe, KeyValuePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
@@ -6,20 +6,18 @@ import {
   inject,
   model,
   ModelSignal,
-  OnDestroy,
   OnInit
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
+  FormBuilder,
   FormControl,
+  FormGroup,
   FormsModule,
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormGroup
+  ReactiveFormsModule
 } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-
-import { of, Subscription } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, debounceTime, map } from 'rxjs/operators';
 
 import { RenameFilterPipe } from '../_translate';
@@ -30,7 +28,6 @@ import {
   toInputSafeName
 } from '../_helpers/date-helpers';
 import { filterList } from '../_helpers/string-helpers';
-
 import {
   CheckDataRequest,
   CheckDataResults,
@@ -40,12 +37,24 @@ import {
 import { CheckboxComponent } from '../checkbox';
 import { SliderComponent } from '../slider';
 
+interface FilterForm {
+  dataProvider: FormGroup;
+  provider: FormGroup;
+  dateFrom: FormControl<string | null>;
+  dateTo: FormControl<string | null>;
+  percentLinksInOperationFrom: FormControl<number | null>;
+  datasetName: FormControl<string | null>;
+  datasetId: FormControl<string | null>;
+  datasetIds: FormGroup;
+  limit: FormControl<number | null>;
+  offset: FormControl<number | null>;
+}
+
 @Component({
   selector: 'app-filters',
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.scss'],
   imports: [
-    NgFor,
     CheckboxComponent,
     JsonPipe,
     KeyValuePipe,
@@ -55,8 +64,8 @@ import { SliderComponent } from '../slider';
     SliderComponent
   ]
 })
-export class FiltersComponent implements OnInit, OnDestroy {
-  private readonly fb = inject(UntypedFormBuilder);
+export class FiltersComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(APIService);
@@ -65,7 +74,6 @@ export class FiltersComponent implements OnInit, OnDestroy {
   public filterList = filterList;
   public toInputSafeName = toInputSafeName;
 
-  subs: Array<Subscription> = [];
   queryParams: Params = {};
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
@@ -83,34 +91,43 @@ export class FiltersComponent implements OnInit, OnDestroy {
     dataProvider: ''
   };
 
-  form = new UntypedFormGroup({
-    dataProvider: new UntypedFormGroup({}),
-    provider: new UntypedFormGroup({}),
-    dateFrom: new FormControl(),
-    dateTo: new FormControl(),
-    percentLinksInOperationFrom: new FormControl(),
-    datasetName: new FormControl(),
-    datasetId: new FormControl(),
-    datasetIds: new UntypedFormGroup({}),
-    limit: new FormControl(),
-    offset: new FormControl()
+  form = this.fb.group<FilterForm>({
+    dataProvider: this.fb.group({}),
+    provider: this.fb.group({}),
+    dateFrom: this.fb.control<string | null>(''),
+    dateTo: this.fb.control<string | null>(''),
+    percentLinksInOperationFrom: this.fb.control<number | null>(null),
+    datasetName: this.fb.control<string | null>(''),
+    datasetId: this.fb.control<string | null>(''),
+    datasetIds: this.fb.group({}),
+    limit: this.fb.control<number | null>(25),
+    offset: this.fb.control<number | null>(0)
   });
 
   error?: HttpErrorResponse;
 
   ngOnInit(): void {
-    // parse the url param values into the form
     this.route.queryParams
       .pipe(
         debounceTime(0),
+        takeUntilDestroyed(this.destroyRef), // Auto-manages cleanup context perfectly
         map((qp) => {
           const qpValArrays: Params = {};
           Object.keys(qp).forEach((paramName: string) => {
-            qpValArrays[paramName] = (
-              Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
-            ).map((qpValue: string) => {
-              return toInputSafeName(qpValue);
-            });
+            // Numbers are treated as primitives to keep slider inputs flawless
+            if (
+              ['percentLinksInOperationFrom', 'limit', 'offset'].includes(
+                paramName
+              )
+            ) {
+              qpValArrays[paramName] = Array.isArray(qp[paramName])
+                ? Number(qp[paramName][0])
+                : Number(qp[paramName]);
+            } else {
+              qpValArrays[paramName] = (
+                Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
+              ).map((qpValue: string) => toInputSafeName(qpValue));
+            }
           });
           return qpValArrays;
         })
@@ -118,53 +135,50 @@ export class FiltersComponent implements OnInit, OnDestroy {
       .subscribe((queryParams) => {
         const datasetId = queryParams['datasetId'];
         const datasetName = queryParams['datasetName'];
-        const percentLinksInOperationFrom =
+        const percentLinksInOperation =
           queryParams['percentLinksInOperationFrom'];
 
         if (datasetId) {
-          const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
-          `${datasetId}`.split(',').forEach((part: string) => {
-            datasetIds.addControl(part.trim(), new FormControl(part));
-          });
+          const datasetIds = this.form.get('datasetIds') as FormGroup;
+          if (datasetIds) {
+            `${datasetId}`.split(',').forEach((part: string) => {
+              const trimmed = part.trim();
+              if (trimmed && !datasetIds.contains(trimmed)) {
+                datasetIds.addControl(trimmed, this.fb.control(trimmed));
+              }
+            });
+          }
         }
 
         this.queryParams = queryParams;
 
-        const dateFrom = this.queryParams['dateFrom'];
-        const dateTo = this.queryParams['dateTo'];
-        const limit = this.queryParams['limit']
-          ? Number.parseInt(queryParams['limit'][0], 10)
-          : 25;
-        const offset = this.queryParams['offset']
-          ? Number.parseInt(queryParams['offset'][0], 10)
-          : 0;
+        const dateFrom = queryParams['dateFrom'];
+        const dateTo = queryParams['dateTo'];
+        const limit = queryParams['limit'] ?? 25;
+        const offset = queryParams['offset'] ?? 0;
 
-        this.form.patchValue({
-          dateFrom: dateFrom ? dateFrom[0] : '',
-          dateTo: dateTo ? dateTo[0] : '',
-          datasetId: datasetId ? datasetId[0] : '',
-          datasetName: datasetName ? datasetName[0] : '',
-          percentLinksInOperationFrom: percentLinksInOperationFrom
-            ? percentLinksInOperationFrom[0]
-            : '',
-          // Set extracted pagination parameters safely
-          limit: Number.isNaN(limit) ? 25 : limit,
-          offset: Number.isNaN(offset) ? 0 : offset
-        });
+        this.form.patchValue(
+          {
+            dateFrom: dateFrom ? dateFrom[0] : '',
+            dateTo: dateTo ? dateTo[0] : '',
+            datasetId: datasetId ? datasetId[0] : '',
+            datasetName: datasetName ? datasetName[0] : '',
+            percentLinksInOperationFrom: Number.isNaN(percentLinksInOperation)
+              ? null
+              : percentLinksInOperation,
+            limit: Number.isNaN(limit) ? 25 : limit,
+            offset: Number.isNaN(offset) ? 0 : offset
+          },
+          { emitEvent: false }
+        );
+
         this.loadData();
       });
   }
 
-  ngOnDestroy(): void {
-    this.subs.forEach((sub: Subscription | undefined) => {
-      if (sub) {
-        sub.unsubscribe();
-      }
-    });
-    this.subs = [];
-  }
-
+  // 💡 Safe ISO Parsing: Avoids UTC shifts modifying date selection by exactly one calendar day
   getDateAsISOString(localDate: Date): string {
+    if (Number.isNaN(localDate.getTime())) return '';
     const date = new Date(localDate.toISOString());
     const dateUTC = new Date(
       date.getTime() - localDate.getTimezoneOffset() * 60000
@@ -180,18 +194,21 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
     if (!queryKeys || queryKeys.length === 0) {
       res.push({ label: 'All checks' });
+      return res;
     }
 
     queryKeys.forEach((key: string, index: number) => {
-      const values = this.queryParams[key].map((paramName: string) => {
-        return fromInputSafeName(paramName);
-      });
+      const rawValues = Array.isArray(this.queryParams[key])
+        ? this.queryParams[key]
+        : [this.queryParams[key]];
+
+      const values = rawValues.map((paramName: unknown) =>
+        fromInputSafeName(String(paramName))
+      );
 
       if (key === 'dateFrom') {
         res.push(
-          {
-            label: `from`
-          },
+          { label: 'from' },
           {
             label: `${values[0]}`,
             fn: () => {
@@ -202,9 +219,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         );
       } else if (key === 'dateTo') {
         res.push(
-          {
-            label: `until`
-          },
+          { label: 'until' },
           {
             label: `${values[0]}`,
             fn: () => {
@@ -215,11 +230,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         );
       } else if (key === 'datasetId') {
         const label = 'Dataset Id';
-        if (index > 0) {
-          res.push({
-            label: 'and'
-          });
-        }
+        if (index > 0) res.push({ label: 'and' });
         res.push({
           label: `${label} (${values[0]})`,
           fn: () => {
@@ -229,11 +240,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
         });
       } else if (key === 'datasetName') {
         const label = 'Dataset Name';
-        if (index > 0) {
-          res.push({
-            label: 'and'
-          });
-        }
+        if (index > 0) res.push({ label: 'and' });
         res.push({
           label: `${label} "${values[0]}"`,
           fn: () => {
@@ -243,49 +250,37 @@ export class FiltersComponent implements OnInit, OnDestroy {
         });
       } else if (key === 'percentLinksInOperationFrom') {
         const label = 'Percent In Operation';
-        if (index > 0) {
-          res.push({
-            label: 'and'
-          });
-        }
+        if (index > 0) res.push({ label: 'and' });
         res.push({
           label: `${label} >= ${values[0]}%`,
           fn: () => {
             this.form.patchValue({
-              percentLinksInOperationFrom: '',
+              percentLinksInOperationFrom: null,
               offset: 0
             });
             this.updatePageUrl();
           }
         });
       } else {
-        this.queryParams[key].forEach((valPart: string, indexInner: number) => {
+        rawValues.forEach((valPart: string, indexInner: number) => {
           if (indexInner === 0) {
-            if (index > 0) {
-              res.push({
-                label: 'and ' + key
-              });
-            } else {
-              res.push({
-                label: key
-              });
-            }
+            res.push({ label: index > 0 ? 'and ' + key : key });
           }
 
           res.push({
             label: `${values[indexInner]}`,
             fn: () => {
-              const currVal = this.form.value[key];
-              delete currVal[toInputSafeName(values[indexInner])];
-              this.form.patchValue({ key: currVal, offset: 0 });
+              const group = this.form.get(key) as FormGroup;
+              if (group) {
+                group.removeControl(toInputSafeName(values[indexInner]));
+              }
+              this.form.patchValue({ offset: 0 });
               this.updatePageUrl();
             }
           });
 
-          if (indexInner !== this.queryParams[key].length - 1) {
-            res.push({
-              label: 'or'
-            });
+          if (indexInner !== rawValues.length - 1) {
+            res.push({ label: 'or' });
           }
         });
       }
@@ -297,158 +292,161 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const offset = Number(this.form.value.offset ?? 0);
     const limit = Number(this.form.value.limit ?? 25);
     this.form.patchValue({ offset: offset + limit });
+    this.updatePageUrl();
   }
 
   dropPage(): void {
     const offset = Number(this.form.value.offset ?? 0);
     const limit = Number(this.form.value.limit ?? 25);
     this.form.patchValue({ offset: Math.max(0, offset - limit) });
+    this.updatePageUrl();
   }
 
   getDataServerDataRequest(): CheckDataRequest {
     const dataRequest = {
       filters: {
-        percentLinksInOperationFrom: 0,
+        percentLinksInOperationFrom: Number(
+          this.form.value.percentLinksInOperationFrom ?? 0
+        ),
         offset: Number(this.form.value.offset ?? 0),
         limit: Number(this.form.value.limit ?? 25)
       }
     } as unknown as CheckDataRequest;
 
     Object.keys(this.queryParams)
-      .filter((key: string) => {
-        return !['offset', 'limit'].includes(key);
-      })
+      .filter((key: string) => !['offset', 'limit'].includes(key))
       .forEach((key: string) => {
-        dataRequest.filters[key as FilterParameterName] = this.queryParams[
-          key
-        ].map((paramVal: FilterParameterName) => {
-          return fromInputSafeName(paramVal);
-        });
+        const rawValues = Array.isArray(this.queryParams[key])
+          ? this.queryParams[key]
+          : [this.queryParams[key]];
+
+        dataRequest.filters[key as FilterParameterName] = rawValues.map(
+          (paramVal: any) => {
+            return fromInputSafeName(String(paramVal));
+          }
+        );
       });
 
     const valDatasetId = this.form.value.datasetId;
-
     if (valDatasetId) {
       dataRequest.filters['datasetId'] = fromCSL(valDatasetId);
     }
 
-    const valDateFrom = this.form.value.dateFrom;
-    const valDateTo = this.form.value.dateTo;
-
-    const valpercentLinksInOperationFrom =
-      this.form.value.percentLinksInOperationFrom;
-
-    dataRequest.filters['percentLinksInOperationFrom'] =
-      valpercentLinksInOperationFrom;
-
-    dataRequest.filters['dateFrom'] = valDateFrom;
-    dataRequest.filters['dateTo'] = valDateTo;
+    dataRequest.filters['dateFrom'] = this.form.value.dateFrom ?? '';
+    dataRequest.filters['dateTo'] = this.form.value.dateTo ?? '';
 
     return dataRequest;
   }
 
+  getSetCheckboxValues(filterName: string): Array<string> {
+    const groupControl = this.form.get(filterName);
+    const vals = groupControl ? groupControl.value : null;
+    return vals ? Object.keys(vals).filter((key: string) => !!vals[key]) : [];
+  }
+
   addOrUpdateFilterControls(name: string, options: Array<string>): void {
-    const checkboxes = this.form.get(name) as UntypedFormGroup;
+    const checkboxes = this.form.get(name) as FormGroup;
+    if (!checkboxes) return;
+
     options.forEach((option: string) => {
       const fName = toInputSafeName(option);
-      const ctrl = this.form.get(`${name}.${fName}`);
-      const defaultValue = `${this.queryParams[name]}`.includes(fName);
+      const ctrl = checkboxes.get(fName);
+
+      const queryParamValue = this.queryParams[name];
+      const defaultValue = queryParamValue
+        ? String(queryParamValue).includes(fName)
+        : false;
+
       if (ctrl) {
-        ctrl.setValue(defaultValue);
+        ctrl.setValue(defaultValue, { emitEvent: false });
       } else {
-        checkboxes.addControl(fName, new FormControl(defaultValue));
+        checkboxes.addControl(fName, this.fb.control(defaultValue), {
+          emitEvent: false
+        });
       }
     });
   }
 
-  /** loadData
-   **/
   loadData(): void {
     this.error = undefined;
-    this.subs.push(
-      this.api
-        .getFilteredClioChecks(this.getDataServerDataRequest())
-        .pipe(
-          catchError((err: HttpErrorResponse) => {
-            this.error = err;
-            return of({
-              results: [],
-              filterOptions: {}
-            });
-          }),
-          takeUntilDestroyed(this.destroyRef)
-        )
-        .subscribe((CheckDataResults: CheckDataResults) => {
-          const list = CheckDataResults.results;
-          const filterOps = CheckDataResults.filterOptions;
 
-          Object.keys(filterOps).forEach((key: string) => {
-            delete filterOps['datasetId'];
-            delete filterOps['datasetName'];
-            delete filterOps['dateFrom'];
-            delete filterOps['dateTo'];
-            delete filterOps['excludedCheckId'];
-            delete filterOps['percentLinksInOperationTo'];
-            delete filterOps['percentLinksInOperationFrom'];
+    this.api
+      .getFilteredClioChecks(this.getDataServerDataRequest())
+      .pipe(
+        catchError((err: HttpErrorResponse) => {
+          this.error = err;
+          return of({
+            results: [],
+            filterOptions: {}
+          } as unknown as CheckDataResults);
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((checkDataResults: CheckDataResults) => {
+        const list = checkDataResults.results || [];
+        const filterOps = checkDataResults.filterOptions || {};
 
-            if (filterOps[key]) {
-              this.addOrUpdateFilterControls(key, filterOps[key]);
-            }
-            const percentLinksInOperationFrom =
-              this.route.snapshot.queryParamMap.get(
-                'percentLinksInOperationFrom'
-              );
-            this.form.controls.percentLinksInOperationFrom.setValue(
-              percentLinksInOperationFrom ?? 0
-            );
-          });
+        const cleanOps = { ...filterOps };
+        delete cleanOps['datasetId'];
+        delete cleanOps['datasetName'];
+        delete cleanOps['dateFrom'];
+        delete cleanOps['dateTo'];
+        delete cleanOps['excludedCheckId'];
+        delete cleanOps['percentLinksInOperationTo'];
+        delete cleanOps['percentLinksInOperationFrom'];
 
-          let averageScore = 0;
-          if (list.length) {
-            averageScore = Math.floor(
-              list.reduce((sum, obj) => sum + obj.percentLinksInOperation, 0) /
-                list.length
-            );
+        Object.keys(cleanOps).forEach((key: string) => {
+          if (cleanOps[key]) {
+            this.addOrUpdateFilterControls(key, cleanOps[key]);
           }
-          const listAverageScore = Math.floor(averageScore / 20);
-          const datasetChecks = this.api.groupChecksByDatasetId(list);
-          const titleMarkup = this.generateTitleMarkup();
+        });
 
-          this.modelClioInfo.set({
-            filterOps,
-            datasetChecks,
-            list,
-            listLength: list.length,
-            listAverageScore,
-            titleMarkup
-          });
-        })
-    );
+        const queryParamMap = this.route.snapshot.queryParamMap;
+
+        if (queryParamMap.has('percentLinksInOperationFrom')) {
+          const rawPercent = queryParamMap.get('percentLinksInOperationFrom');
+          this.form.controls.percentLinksInOperationFrom.setValue(
+            rawPercent ? Number.parseInt(rawPercent, 10) : null,
+            { emitEvent: false }
+          );
+        }
+
+        let averageScore = 0;
+        if (list.length) {
+          averageScore = Math.floor(
+            list.reduce(
+              (sum, obj) => sum + (obj.percentLinksInOperation ?? 0),
+              0
+            ) / list.length
+          );
+        }
+        const listAverageScore = Math.floor(averageScore / 20);
+        const datasetChecks = this.api.groupChecksByDatasetId(list);
+        const titleMarkup = this.generateTitleMarkup();
+
+        this.modelClioInfo.set({
+          filterOps: cleanOps,
+          datasetChecks,
+          list,
+          listLength: list.length,
+          listAverageScore,
+          titleMarkup
+        });
+      });
   }
 
-  getSetCheckboxValues(filterName: string): Array<string> {
-    const vals = this.form.value[filterName];
-    return vals
-      ? Object.keys(vals).filter((key: string) => {
-          return vals[key];
-        })
-      : [];
-  }
-
-  /** updatePageUrl
-  /* Navigate to url according to form state
-  */
   updatePageUrl(clearPagination = false): void {
     const qp: Params = {};
 
-    Object.keys(this.modelClioInfo().filterOps).forEach(
-      (filterName: string) => {
+    const currentClioInfo = this.modelClioInfo();
+    if (currentClioInfo && currentClioInfo.filterOps) {
+      Object.keys(currentClioInfo.filterOps).forEach((filterName: string) => {
         const filterVals = this.getSetCheckboxValues(filterName);
         if (filterVals.length > 0) {
           qp[filterName] = filterVals;
         }
-      }
-    );
+      });
+    }
 
     if (clearPagination) {
       this.form.patchValue({ offset: 0 });
@@ -457,37 +455,43 @@ export class FiltersComponent implements OnInit, OnDestroy {
     const {
       datasetId,
       datasetName,
-      valFrom,
-      valTo,
+      dateFrom,
+      dateTo,
       percentLinksInOperationFrom,
       limit,
       offset
     } = this.form.value;
 
-    if (valFrom) {
-      qp['dateFrom'] = this.getDateAsISOString(new Date(valFrom));
+    if (dateFrom) {
+      qp['dateFrom'] =
+        typeof dateFrom === 'string'
+          ? dateFrom
+          : this.getDateAsISOString(new Date(dateFrom));
     }
-    if (valTo) {
-      qp['dateTo'] = this.getDateAsISOString(new Date(valTo));
+    if (dateTo) {
+      qp['dateTo'] =
+        typeof dateTo === 'string'
+          ? dateTo
+          : this.getDateAsISOString(new Date(dateTo));
     }
-    if (datasetId) {
-      qp['datasetId'] = datasetId;
-    }
-    if (datasetName) {
-      qp['datasetName'] = datasetName;
-    }
-    if (percentLinksInOperationFrom) {
+    if (datasetId) qp['datasetId'] = datasetId;
+    if (datasetName) qp['datasetName'] = datasetName;
+
+    if (
+      percentLinksInOperationFrom !== null &&
+      percentLinksInOperationFrom !== undefined &&
+      String(percentLinksInOperationFrom) !== ''
+    ) {
       qp['percentLinksInOperationFrom'] = percentLinksInOperationFrom;
     }
-    if (limit) {
-      qp['limit'] = limit;
-    }
-    if (offset !== undefined && offset !== null) {
-      qp['offset'] = offset;
-    }
 
-    this.router.navigate([''], {
-      queryParams: qp
+    if (limit) qp['limit'] = limit;
+    if (offset !== undefined && offset !== null) qp['offset'] = offset;
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: qp,
+      queryParamsHandling: 'merge'
     });
   }
 

@@ -7,11 +7,10 @@ import {
 } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-
-import { UntypedFormGroup } from '@angular/forms';
-
+import { FormGroup } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
-import { FiltersComponent } from '.';
+
+import { FiltersComponent } from './filters.component';
 import { APIService } from '../_services';
 import { MockAPIService, MockAPIServiceErrors } from '../_mocked';
 
@@ -21,6 +20,20 @@ describe('FiltersComponent', () => {
   let router: Router;
 
   const queryParams = new BehaviorSubject({} as Params);
+
+  const createMockParamMap = (
+    params: Record<string, string>
+  ): {
+    has: (key: string) => boolean;
+    get: (key: string) => string | null;
+    getAll: (key: string) => string[];
+    keys: string[];
+  } => ({
+    has: (key: string) => key in params,
+    get: (key: string) => params[key] || null,
+    getAll: (key: string) => (params[key] ? [params[key]] : []),
+    keys: Object.keys(params)
+  });
 
   const configureTestbed = (errorMode = false): void => {
     TestBed.configureTestingModule({
@@ -32,8 +45,11 @@ describe('FiltersComponent', () => {
           useValue: {
             params: {},
             queryParams,
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            snapshot: { queryParamMap: { get: (): void => {} } }
+            snapshot: {
+              queryParamMap: createMockParamMap({
+                percentLinksInOperationFrom: '40'
+              })
+            }
           }
         },
         {
@@ -73,7 +89,7 @@ describe('FiltersComponent', () => {
     });
 
     it('should go to the page', () => {
-      jest.spyOn(component, 'updatePageUrl');
+      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
       component.form.patchValue({ offset: 50, limit: 25 });
       component.goToPage(2);
       expect(component.updatePageUrl).toHaveBeenCalled();
@@ -89,7 +105,9 @@ describe('FiltersComponent', () => {
     });
 
     it('should update the page location', () => {
-      jest.spyOn(router, 'navigate');
+      jest
+        .spyOn(router, 'navigate')
+        .mockImplementation(() => Promise.resolve(true));
       component.ngOnInit();
       fixture.detectChanges();
       component.updatePageUrl();
@@ -97,7 +115,7 @@ describe('FiltersComponent', () => {
     });
 
     it('should react to the page params (dataset-name)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData');
+      jest.spyOn(component, 'loadData').mockImplementation(() => {});
       component.ngOnInit();
       queryParams.next({});
       queryParams.next({ 'dataset-name': 'my_dataset' });
@@ -107,7 +125,7 @@ describe('FiltersComponent', () => {
     }));
 
     it('should react to the page params (datasetId)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData');
+      jest.spyOn(component, 'loadData').mockImplementation(() => {});
       component.ngOnInit();
       queryParams.next({});
       queryParams.next({ datasetId: '1' });
@@ -117,7 +135,7 @@ describe('FiltersComponent', () => {
     }));
 
     it('should react to the page params (datasetIds)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData');
+      jest.spyOn(component, 'loadData').mockImplementation(() => {});
       component.ngOnInit();
       queryParams.next({});
       queryParams.next({ datasetId: '1,2' });
@@ -127,7 +145,7 @@ describe('FiltersComponent', () => {
     }));
 
     it('should react to the page params (from-date)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData');
+      jest.spyOn(component, 'loadData').mockImplementation(() => {});
       component.ngOnInit();
       queryParams.next({});
       queryParams.next({ dateFrom: '2026-01-06' });
@@ -137,7 +155,7 @@ describe('FiltersComponent', () => {
     }));
 
     it('should react to the page params (to-date)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData');
+      jest.spyOn(component, 'loadData').mockImplementation(() => {});
       component.ngOnInit();
       queryParams.next({});
       queryParams.next({ dateTo: '2026-01-06' });
@@ -147,7 +165,7 @@ describe('FiltersComponent', () => {
     }));
 
     it('should react to the page params (provider)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData');
+      jest.spyOn(component, 'loadData').mockImplementation(() => {});
       component.ngOnInit();
       queryParams.next({});
       queryParams.next({
@@ -159,7 +177,7 @@ describe('FiltersComponent', () => {
     }));
 
     it('should react to the page params (dataProvider)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData');
+      jest.spyOn(component, 'loadData').mockImplementation(() => {});
       component.ngOnInit();
       queryParams.next({});
       queryParams.next({
@@ -182,29 +200,32 @@ describe('FiltersComponent', () => {
       });
       tick(1);
       fixture.detectChanges();
-      jest.spyOn(router, 'navigate');
+      jest
+        .spyOn(router, 'navigate')
+        .mockImplementation(() => Promise.resolve(true));
       component.updatePageUrl();
       expect(router.navigate).toHaveBeenCalled();
     }));
 
     it('should add or update filter controls', () => {
-      const ctrlProvider = component.form.controls.provider as UntypedFormGroup;
+      const ctrlProvider = component.form.controls.provider as FormGroup;
       expect(ctrlProvider).toBeTruthy();
-      expect(ctrlProvider.controls.A).toBeFalsy();
+      expect(ctrlProvider.controls['A']).toBeFalsy();
       component.addOrUpdateFilterControls('provider', ['A', 'B']);
-      expect(ctrlProvider.controls.A).toBeTruthy();
+      expect(ctrlProvider.controls['A']).toBeTruthy();
     });
 
     it('should get the set checkbox values', () => {
       component.addOrUpdateFilterControls('provider', ['A', 'B']);
-      const ctrlProvider = component.form.controls.provider as UntypedFormGroup;
+      const ctrlProvider = component.form.controls.provider as FormGroup;
       expect(component.getSetCheckboxValues('provider').length).toBeFalsy();
-      ctrlProvider.controls.A.setValue(true);
+      ctrlProvider.controls['A'].setValue(true);
       expect(component.getSetCheckboxValues('provider').length).toBeTruthy();
     });
 
-    it('should generate the title markup', () => {
+    it('should generate the title markup and trigger interactive filter removals', () => {
       let markup = component.generateTitleMarkup();
+      expect(markup[0].label).toBe('All checks');
 
       const clause1 = 'provider A or B';
       const clause2 = 'dataProvider C or D';
@@ -213,6 +234,7 @@ describe('FiltersComponent', () => {
       const clause5 = 'from Dec 12th';
       const clause6 = 'until June 10th';
       const clause7 = 'Percent In Operation >= 60%';
+
       component.queryParams = {
         provider: ['A', 'B'],
         dataProvider: ['C', 'D'],
@@ -223,16 +245,28 @@ describe('FiltersComponent', () => {
         percentLinksInOperationFrom: ['60']
       };
 
+      const providerGroup = component.form.get('provider') as FormGroup;
+      const dataProviderGroup = component.form.get('dataProvider') as FormGroup;
+      providerGroup.addControl('a', component.form.controls.dateFrom);
+      providerGroup.addControl('b', component.form.controls.dateFrom);
+      dataProviderGroup.addControl('c', component.form.controls.dateFrom);
+      dataProviderGroup.addControl('d', component.form.controls.dateFrom);
+
       markup = component.generateTitleMarkup();
+
       expect(markup.map((m) => m.label).join(' ')).toEqual(
         `${clause1} and ${clause2} and ${clause3} and ${clause4} ${clause5} ${clause6} and ${clause7}`
       );
+
       jest.spyOn(component.form, 'patchValue');
+      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
+
       markup.forEach((m: { fn?: () => void }) => {
         if (m.fn) {
           m.fn();
         }
       });
+
       expect(component.form.patchValue).toHaveBeenCalledTimes(9);
     });
   });
@@ -246,7 +280,7 @@ describe('FiltersComponent', () => {
 
     beforeEach(b4Each);
 
-    it('should handle load errors', fakeAsync(() => {
+    it('should handle load errors gracefully', fakeAsync(() => {
       expect(component.error).toBeFalsy();
       component.loadData();
       tick(1);

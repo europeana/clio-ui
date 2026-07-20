@@ -9,9 +9,9 @@
 >
   <span class="last-cell" [ngClass]="{ 'top-time': isTopTime }">
     <span class="time">
-      <span>
-        {{ time | date: DATE_CONCISE_FMT }}
-      </span>
+      <span>{{
+        time | date: (graphMode ? DATE_CONCISE_FMT : DATE_DEFAULT_FMT)
+      }}</span>
       <app-checkbox
         [form]="form"
         [controlName]="id + ''"
@@ -136,11 +136,28 @@
       </span>
 
       @if (clioInfoValue.listLength) {
-        <span class="list-header align-left">Dataset Id / Name</span>
+        <span class="list-header align-left">Id</span>
+        <span class="list-header align-left">
+          @if (!graphMode) {
+            Dataset
+          }
+          Name</span
+        >
         <span class="list-header">Data Provider</span>
         <span class="list-header">Provider</span>
-        <span class="list-header align-centre">Export</span>
-        <span class="list-header align-left">Check Date</span>
+        <span class="list-header align-centre">
+          @if (!graphMode) {
+            Export
+          } @else {
+            CSV
+          }
+        </span>
+        <span class="list-header align-left">
+          @if (!graphMode) {
+            Check
+          }
+          Date</span
+        >
       } @else {
         <span class="list-empty">no checks available</span>
       }
@@ -164,7 +181,6 @@
             >
             </ng-container>
           }
-
           <span class="state-display">
             <ng-container
               [ngTemplateOutlet]="stateLink"
@@ -183,13 +199,14 @@
             (click)="group.opened = !group.opened"
             (keyUp.enter)="group.opened = !group.opened"
           >
-            <span>
+            <span class="opener-content">
               {{ dsId }}
             </span>
-            <span class="opener-content">
-              {{ group.list[0].datasetName }}
-            </span>
           </a>
+
+          <span class="align-left">
+            {{ group.list[0].datasetName }}
+          </span>
 
           <span>
             {{ group.list[0].dataProvider }}

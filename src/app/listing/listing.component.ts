@@ -20,7 +20,10 @@ import {
   UntypedFormGroup
 } from '@angular/forms';
 
-import { DATE_CONCISE_FMT } from '../_data/static/date-formats';
+import {
+  DATE_CONCISE_FMT,
+  DATE_DEFAULT_FMT
+} from '../_data/static/date-formats';
 import { ClickAwareDirective } from '../_directives';
 import { ClioCheck, ClioInfo } from '../_models';
 import { RenameFilterPipe } from '../_translate';
@@ -44,6 +47,7 @@ import { CheckboxComponent } from '../checkbox';
 })
 export class ListingComponent {
   public DATE_CONCISE_FMT = DATE_CONCISE_FMT;
+  public DATE_DEFAULT_FMT = DATE_DEFAULT_FMT;
   private readonly fb = inject(UntypedFormBuilder);
 
   listSelectionCount = 0;

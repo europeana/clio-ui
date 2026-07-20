@@ -92,7 +92,6 @@ export class APIService {
       })
       .pipe(
         catchError(() => {
-          console.log('download request:' + JSON.stringify(request, null, 4));
           return of('CSV_DOWNLOAD');
         })
       )
