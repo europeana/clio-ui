@@ -30,10 +30,10 @@ import { Subject, takeUntil } from 'rxjs';
 export class SliderComponent
   implements ControlValueAccessor, OnInit, OnDestroy
 {
-  @Output() change = new EventEmitter<number | null>();
+  @Output() valueChange = new EventEmitter<number | null>();
 
   internalControl = new FormControl<number | null>(null);
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onChange: (_: number | null) => void = () => {};
@@ -49,7 +49,7 @@ export class SliderComponent
 
         // this fires the value back up to the parent formControlName wrapper cleanly
         this.onChange(numValue);
-        this.change.emit(numValue);
+        this.valueChange.emit(numValue);
       });
   }
 

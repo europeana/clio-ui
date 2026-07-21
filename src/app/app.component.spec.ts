@@ -15,6 +15,8 @@ import {
   MockAPIServiceErrors,
   MockFiltersComponent
 } from './_mocked';
+
+import { ClioCheck } from './_models';
 import { APIService, ClickService } from './_services';
 
 import { AppComponent } from './app.component';
@@ -95,7 +97,7 @@ describe('AppComponent', () => {
       expect(spyNext).toHaveBeenCalledTimes(2);
     }));
 
-    it('should download datasets', () => {
+    it('should download datasets and map run IDs correctly', () => {
       app.filters = {
         getDataServerDataRequest: jest.fn().mockReturnValue({ filters: {} })
       } as unknown as FiltersComponent;
@@ -106,16 +108,14 @@ describe('AppComponent', () => {
       app.listing = {
         form: {
           value: {
-            check_ids: ['1'],
-            offset: 0,
-            limit: 5
+            check_ids: { '123': false }
           }
         } as unknown as FormGroup,
         clioInfo: () => {
           return {
             datasetChecks: {
               x: {
-                list: []
+                list: [{ id: 123 } as ClioCheck]
               }
             }
           };
@@ -123,6 +123,7 @@ describe('AppComponent', () => {
       } as unknown as ListingComponent;
 
       app.downloadDataset('x');
+
       expect(app.filters.getDataServerDataRequest).toHaveBeenCalled();
       expect(api.getDownload).toHaveBeenCalled();
     });

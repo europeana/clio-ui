@@ -7,4 +7,8 @@ describe('Clio UI', () => {
   it('loads', () => {
     cy.get('.logo').should('exist');
   })
+
+  it('shows legal info', () => {
+    cy.get('.legal').should('exist');
+  })
 })

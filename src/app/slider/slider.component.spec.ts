@@ -12,7 +12,7 @@ import { SliderComponent } from './slider.component';
     <form [formGroup]="testForm">
       <app-slider
         formControlName="sliderVal"
-        (change)="onSliderChange($event)"
+        (valueChange)="onSliderChange($event)"
       ></app-slider>
     </form>
   `
@@ -78,6 +78,18 @@ describe('SliderComponent', () => {
     // Verify parent form group context caught the update cleanly
     expect(hostComponent.testForm.get('sliderVal')?.value).toBe(40);
     expect(hostComponent.onSliderChange).toHaveBeenCalledWith(40);
+  });
+
+  it('should explicitly emit valueChange when internal control changes', () => {
+    // Spy directly on the EventEmitter instance
+    const emitSpy = jest.spyOn(sliderComponent.valueChange, 'emit');
+
+    // Trigger the value change
+    sliderComponent.internalControl.setValue(85);
+    fixture.detectChanges();
+
+    // Verify the output emitter itself was called with the correct mapped value
+    expect(emitSpy).toHaveBeenCalledWith(85);
   });
 
   it('should properly render the unset visual CSS state condition', () => {
