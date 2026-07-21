@@ -35,7 +35,10 @@ export class SliderComponent
   internalControl = new FormControl<number | null>(null);
   private destroy$ = new Subject<void>();
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onChange: (_: number | null) => void = () => {};
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onTouched: () => void = () => {};
 
   ngOnInit(): void {

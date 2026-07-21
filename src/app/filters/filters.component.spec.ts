@@ -102,14 +102,13 @@ describe('FiltersComponent', () => {
       jest.spyOn(component, 'loadData').mockImplementation(() => {});
       component.ngOnInit();
 
-      // trigger primitive conversions, array mapping configurations, and edge case parameters
       queryParams$.next({
-        percentLinksInOperationFrom: ['85'], // Array of numeric string
-        limit: 50, // Direct primitive number
-        offset: NaN, // Faulty numeric mapping check pass
-        datasetId: '999, 888', // Multiple list values splitting path
-        dateFrom: undefined, // Void/Falsy object conditions
-        dateTo: ['2026-12-31'] // Array of standard string date
+        percentLinksInOperationFrom: ['85'],
+        limit: 50,
+        offset: NaN,
+        datasetId: '999, 888',
+        dateFrom: undefined,
+        dateTo: ['2026-12-31']
       });
       tick(0);
       fixture.detectChanges();
@@ -123,7 +122,6 @@ describe('FiltersComponent', () => {
     it('should cover the server request mapping data translation fallback branches', () => {
       fixture.detectChanges();
 
-      // Force fallback conditions inside getDataServerDataRequest()
       component.form.patchValue({
         percentLinksInOperationFrom: null,
         offset: null,
@@ -140,11 +138,10 @@ describe('FiltersComponent', () => {
       expect(req.filters.limit).toBe(25);
     });
 
-    it('should updatePageUrl', () => {
+    it('should updatePageUrl and leverage internal private helper parameters blocks', () => {
       fixture.detectChanges();
       jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
-      // Supply complex instance formats to evaluate every single typeof string verification check inside updatePageUrl
       component.form.patchValue({
         dateFrom: '2026-07-20',
         dateTo: '2026-07-21',
@@ -159,7 +156,17 @@ describe('FiltersComponent', () => {
       expect(router.navigate).toHaveBeenCalled();
     });
 
-    it('should get the date as an ISO string', () => {
+    it('should updatePageUrl with clearPagination reset path verified', () => {
+      fixture.detectChanges();
+      jest.spyOn(router, 'navigate').mockResolvedValue(true);
+      component.form.patchValue({ offset: 50 });
+
+      component.updatePageUrl(true);
+      expect(component.form.value.offset).toBe(0);
+      expect(router.navigate).toHaveBeenCalled();
+    });
+
+    it('should get the date as an ISO string split array signature match', () => {
       fixture.detectChanges();
       const inputDate = new Date('2026-06-24T12:00:00');
       const result = component.getDateAsISOString(inputDate);
@@ -175,11 +182,12 @@ describe('FiltersComponent', () => {
       expect(component.form.value.offset).toBe(25);
     });
 
-    it('should go to the page', () => {
+    it('should go to the target page via limit calculation sets', () => {
       fixture.detectChanges();
       jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
       component.form.patchValue({ offset: 50, limit: 25 });
       component.goToPage(2);
+      expect(component.form.value.offset).toBe(50);
       expect(component.updatePageUrl).toHaveBeenCalled();
     });
 
@@ -250,14 +258,12 @@ describe('FiltersComponent', () => {
       expect(component.getSetCheckboxValues('provider')).toEqual(['A']);
     });
 
-    it('should generate the title markup and trigger interactive filter removals including individual field edge cases', () => {
+    it('should generate the title markup and trigger interactive filter removals via switch mapping loops', () => {
       fixture.detectChanges();
 
-      // 1. Verify empty query scenario
       let markup = component.generateTitleMarkup();
       expect(markup[0].label).toBe('All checks');
 
-      // 2. Test full multi-value query parameter map parsing layout
       component.queryParams = {
         provider: ['A', 'B'],
         dataProvider: ['C', 'D'],
@@ -282,7 +288,6 @@ describe('FiltersComponent', () => {
         'provider A or B and dataProvider C or D and Dataset Id (101) and Dataset Name "MyDataset" from Dec 12th until June 10th and Percent In Operation >= 60%'
       );
 
-      // 3. Spy on changes and trigger chip cleanup callback branches
       jest.spyOn(component.form, 'patchValue');
       jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
 
@@ -291,31 +296,11 @@ describe('FiltersComponent', () => {
       });
 
       expect(component.form.patchValue).toHaveBeenCalled();
-
-      // 4. Sequentially sweep remaining conditional branches to maximize condition metrics coverage
-      component.queryParams = { dateFrom: ['2026-01-01'] };
-      markup = component.generateTitleMarkup();
-      expect(markup.some((m) => m.label?.includes('from'))).toBe(true);
-
-      component.queryParams = { dateTo: ['2026-01-02'] };
-      markup = component.generateTitleMarkup();
-      expect(markup.some((m) => m.label?.includes('until'))).toBe(true);
-
-      component.queryParams = { datasetId: ['XYZ'] };
-      markup = component.generateTitleMarkup();
-      expect(markup.some((m) => m.label?.includes('Dataset Id'))).toBe(true);
-
-      component.queryParams = { percentLinksInOperationFrom: ['50'] };
-      markup = component.generateTitleMarkup();
-      expect(
-        markup.some((m) => m.label?.includes('Percent In Operation'))
-      ).toBe(true);
     });
 
     it('should evaluate title markup parsing edge cases for all individual fields', () => {
       fixture.detectChanges();
 
-      // Test individual fields sequentially to hit solitary logic branches safely
       component.queryParams = { dateFrom: ['2026-01-01'] };
       let markup = component.generateTitleMarkup();
       expect(markup.some((m) => m.label?.includes('from'))).toBe(true);
@@ -333,6 +318,19 @@ describe('FiltersComponent', () => {
       expect(
         markup.some((m) => m.label?.includes('Percent In Operation'))
       ).toBe(true);
+    });
+
+    it('should append or append control configurations onFilterCheckboxToggle loops execution paths', () => {
+      fixture.detectChanges();
+      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
+
+      const providerGroup = component.form.get('provider') as FormGroup;
+      expect(providerGroup.contains('Z')).toBe(false);
+
+      component.onFilterCheckboxToggle('provider', 'Z');
+      expect(providerGroup.contains('Z')).toBe(true);
+      expect(component.form.value.offset).toBe(0);
+      expect(component.updatePageUrl).toHaveBeenCalled();
     });
   });
 

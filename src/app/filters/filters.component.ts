@@ -314,23 +314,35 @@ export class FiltersComponent implements OnInit {
     } as unknown as CheckDataRequest;
 
     Object.keys(this.queryParams)
-      .filter((key: string) => !['offset', 'limit'].includes(key))
+      // exclude explicit controls
+      .filter(
+        (key: string) =>
+          ![
+            'offset',
+            'limit',
+            'percentLinksInOperationFrom',
+            'datasetId',
+            'datasetName',
+            'dateFrom',
+            'dateTo'
+          ].includes(key)
+      )
       .forEach((key: string) => {
         const rawValues = Array.isArray(this.queryParams[key])
           ? this.queryParams[key]
           : [this.queryParams[key]];
 
         dataRequest.filters[key as FilterParameterName] = rawValues.map(
-          (paramVal: any) => {
-            return fromInputSafeName(String(paramVal));
-          }
+          (paramVal: string) => fromInputSafeName(String(paramVal))
         );
       });
 
-    const valDatasetId = this.form.value.datasetId;
-    if (valDatasetId) {
-      dataRequest.filters['datasetId'] = fromCSL(valDatasetId);
+    if (this.form.value.datasetId) {
+      dataRequest.filters['datasetId'] = fromCSL(this.form.value.datasetId);
     }
+    dataRequest.filters['datasetName'] = this.form.value.datasetName
+      ? [this.form.value.datasetName]
+      : [];
     dataRequest.filters['dateFrom'] = this.form.value.dateFrom ?? '';
     dataRequest.filters['dateTo'] = this.form.value.dateTo ?? '';
     return dataRequest;
@@ -434,10 +446,27 @@ export class FiltersComponent implements OnInit {
   }
 
   updatePageUrl(clearPagination = false): void {
-    const qp: Params = {};
+    if (clearPagination) {
+      this.form.patchValue({ offset: 0 });
+    }
 
+    const qp: Params = {
+      ...this.getFilterParams(),
+      ...this.getFormQueryParams()
+    };
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: qp,
+      queryParamsHandling: ''
+    });
+  }
+
+  private getFilterParams(): Params {
+    const qp: Params = {};
     const currentClioInfo = this.modelClioInfo();
-    if (currentClioInfo && currentClioInfo.filterOps) {
+
+    if (currentClioInfo?.filterOps) {
       Object.keys(currentClioInfo.filterOps).forEach((filterName: string) => {
         const filterVals = this.getSetCheckboxValues(filterName);
         if (filterVals.length > 0) {
@@ -445,50 +474,40 @@ export class FiltersComponent implements OnInit {
         }
       });
     }
+    return qp;
+  }
 
-    if (clearPagination) {
-      this.form.patchValue({ offset: 0 });
+  private getFormQueryParams(): Params {
+    const qp: Params = {};
+    const values = this.form.value;
+
+    if (values.dateFrom) qp['dateFrom'] = this.formatDateParam(values.dateFrom);
+    if (values.dateTo) qp['dateTo'] = this.formatDateParam(values.dateTo);
+    if (values.datasetId) qp['datasetId'] = values.datasetId;
+    if (values.datasetName) qp['datasetName'] = values.datasetName;
+    if (values.limit) qp['limit'] = values.limit;
+
+    if (values.offset !== undefined && values.offset !== null) {
+      qp['offset'] = values.offset;
     }
 
-    const {
-      datasetId,
-      datasetName,
-      dateFrom,
-      dateTo,
-      percentLinksInOperationFrom,
-      limit,
-      offset
-    } = this.form.value;
-
-    if (dateFrom)
-      qp['dateFrom'] =
-        typeof dateFrom === 'string'
-          ? dateFrom
-          : this.getDateAsISOString(new Date(dateFrom));
-    if (dateTo)
-      qp['dateTo'] =
-        typeof dateTo === 'string'
-          ? dateTo
-          : this.getDateAsISOString(new Date(dateTo));
-    if (datasetId) qp['datasetId'] = datasetId;
-    if (datasetName) qp['datasetName'] = datasetName;
-
-    if (
-      percentLinksInOperationFrom !== null &&
-      percentLinksInOperationFrom !== undefined &&
-      String(percentLinksInOperationFrom) !== ''
-    ) {
-      qp['percentLinksInOperationFrom'] = percentLinksInOperationFrom;
+    if (this.hasValidStringValue(values.percentLinksInOperationFrom)) {
+      qp['percentLinksInOperationFrom'] = values.percentLinksInOperationFrom;
     }
 
-    if (limit) qp['limit'] = limit;
-    if (offset !== undefined && offset !== null) qp['offset'] = offset;
+    return qp;
+  }
 
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: qp,
-      queryParamsHandling: ''
-    });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private formatDateParam(date: any): string {
+    return typeof date === 'string'
+      ? date
+      : this.getDateAsISOString(new Date(date));
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private hasValidStringValue(val: any): boolean {
+    return val !== null && val !== undefined && String(val) !== '';
   }
 
   goToPage(pageIndex: number): void {
@@ -503,16 +522,11 @@ export class FiltersComponent implements OnInit {
     const group = this.form.get(filterName) as FormGroup;
     const safeName = toInputSafeName(option);
 
-    // If the checkbox control doesn't exist yet, add it as true.
-    // Otherwise, leave it alone! The custom checkbox component has already flipped its value.
     if (group && !group.contains(safeName)) {
       group.addControl(safeName, this.fb.control(true));
     }
 
-    // Always reset to the first page when changing filters
     this.form.patchValue({ offset: 0 });
-
-    // Update browser URL query strings
     this.updatePageUrl();
   }
 }
