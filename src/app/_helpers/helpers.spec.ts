@@ -2,7 +2,9 @@ import {
   appendDiacriticEquivalents,
   filterList,
   fromCSL,
-  replaceDiacritics
+  fromInputSafeName,
+  replaceDiacritics,
+  toInputSafeName
 } from '.';
 
 describe('Helpers', () => {
@@ -63,5 +65,35 @@ describe('Helpers', () => {
     expect(filterList('ia$', list).length).toEqual(3);
     expect(filterList('a$', list).length).toEqual(4);
     expect(filterList('$l', list).length).toEqual(1);
+  });
+});
+
+describe('Input Safe Name Utilities', () => {
+  describe('toInputSafeName', () => {
+    it('should replace periods with underscores', () => {
+      expect(toInputSafeName('my.provider.name')).toBe(
+        'my_____provider_____name'
+      );
+    });
+
+    it('should return an empty string safely if input is falsy, null, or undefined', () => {
+      expect(toInputSafeName(null)).toBe('');
+      expect(toInputSafeName(undefined)).toBe('');
+      expect(toInputSafeName('')).toBe('');
+    });
+  });
+
+  describe('fromInputSafeName', () => {
+    it('should restore underscores back to periods', () => {
+      expect(fromInputSafeName('my_____provider_____name')).toBe(
+        'my.provider.name'
+      );
+    });
+
+    it('should return an empty string safely if input is falsy, null, or undefined', () => {
+      expect(fromInputSafeName(null)).toBe('');
+      expect(fromInputSafeName(undefined)).toBe('');
+      expect(fromInputSafeName('')).toBe('');
+    });
   });
 });

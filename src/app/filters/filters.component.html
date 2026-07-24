@@ -1,88 +1,94 @@
-<div class="filters">
+<div class="filters" [formGroup]="form">
   @let filter = modelClioInfo().filterOps;
 
   @if (error) {
-    <span style="color: red">
+    <span style="color: red; display: block; margin-bottom: 10px">
       {{ error | json }}
     </span>
   }
-  <ng-container *ngFor="let field of filter | keyvalue">
-    <span class="checkbox-filter">
-      <span [id]="field.key + '-title'" class="filter-label">{{
-        field.key | renameFilter
-      }}</span>
-      @if (field.value && field.value.length > 5) {
-        <span class="search-icon"></span>
-        <input
-          [id]="field.key"
-          [attr.aria-labelledby]="field.key + '-title'"
-          class="checkbox-filter-input"
-          #filterEntries
-          placeholder="Search ({{ field.value.length }} entries)"
-          [(ngModel)]="optionFilters[field.key]"
-        />
-      }
-    </span>
 
-    <div class="filter-wrapper">
-      <ul class="filter-height-maintainer">
-        <li
-          *ngFor="
-            let option of filterList(optionFilters[field.key], field.value)
-          "
-        >
-          &nbsp;
-        </li>
-      </ul>
+  <!-- Loop through dynamic checkbox filters using optimized @for syntax -->
+  @for (field of filter | keyvalue; track field.key) {
+    <div class="filter-group-container">
+      <span class="checkbox-filter">
+        <span [id]="field.key + '-title'" class="filter-label">
+          {{ field.key | renameFilter }}
+        </span>
 
-      <ul class="filter">
-        <li
-          *ngFor="
-            let option of filterList(optionFilters[field.key], field.value)
-          "
-        >
-          <app-checkbox
-            [form]="form"
-            [controlName]="toInputSafeName(option)"
-            [labelText]="option"
-            [group]="field.key"
-            (valueChanged)="updatePageUrl(true)"
-            title="Test"
-          ></app-checkbox>
-        </li>
-      </ul>
+        @if (field.value && field.value.length > 5) {
+          <span class="search-icon"></span>
+          <!-- Dynamic search filter for long lists -->
+          <input
+            [id]="field.key"
+            [attr.aria-labelledby]="field.key + '-title'"
+            class="checkbox-filter-input"
+            placeholder="Search ({{ field.value.length }} entries)"
+            (input)="optionFilters[field.key] = $any($event.target).value"
+            [value]="optionFilters[field.key] || ''"
+          />
+        }
+      </span>
+
+      <div class="filter-wrapper">
+        <!-- Kept layout maintainer clean using modern track syntax -->
+        <ul class="filter-height-maintainer">
+          @for (
+            option of filterList(optionFilters[field.key], field.value);
+            track option
+          ) {
+            <li>&nbsp;</li>
+          }
+        </ul>
+
+        <ul class="filter">
+          @for (
+            option of filterList(optionFilters[field.key], field.value);
+            track option
+          ) {
+            <li>
+              <app-checkbox
+                [form]="form"
+                [controlName]="toInputSafeName(option)"
+                [labelText]="option"
+                [group]="field.key"
+                (valueChanged)="onFilterCheckboxToggle(field.key, option)"
+                title="Test"
+              ></app-checkbox>
+            </li>
+          }
+        </ul>
+      </div>
     </div>
-  </ng-container>
+  }
 
-  <span>
+  <!-- Percent In Operation Slider Control -->
+  <div class="slider-control-block">
     <span class="filter-label">Percent In Operation</span>
     <span class="input-wrapper">
       <app-slider
-        (change)="updatePageUrl(true)"
-        [form]="form"
-        [controlName]="'percentLinksInOperationFrom'"
-      >
-      </app-slider>
+        formControlName="percentLinksInOperationFrom"
+        (valueChange)="updatePageUrl(true)"
+      ></app-slider>
     </span>
-  </span>
+  </div>
 
-  <div [formGroup]="form">
+  <!-- Main Dataset and Date Filter Group -->
+  <div class="explicit-filters-group">
     <span class="filter-label">Dataset Id(s)</span>
     <span class="input-wrapper">
       <input
         data-e2e="dataset-id"
         placeholder="dataset id"
         formControlName="datasetId"
-        (keyUp.enter)="updatePageUrl(true)"
+        (keyup.enter)="updatePageUrl(true)"
       />
       <a
         aria-label="filter dataset label"
         class="search-icon-solid"
         tabindex="0"
         (click)="updatePageUrl(true)"
-        (keyUp.enter)="updatePageUrl(true)"
-        ><!-- //NOSONAR --></a
-      >
+        (keyup.enter)="updatePageUrl(true)"
+      ></a>
     </span>
 
     <span class="filter-label">Dataset Name</span>
@@ -91,16 +97,15 @@
         data-e2e="dataset-name"
         placeholder="dataset name"
         formControlName="datasetName"
-        (keyUp.enter)="updatePageUrl(true)"
+        (keyup.enter)="updatePageUrl(true)"
       />
       <a
         aria-label="filter dataset name"
         class="search-icon-solid"
         tabindex="0"
         (click)="updatePageUrl(true)"
-        (keyUp.enter)="updatePageUrl(true)"
-        ><!-- //NOSONAR --></a
-      >
+        (keyup.enter)="updatePageUrl(true)"
+      ></a>
     </span>
 
     <span class="filter-label">From</span>
@@ -116,9 +121,8 @@
         class="search-icon-solid"
         tabindex="0"
         (click)="updatePageUrl(true)"
-        (keyUp.enter)="updatePageUrl(true)"
-        ><!-- //NOSONAR --></a
-      >
+        (keyup.enter)="updatePageUrl(true)"
+      ></a>
     </span>
 
     <span class="filter-label">To</span>
@@ -134,9 +138,8 @@
         class="search-icon-solid"
         tabindex="0"
         (click)="updatePageUrl(true)"
-        (keyUp.enter)="updatePageUrl(true)"
-        ><!-- //NOSONAR --></a
-      >
+        (keyup.enter)="updatePageUrl(true)"
+      ></a>
     </span>
   </div>
 </div>

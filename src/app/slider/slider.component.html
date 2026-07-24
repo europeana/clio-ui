@@ -1,25 +1,26 @@
-<span *ngIf="form" [formGroup]="form" style="display: flex">
+<span style="display: flex">
   <input
     id="range"
     type="range"
     min="0"
     max="80"
     step="20"
-    [formControlName]="controlName"
-    [(ngModel)]="value"
-    (ngModelChange)="updateChanges()"
+    [formControl]="internalControl"
   />
 
-  @let actualScore = form.value['percentLinksInOperation'];
+  <!-- 💡 FIX 1: Keep actualScore as null if it's unset, instead of forcing a 0 fallback -->
+  @let actualScore = internalControl.value;
+
   <label
     for="range"
     class="clio-state"
     [ngClass]="{
-      'clio-state-0': actualScore === '0',
-      'clio-state-1': actualScore === '20',
-      'clio-state-2': actualScore === '40',
-      'clio-state-3': actualScore === '60',
-      'clio-state-4': actualScore === '80'
+      'clio-state-unset': actualScore === null || actualScore === undefined,
+      'clio-state-0': actualScore === 0,
+      'clio-state-1': actualScore === 20,
+      'clio-state-2': actualScore === 40,
+      'clio-state-3': actualScore === 60,
+      'clio-state-4': actualScore === 80
     }"
   >
   </label>

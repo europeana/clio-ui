@@ -1,8 +1,10 @@
-export function toInputSafeName(s: string): string {
+export function toInputSafeName(s: string | null | undefined): string {
+  if (!s) return '';
   return s.replace(/\./g, '_____'); // NOSONAR
 }
 
-export function fromInputSafeName(s: string): string {
+export function fromInputSafeName(s: string | null | undefined): string {
+  if (!s) return '';
   return s.replace(/_____/g, '.'); // NOSONAR
 }
 

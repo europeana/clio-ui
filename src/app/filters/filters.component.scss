@@ -83,6 +83,7 @@ select {
     padding-right: 1.5em;
   }
 
+  &:hover,
   &:has(:hover) {
     max-height: 270px;
     overflow-y: auto;
