@@ -31,6 +31,13 @@ jobs:
           echo TAG_ESCAPED=${TAG_ESCAPED} >> $GITHUB_ENV
       - name: Inject Variables
         run: |
+          ENV_FILE_PATH="deployment/${{ inputs.deploy_environment }}/env_file"
+          if [ -f "$ENV_FILE_PATH" ]; then
+            while IFS= read -r line || [ -n "$line" ]; do
+              [[ "$line" =~ ^#.*$ ]] || [ -z "$line" ] && continue
+              export "$line"
+            done < "$ENV_FILE_PATH"
+          fi
           export APP_IMAGE='europeana/clio-ui:${{ env.TAG_ESCAPED }}'
           export MIN_REPLICAS='2'
           export MAX_REPLICAS='4'

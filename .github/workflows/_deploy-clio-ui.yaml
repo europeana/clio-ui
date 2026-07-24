@@ -63,6 +63,7 @@ jobs:
   build-dist:
     if: ${{ github.event.inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
+    environment: ${{ inputs.deploy_environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
