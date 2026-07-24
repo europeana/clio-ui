@@ -40,17 +40,24 @@ jobs:
     if: ${{ github.event.inputs.run_build == 'true' }}
     name: 'e2e'
     uses: ./.github/workflows/run-tests-e2e.yaml
+    with:
+      tag_name: ${{ github.event.inputs.tag_name }}
+      run_build: ${{ github.event.inputs.run_build }}
 
   run-unit:
     if: ${{ github.event.inputs.run_build == 'true' }}
     name: 'tests'
     uses: ./.github/workflows/run-tests.yaml
+    with:
+      tag_name: ${{ github.event.inputs.tag_name }}
     secrets: inherit
 
   run-sonar:
     if: ${{ github.event.inputs.run_build == 'true' }}
     needs: [run-unit]
     uses: ./.github/workflows/run-sonar.yaml
+    with:
+      tag_name: ${{ github.event.inputs.tag_name }}
     secrets: inherit
 
   build-dist:
@@ -140,4 +147,6 @@ jobs:
     uses: ./.github/workflows/deploy-image.yaml
     with:
       deploy_environment: ${{ github.event.inputs.deploy_environment }}
+      tag_name: ${{ github.event.inputs.tag_name }}
+      delete: ${{ github.event.inputs.delete }}
     secrets: inherit

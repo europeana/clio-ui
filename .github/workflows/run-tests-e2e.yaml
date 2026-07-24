@@ -1,14 +1,24 @@
 name: '- helper (e2e testing)'
-on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      tag_name:
+        required: false
+        type: string
+        default: 'develop'
+      run_build:
+        required: false
+        type: string
+        default: 'false'
 jobs:
   cypress:
-    if: ${{ github.event.inputs.run_build == 'true' }}
+    if: ${{ inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name }}
+          ref: ${{ inputs.tag_name }}
       - uses: actions/setup-node@v5
         with:
           node-version: '22.12'
@@ -21,26 +31,22 @@ jobs:
         run: |
           fuser -k 3000/tcp
   a11y:
-    if: ${{ github.event.inputs.run_build == 'true' }}
+    if: ${{ inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name }}
-
+          ref: ${{ inputs.tag_name }}
       - uses: actions/setup-node@v5
         with:
           node-version: '22.12'
-
       - run: npm install
-
       - name: Run Cypress AccessibilityTests
         run: |
           ((npm run start:ci-data & echo 'started test-data server')
           && sleep 10) & (npm run cypress:ci-accessibility)
-
       - name: close test-data server
         if: success() || failure()
         run: |

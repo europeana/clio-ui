@@ -11,11 +11,13 @@ on:
 jobs:
   create-env-file:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.deploy_environment }}
     steps:
       - run: |
           touch env_file
           echo APP_DATASPACE_URL=${{ secrets.DATASPACE_URL }} >> env_file
-          case ${{ github.event.inputs.deploy_environment }} in
+          # FIXED: Swapped github.event.inputs to inputs context
+          case ${{ inputs.deploy_environment }} in
             'production')
               echo APP_SERVER_API=${{ secrets.PRODUCTION_SERVER_API }} >> env_file
             ;;
