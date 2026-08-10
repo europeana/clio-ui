@@ -6,9 +6,10 @@ import {
   inject,
   model,
   ModelSignal,
-  OnInit
+  OnInit,
+  signal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
   FormControl,
@@ -74,6 +75,7 @@ export class FiltersComponent implements OnInit {
   public filterList = filterList;
   public toInputSafeName = toInputSafeName;
 
+  hasMoreAvailable = signal(false);
   queryParams: Params = {};
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
 
@@ -102,6 +104,10 @@ export class FiltersComponent implements OnInit {
     datasetIds: this.fb.group({}),
     limit: this.fb.control<number | null>(25),
     offset: this.fb.control<number | null>(0)
+  });
+
+  readonly formValueSignal = toSignal(this.form.valueChanges, {
+    initialValue: this.form.value
   });
 
   error?: HttpErrorResponse;
@@ -404,6 +410,7 @@ export class FiltersComponent implements OnInit {
         delete cleanOps['excludedCheckId'];
         delete cleanOps['percentLinksInOperationTo'];
         delete cleanOps['percentLinksInOperationFrom'];
+        delete cleanOps['hasMoreAvailable'];
 
         Object.keys(cleanOps).forEach((key: string) => {
           if (cleanOps[key]) {
@@ -412,6 +419,8 @@ export class FiltersComponent implements OnInit {
         });
 
         const queryParamMap = this.route.snapshot.queryParamMap;
+
+        this.hasMoreAvailable.set(!!filterOps['hasMoreAvailable']);
 
         if (queryParamMap.has('percentLinksInOperationFrom')) {
           const rawPercent = queryParamMap.get('percentLinksInOperationFrom');
