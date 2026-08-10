@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, signal, WritableSignal } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -15,13 +15,11 @@ import {
   MockAPIServiceErrors,
   MockFiltersComponent
 } from './_mocked';
-
 import { ClioCheck } from './_models';
 import { APIService, ClickService } from './_services';
 
 import { AppComponent } from './app.component';
 import { FiltersComponent } from './filters';
-import { ListingComponent } from './listing';
 
 describe('AppComponent', () => {
   let clicks: ClickService;
@@ -30,12 +28,23 @@ describe('AppComponent', () => {
   let api: APIService;
   let mockQueryParams$: BehaviorSubject<Params>;
 
+  // Track shared mock spies globally across the suite context
+  let mockFilters: {
+    hasMoreAvailable: WritableSignal<boolean>;
+    form: FormGroup;
+    getDataServerDataRequest: jest.Mock;
+    dropPage: jest.Mock;
+    bumpPage: jest.Mock;
+  };
+
+  // Track shared mock listing structures reactively
+  let mockListing: {
+    form: FormGroup;
+    clioInfo: WritableSignal<Record<string, unknown>>;
+  };
+
   const formVals = {
-    value: {
-      check_ids: ['1'],
-      offset: 0,
-      limit: 5
-    }
+    value: { check_ids: ['1'], offset: 0, limit: 5 }
   } as unknown as FormGroup;
 
   const configureTestbed = (errorMode = false): void => {
@@ -49,12 +58,7 @@ describe('AppComponent', () => {
           provide: APIService,
           useClass: errorMode ? MockAPIServiceErrors : MockAPIService
         },
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            queryParams: mockQueryParams$
-          }
-        }
+        { provide: ActivatedRoute, useValue: { queryParams: mockQueryParams$ } }
       ]
     })
       .overrideComponent(AppComponent, {
@@ -72,6 +76,36 @@ describe('AppComponent', () => {
       configureTestbed();
       fixture = TestBed.createComponent(AppComponent);
       app = fixture.componentInstance;
+
+      // Centralized Filters Mock Setup
+      mockFilters = {
+        hasMoreAvailable: signal(false),
+        form: formVals,
+        getDataServerDataRequest: jest.fn().mockReturnValue({ filters: {} }),
+        dropPage: jest.fn(),
+        bumpPage: jest.fn()
+      };
+
+      // Centralized Listing Mock Setup using a real writable signal for clioInfo
+      mockListing = {
+        form: formVals,
+        clioInfo: signal({ datasetChecks: {} })
+      };
+
+      // Inject the filters viewChild signal cleanly
+      Object.defineProperty(app, 'filters', {
+        value: signal(mockFilters),
+        writable: true,
+        configurable: true
+      });
+
+      // Inject the listing viewChild signal cleanly to avoid TS2540 compilation errors
+      Object.defineProperty(app, 'listing', {
+        value: signal(mockListing),
+        writable: true,
+        configurable: true
+      });
+
       fixture.detectChanges();
     });
 
@@ -93,55 +127,34 @@ describe('AppComponent', () => {
           nativeElement: { contains: () => false }
         } as unknown as HTMLElement
       });
-
       expect(spyNext).toHaveBeenCalledTimes(2);
     }));
 
     it('should download datasets and map run IDs correctly', () => {
-      app.filters = {
-        getDataServerDataRequest: jest.fn().mockReturnValue({ filters: {} })
-      } as unknown as FiltersComponent;
-
-      jest.spyOn(app.filters, 'getDataServerDataRequest');
       jest.spyOn(api, 'getDownload');
 
-      app.listing = {
-        form: {
-          value: {
-            check_ids: { '123': false }
-          }
-        } as unknown as FormGroup,
-        clioInfo: () => {
-          return {
-            datasetChecks: {
-              x: {
-                list: [{ id: 123 } as ClioCheck]
-              }
-            }
-          };
-        }
-      } as unknown as ListingComponent;
+      mockListing.form = {
+        value: { check_ids: { '123': false } }
+      } as unknown as FormGroup;
+
+      mockListing.clioInfo.set({
+        datasetChecks: { x: { list: [{ id: 123 } as ClioCheck] } }
+      });
 
       app.downloadDataset('x');
 
-      expect(app.filters.getDataServerDataRequest).toHaveBeenCalled();
+      expect(mockFilters.getDataServerDataRequest).toHaveBeenCalled();
       expect(api.getDownload).toHaveBeenCalled();
     });
 
     it('should download all', () => {
       jest.spyOn(api, 'getDownload');
 
-      app.listing = {
-        form: formVals
-      } as unknown as ListingComponent;
-
-      app.filters = {
-        getDataServerDataRequest: jest.fn(),
-        form: formVals
-      } as unknown as FiltersComponent;
+      mockListing.form = formVals;
 
       app.downloadAll();
-      expect(app.filters.getDataServerDataRequest).toHaveBeenCalled();
+
+      expect(mockFilters.getDataServerDataRequest).toHaveBeenCalled();
       expect(api.getDownload).toHaveBeenCalled();
     });
 
@@ -152,48 +165,51 @@ describe('AppComponent', () => {
     });
 
     it('should drop the page configuration and let route sync handle loading', () => {
-      app.filters = {
-        dropPage: jest.fn()
-      } as any;
-
       app.loadPrevPage();
-      expect(app.filters.dropPage).toHaveBeenCalledTimes(1);
+      expect(mockFilters.dropPage).toHaveBeenCalledTimes(1);
     });
 
     it('should bump the page configuration and let route sync handle loading', () => {
-      app.filters = {
-        bumpPage: jest.fn()
-      } as any;
-
       app.loadNextPage();
-      expect(app.filters.bumpPage).toHaveBeenCalledTimes(1);
+      expect(mockFilters.bumpPage).toHaveBeenCalledTimes(1);
     });
 
-    it('should determine if can load prev page based on child dynamic form state', () => {
-      app.filters = { form: undefined } as any;
-      expect(app.canLoadPrevPage()).toBeFalsy();
+    it('should determine if can load prev page based on URL route query state', fakeAsync(() => {
+      expect(app.canLoadPrevPageSignal()).toBeFalsy();
 
-      app.filters = {
-        form: {
-          value: { offset: '50', limit: '10' }
-        }
-      } as any;
-      expect(app.canLoadPrevPage()).toBeTruthy();
-
-      app.filters = {
-        form: {
-          value: { offset: '0', limit: '100' }
-        }
-      } as any;
-      expect(app.canLoadPrevPage()).toBeFalsy();
-    });
-
-    it('should compute the correct visual page string text via the reactive query params stream', fakeAsync(() => {
-      expect(app.paginationText()).toBe('0 - 25');
       mockQueryParams$.next({ offset: 50, limit: 10 });
       tick(0);
       fixture.detectChanges();
-      expect(app.paginationText()).toBe('50 - 60');
+      expect(app.canLoadPrevPageSignal()).toBeTruthy();
+
+      mockQueryParams$.next({ offset: 0, limit: 100 });
+      tick(0);
+      fixture.detectChanges();
+      expect(app.canLoadPrevPageSignal()).toBeFalsy();
+    }));
+
+    it('should compute the correct visual page string text via the reactive query params stream', fakeAsync(() => {
+      // 1. Set the mock dataset values through the real signal payload channel
+      mockListing.clioInfo.set({
+        datasetChecks: {
+          'dataset-1': { list: [] },
+          'dataset-2': { list: [] }
+        }
+      });
+
+      // 2. Force change detection so the parent computed blocks re-evaluate
+      fixture.detectChanges();
+
+      // Since we have 2 datasets (less than the limit of 25), maxBound becomes 0 + 2 = 2
+      expect(app.paginationText()).toBe('0 - 2');
+
+      // 3. Update query parameters stream (offset: 50, limit: 10)
+      mockQueryParams$.next({ offset: 50, limit: 10 });
+      tick(0);
+      fixture.detectChanges();
+
+      // Since we have 2 datasets (less than the limit of 10), maxBound becomes 50 + 2 = 52
+      expect(app.paginationText()).toBe('50 - 52');
     }));
   });
 });

@@ -14,18 +14,27 @@
         [clioInfo]="filters.modelClioInfo"
       ></app-listing>
 
-      <a
-        (click)="loadPrevPage()"
-        (keyUp.enter)="loadPrevPage()"
-        [attr.tabindex]="!canLoadPrevPage() ? -1 : 0"
-        [attr.disabled]="!canLoadPrevPage() ? 'disabled' : null"
-      >
-        &lt;&lt;
-      </a>
-      &nbsp;
-      {{ paginationText() }}
-      &nbsp;
-      <a (click)="loadNextPage()" (keyUp.enter)="loadNextPage()"> &gt;&gt; </a>
+      <div class="result-nav">
+        <a
+          (click)="loadPrevPage()"
+          (keyUp.enter)="loadPrevPage()"
+          [attr.tabindex]="!canLoadPrevPageSignal() ? -1 : 0"
+          [attr.disabled]="!canLoadPrevPageSignal() ? 'disabled' : null"
+        >
+          &laquo;
+        </a>
+        &nbsp;
+        {{ paginationText() }}
+        &nbsp;
+        <a
+          [attr.tabindex]="!canLoadNextPageSignal() ? -1 : 0"
+          [attr.disabled]="!canLoadNextPageSignal() ? 'disabled' : null"
+          (click)="loadNextPage()"
+          (keyUp.enter)="loadNextPage()"
+        >
+          &raquo;
+        </a>
+      </div>
     </div>
   </div>
 

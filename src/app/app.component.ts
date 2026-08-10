@@ -1,13 +1,14 @@
 import {
   Component,
+  computed,
   HostListener,
   inject,
   Signal,
-  ViewChild
+  viewChild
 } from '@angular/core';
+
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { ActivatedRoute, Params } from '@angular/router';
 
 import { apiSettings } from '../environments/apisettings';
 import { ClioCheck, DownloadRequest } from './_models';
@@ -28,8 +29,8 @@ export class AppComponent {
   private readonly route = inject(ActivatedRoute);
   public apiSettings = apiSettings;
 
-  @ViewChild('listing', { static: false }) listing: ListingComponent;
-  @ViewChild('filters', { static: false }) filters: FiltersComponent;
+  readonly listing = viewChild.required<ListingComponent>('listing');
+  readonly filters = viewChild.required<FiltersComponent>('filters');
 
   /**
    * documentClick
@@ -51,18 +52,18 @@ export class AppComponent {
   }
 
   downloadDataset(id: string): void {
-    const runIdsForDatasetId = this.listing
+    const runIdsForDatasetId = this.listing()
       .clioInfo()
       .datasetChecks[id].list.map((run: ClioCheck) => {
         return `${run.id}`;
       });
 
-    const exclusionMap = this.listing.form.value['check_ids'];
+    const exclusionMap = this.listing().form.value['check_ids'];
     const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
       return !exclusionMap[key] && new Set(runIdsForDatasetId).has(key);
     });
-    const downloadRequest = this.filters.getDataServerDataRequest();
 
+    const downloadRequest = this.filters().getDataServerDataRequest();
     downloadRequest.filters['datasetId'] = [id];
 
     this.api.getDownload({
@@ -72,37 +73,61 @@ export class AppComponent {
   }
 
   downloadAll(): void {
-    const exclusionMap = this.listing.form.value['check_ids'];
+    const exclusionMap = this.listing().form.value['check_ids'];
     const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
       return !exclusionMap[key];
     });
+
     this.api.getDownload({
-      ...this.filters.getDataServerDataRequest(),
+      ...this.filters().getDataServerDataRequest(),
       excluded_check_ids: exclusionList
     });
   }
 
-  public paginationText: Signal<string> = toSignal(
-    this.route.queryParams.pipe(
-      map((params) => {
-        const offset = Number(params['offset'] ?? 0);
-        const limit = Number(params['limit'] ?? 25);
-        return `${offset} - ${offset + limit}`;
-      })
-    ),
-    { initialValue: '0 - 25' }
+  // Reactive URL routing query stream wrapper matching core contract types
+  private readonly queryParamsSignal = toSignal<Params, Params>(
+    this.route.queryParams,
+    {
+      initialValue: {} as Params
+    }
   );
 
-  canLoadPrevPage(): boolean {
-    const offset = this.filters?.form?.value?.offset;
-    return !!(offset && Number(offset) > 0);
-  }
+  // Computes previous page navigation visibility state directly off the active URL parameter stream
+  public readonly canLoadPrevPageSignal: Signal<boolean> = computed(() => {
+    const params = this.queryParamsSignal();
+    const offset = Number(params['offset'] ?? 0);
+    return offset > 0;
+  });
+
+  // Calculates structural range text limits dynamically using real visible item counts
+  public readonly paginationText: Signal<string> = computed(() => {
+    const params = this.queryParamsSignal();
+    const offset = Number(params['offset'] ?? 0);
+    const limit = Number(params['limit'] ?? 25);
+
+    const datasetChecksMap = this.listing().clioInfo()?.datasetChecks;
+    const visibleDatasetCount = datasetChecksMap
+      ? Object.keys(datasetChecksMap).length
+      : 0;
+
+    const maxBound =
+      visibleDatasetCount < limit
+        ? offset + visibleDatasetCount
+        : offset + limit;
+
+    return `${offset} - ${maxBound}`;
+  });
+
+  // Computes next page validation parameters smoothly off the required child filter signals
+  readonly canLoadNextPageSignal = computed(() => {
+    return !!this.filters().hasMoreAvailable();
+  });
 
   loadPrevPage(): void {
-    this.filters.dropPage();
+    this.filters().dropPage();
   }
 
   loadNextPage(): void {
-    this.filters.bumpPage();
+    this.filters().bumpPage();
   }
 }
