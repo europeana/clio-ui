@@ -30,7 +30,6 @@
       </span>
 
       <div class="filter-wrapper">
-        <!-- Kept layout maintainer clean using modern track syntax -->
         <ul class="filter-height-maintainer">
           @for (
             option of filterList(optionFilters[field.key], field.value);
@@ -47,8 +46,7 @@
           ) {
             <li>
               <app-checkbox
-                [form]="form"
-                [controlName]="toInputSafeName(option)"
+                [checked]="isCheckboxChecked(field.key, option)"
                 [labelText]="option"
                 [group]="field.key"
                 (valueChanged)="onFilterCheckboxToggle(field.key, option)"

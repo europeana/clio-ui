@@ -9,16 +9,11 @@ import {
 import {
   Component,
   effect,
-  inject,
   Input,
   ModelSignal,
-  output
+  output,
+  signal
 } from '@angular/core';
-import {
-  FormControl,
-  UntypedFormBuilder,
-  UntypedFormGroup
-} from '@angular/forms';
 
 import {
   DATE_CONCISE_FMT,
@@ -46,61 +41,45 @@ import { CheckboxComponent } from '../checkbox';
   ]
 })
 export class ListingComponent {
-  public DATE_CONCISE_FMT = DATE_CONCISE_FMT;
-  public DATE_DEFAULT_FMT = DATE_DEFAULT_FMT;
-  private readonly fb = inject(UntypedFormBuilder);
+  public readonly DATE_CONCISE_FMT = DATE_CONCISE_FMT;
+  public readonly DATE_DEFAULT_FMT = DATE_DEFAULT_FMT;
 
-  listSelectionCount = 0;
   graphMode = false;
   requestDownloadCheck = output<number>();
   requestDownloadAll = output<void>();
   requestDownloadDataset = output<string>();
 
-  form = new UntypedFormGroup({
-    check_ids: new UntypedFormGroup({})
-  });
-
-  formDatasets = new UntypedFormGroup({
-    dataset_ids: new UntypedFormGroup({})
-  });
+  selectedCheckIds = signal<Set<number>>(new Set());
+  selectedDatasetIds = signal<Set<string>>(new Set());
 
   @Input() clioInfo: ModelSignal<ClioInfo>;
 
-  /**
-   * when info changes...
-   * add form controls (run ids)
-   * add form controls (group ids)
-   * update the listSelectionCount
-   * reset checkboxes
-   **/
   constructor() {
+    /**
+     * Reacts directly to incoming data shifts.
+     * Automatically ensures all visible data items default to an active checked selection layout.
+     */
     effect(() => {
-      if (this.clioInfo().list) {
-        this.setClioCheckFormValues(false);
-        const runFormGroup = this.form.get('check_ids') as UntypedFormGroup;
-        const datasetFormGroup = this.formDatasets.get(
-          'dataset_ids'
-        ) as UntypedFormGroup;
+      const info = this.clioInfo();
+      const list = info?.list || [];
 
-        const clioInfoValue = this.clioInfo();
-        const list = clioInfoValue.list;
+      // Mass initialization executed via single-pass array insertions
+      const initialChecks = new Set<number>();
+      const initialDatasets = new Set<string>();
 
-        list.forEach((check: ClioCheck) => {
-          const fName = `${check.id}`;
-          const ctrlRun = this.form.get(fName);
-          if (!ctrlRun) {
-            runFormGroup.addControl(fName, new FormControl(true, []));
-          }
-          const dsId = `${check.datasetId}`;
-          const ctrlDatset = this.formDatasets.get(dsId);
-          if (!ctrlDatset) {
-            datasetFormGroup.addControl(dsId, new FormControl(true, []));
-          }
-        });
-        this.listSelectionCount = list.length;
-        this.setClioCheckFormValues(true);
-      }
+      list.forEach((check: ClioCheck) => {
+        initialChecks.add(check.id);
+        initialDatasets.add(String(check.datasetId));
+      });
+
+      this.selectedCheckIds.set(initialChecks);
+      this.selectedDatasetIds.set(initialDatasets);
     });
+  }
+
+  // Pure compute mapping metrics: yields lightning fast O(1) checks
+  get listSelectionCount(): number {
+    return this.selectedCheckIds().size;
   }
 
   clickOutside(): void {
@@ -120,52 +99,59 @@ export class ListingComponent {
     this.graphMode = !this.graphMode;
   }
 
-  getSelectedRunCount(list: Array<ClioCheck>): number {
-    return list
-      .map((run: ClioCheck) => {
-        return run.id;
-      })
-      .filter((id: number) => {
-        return this.form.value['check_ids'][id];
-      }).length;
-  }
-
-  setClioCheckFormValues(val: boolean): void {
-    const groupControls = (this.form.get('check_ids') as UntypedFormGroup)
-      .controls;
-    Object.keys(groupControls).forEach((key) => {
-      const ctrl = this.form.get('check_ids.' + key) as FormControl;
-      if (val) {
-        const arrVisible = this.clioInfo().list.map((item: ClioCheck) => {
-          return `${item.id}`;
-        });
-        if (arrVisible.includes(key)) {
-          ctrl.setValue(val);
-        }
-      } else {
-        ctrl.setValue(false);
+  /**
+   * Evaluates checked list sizes per distinct dataset cluster
+   * Optimized from O(N^2) down to linear O(N) using Set.has lookups
+   */
+  getSelectedRunCount(list: Array<ClioCheck> = []): number {
+    const activeChecks = this.selectedCheckIds();
+    let count = 0;
+    for (let i = 0; i < list.length; i++) {
+      if (activeChecks.has(list[i].id)) {
+        count++;
       }
-    });
+    }
+    return count;
   }
 
+  /**
+   * Stateless Individual Run Selector Toggle Handler
+   */
+  toggleCheckSelection(runId: number): void {
+    const current = new Set(this.selectedCheckIds());
+    if (current.has(runId)) {
+      current.delete(runId);
+    } else {
+      current.add(runId);
+    }
+    this.selectedCheckIds.set(current);
+  }
+
+  /**
+   * Maps dataset header checkbox selection flips down to all underlying sibling rows
+   */
   checkAll(datasetId: string, groupList: Array<ClioCheck>): void {
-    const val = this.formDatasets.value['dataset_ids'][datasetId];
-    groupList.forEach((run: ClioCheck) => {
-      const ctrl = this.form.get('check_ids.' + run.id) as FormControl;
-      ctrl.setValue(val);
-    });
-    this.updateIds();
+    const dsStr = String(datasetId);
+    const datasets = new Set(this.selectedDatasetIds());
+    const checks = new Set(this.selectedCheckIds());
+
+    // Toggle master collection parameter boundary
+    const shouldCheckAll = !datasets.has(dsStr);
+
+    if (shouldCheckAll) {
+      datasets.add(dsStr);
+      groupList.forEach((run) => checks.add(run.id));
+    } else {
+      datasets.delete(dsStr);
+      groupList.forEach((run) => checks.delete(run.id));
+    }
+
+    this.selectedDatasetIds.set(datasets);
+    this.selectedCheckIds.set(checks);
   }
 
   getClioClass(score: number): string {
     const rounded = score === 100 ? 4 : Math.floor(score / 20);
     return `clio-state-${rounded}`;
-  }
-
-  updateIds(): void {
-    const vals = this.form.value['check_ids'];
-    this.listSelectionCount = Object.keys(vals).filter((key: string) => {
-      return vals[key];
-    }).length;
   }
 }

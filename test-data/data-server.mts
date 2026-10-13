@@ -200,74 +200,101 @@ export function dataServerRequest(
   dataRequest: CheckDataRequest
 ): CheckDataResults {
   const filterproof: Array<string> = [];
+
+  // Extract all the filter names the client has provided
   const specifiedFilterNames = Object.keys(
-    dataRequest.filters
+    dataRequest.filters || {}
   ) as Array<FilterParameterName>;
-  const filteredRuns = structuredClone(allChecks).filter((check: ClioCheck) => {
+
+  let filteredRuns = structuredClone(allChecks).filter((check: ClioCheck) => {
     let res = true;
 
     specifiedFilterNames.forEach((fName: FilterParameterName) => {
-      const filter = dataRequest.filters[fName];
+      let filter = dataRequest.filters[fName];
+
+      if (['offset', 'limit'].includes(fName)) {
+        return;
+      }
+
+      const firstVal = Array.isArray(filter) ? filter[0] : filter;
 
       if (fName === 'datasetId') {
-        if (!filter.includes(check.datasetId)) {
+        const allowedIds = Array.isArray(filter) ? filter : [String(filter)];
+        if (allowedIds.length > 0 && !allowedIds.includes(String(check.datasetId))) {
           res = false;
         }
       } else if (fName === 'datasetName') {
-        res = false;
-        (filter as Array<string>).forEach((val: string) => {
-          if (check.datasetName.includes(val)) {
-            res = true;
+        if (firstVal) {
+          if (!check.datasetName.includes(String(firstVal))) {
+            res = false;
           }
-        });
+        }
       } else if (fName === 'dateFrom') {
-        const dateParam = Date.parse(filter[0]);
-        const checkDate = Date.parse(check['date']);
-        if (checkDate < dateParam) {
-          res = false;
+        if (firstVal && String(firstVal).trim() !== '') {
+          const dateParam = Date.parse(String(firstVal));
+          const checkDate = Date.parse(check['date']);
+          if (!isNaN(dateParam) && checkDate < dateParam) {
+            res = false;
+          }
         }
       } else if (fName === 'dateTo') {
-        const dateParam = Date.parse(filter[0]);
-        const checkDate = Date.parse(check['date']);
-        if (checkDate > dateParam) {
-          res = false;
+        if (firstVal && String(firstVal).trim() !== '') {
+          const dateParam = Date.parse(String(firstVal));
+          const checkDate = Date.parse(check['date']);
+          if (!isNaN(dateParam) && checkDate > dateParam) {
+            res = false;
+          }
         }
       } else if (fName === 'percentLinksInOperationFrom') {
-        const scoreParam = Number.parseInt(filter.toString());
-        const checkScore = check.percentLinksInOperation;
-        if (checkScore < scoreParam) {
+        const scoreParam = Number.parseInt(String(firstVal || 0), 10);
+        if (check.percentLinksInOperation < scoreParam) {
           res = false;
         }
-      }
-       else if (fName === 'id') {
-        if (!filter.includes(`${check.id}`)) {
+      } else if (fName === 'id') {
+        const allowedIds = Array.isArray(filter) ? filter : [String(filter)];
+        if (!allowedIds.includes(`${check.id}`)) {
           res = false;
         }
-      } else if (
-        filter.includes && filter.includes((check as unknown as { [key: string]: string })[fName])
-      ) {
-        filterproof.push(fName);
-      } else if(!['offset', 'limit'].includes(fName)){
-        console.log('unknowm filter option: ' + fName);
-        res = false;
+      } else if (['dataProvider', 'provider'].includes(fName)) {
+        // Map dynamic custom checkboxes safely
+        const checkValue = (check as unknown as { [key: string]: string })[fName];
+        const targetFilters = Array.isArray(filter) ? filter : [filter];
+
+        if (targetFilters.length > 0 && targetFilters[0] !== undefined) {
+          if (targetFilters.includes(checkValue)) {
+            if (!filterproof.includes(fName)) {
+              filterproof.push(fName);
+            }
+          } else {
+            res = false;
+          }
+        }
+      } else {
+        console.log('unknown filter option dropped: ' + fName);
       }
     });
     return res;
   });
 
   const facetNames = ['dataProvider', 'provider'];
-
   const filterOptions = facetNames.reduce(
     (result: { [key: string]: Array<string> }, fName: string) => {
-      const possibleValues = getDistinctValues(
-        filterproof.includes(fName) ? structuredClone(allChecks) : filteredRuns,
-        fName
-      );
-      result[fName] = possibleValues;
+      const targetSource = filterproof.includes(fName) ? allChecks : filteredRuns;
+      result[fName] = getDistinctValues(structuredClone(targetSource), fName);
       return result;
     },
     {}
   );
+
+  const rawOffset = dataRequest.filters['offset'];
+  const rawLimit = dataRequest.filters['limit'];
+  const offset = Number(Array.isArray(rawOffset) ? rawOffset[0] : (rawOffset ?? 0));
+  const limit = Number(Array.isArray(rawLimit) ? rawLimit[0] : (rawLimit ?? 25));
+
+  const totalCountBeforeSlice = filteredRuns.length;
+  (filterOptions as any)['hasMoreAvailable'] = (offset + limit) < totalCountBeforeSlice;
+
+  filteredRuns = filteredRuns.slice(offset, offset + limit);
 
   return {
     filterOptions,

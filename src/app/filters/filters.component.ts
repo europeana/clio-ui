@@ -194,29 +194,59 @@ export class FiltersComponent implements OnInit {
 
   generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
     const res: Array<{ label: string; fn?: () => void }> = [];
-    const queryKeys = Object.keys(this.queryParams).filter((key: string) => {
-      return !['offset', 'limit'].includes(key);
-    });
+    const queryKeys = Object.keys(this.queryParams).filter(
+      (key) => !['offset', 'limit'].includes(key)
+    );
 
-    if (!queryKeys || queryKeys.length === 0) {
-      res.push({ label: 'All checks' });
-      return res;
+    if (queryKeys.length === 0) {
+      return [{ label: 'All checks' }];
     }
+
+    // Define strategy handlers for uniform filter inputs
+    const standardFilters: Record<
+      string,
+      {
+        prefix: string;
+        labelFactory: (v: string) => string;
+        control: string;
+        defaultVal: any;
+      }
+    > = {
+      datasetId: {
+        prefix: 'and',
+        labelFactory: (v) => `Dataset Id (${v})`,
+        control: 'datasetId',
+        defaultVal: ''
+      },
+      datasetName: {
+        prefix: 'and',
+        labelFactory: (v) => `Dataset Name "${v}"`,
+        control: 'datasetName',
+        defaultVal: ''
+      },
+      percentLinksInOperationFrom: {
+        prefix: 'and',
+        labelFactory: (v) => `Percent In Operation >= ${v}%`,
+        control: 'percentLinksInOperationFrom',
+        defaultVal: null
+      }
+    };
 
     queryKeys.forEach((key: string, index: number) => {
       const rawValues = Array.isArray(this.queryParams[key])
         ? this.queryParams[key]
         : [this.queryParams[key]];
 
-      const values = rawValues.map((paramName: unknown) =>
-        fromInputSafeName(String(paramName))
+      const values = rawValues.map((val: unknown) =>
+        fromInputSafeName(String(val))
       );
+      const isFirstFilter = index === 0;
 
       if (key === 'dateFrom') {
         res.push(
           { label: 'from' },
           {
-            label: `${values[0]}`,
+            label: values[0],
             fn: () => {
               this.form.patchValue({ dateFrom: '', offset: 0 });
               this.updatePageUrl();
@@ -227,54 +257,39 @@ export class FiltersComponent implements OnInit {
         res.push(
           { label: 'until' },
           {
-            label: `${values[0]}`,
+            label: values[0],
             fn: () => {
               this.form.patchValue({ dateTo: '', offset: 0 });
               this.updatePageUrl();
             }
           }
         );
-      } else if (key === 'datasetId') {
-        const label = 'Dataset Id';
-        if (index > 0) res.push({ label: 'and' });
+      }
+      // handle single
+      else if (standardFilters[key]) {
+        const config = standardFilters[key];
+        if (!isFirstFilter) res.push({ label: config.prefix });
+
         res.push({
-          label: `${label} (${values[0]})`,
-          fn: () => {
-            this.form.patchValue({ datasetId: '', offset: 0 });
-            this.updatePageUrl();
-          }
-        });
-      } else if (key === 'datasetName') {
-        const label = 'Dataset Name';
-        if (index > 0) res.push({ label: 'and' });
-        res.push({
-          label: `${label} "${values[0]}"`,
-          fn: () => {
-            this.form.patchValue({ datasetName: '', offset: 0 });
-            this.updatePageUrl();
-          }
-        });
-      } else if (key === 'percentLinksInOperationFrom') {
-        const label = 'Percent In Operation';
-        if (index > 0) res.push({ label: 'and' });
-        res.push({
-          label: `${label} >= ${values[0]}%`,
+          label: config.labelFactory(values[0]),
           fn: () => {
             this.form.patchValue({
-              percentLinksInOperationFrom: null,
+              [config.control]: config.defaultVal,
               offset: 0
             });
             this.updatePageUrl();
           }
         });
-      } else {
+      }
+      // handle arrays
+      else {
         rawValues.forEach((valPart: string, indexInner: number) => {
           if (indexInner === 0) {
-            res.push({ label: index > 0 ? 'and ' + key : key });
+            res.push({ label: isFirstFilter ? key : `and ${key}` });
           }
 
           res.push({
-            label: `${values[indexInner]}`,
+            label: values[indexInner],
             fn: () => {
               const group = this.form.get(key) as FormGroup;
               if (group) {
@@ -291,6 +306,7 @@ export class FiltersComponent implements OnInit {
         });
       }
     });
+
     return res;
   }
 
@@ -308,70 +324,71 @@ export class FiltersComponent implements OnInit {
     this.updatePageUrl();
   }
 
+  /**
+   * Serializes current form controls / active URL query parameters
+   *
+   * @returns {CheckDataRequest}
+   */
   getDataServerDataRequest(): CheckDataRequest {
-    const dataRequest = {
-      filters: {
-        percentLinksInOperationFrom: Number(
-          this.form.value.percentLinksInOperationFrom ?? 0
-        ),
-        offset: Number(this.form.value.offset ?? 0),
-        limit: Number(this.form.value.limit ?? 25)
-      }
-    } as unknown as CheckDataRequest;
-
-    Object.keys(this.queryParams)
-      // exclude explicit controls
-      .filter(
-        (key: string) =>
-          ![
-            'offset',
-            'limit',
-            'percentLinksInOperationFrom',
-            'datasetId',
-            'datasetName',
-            'dateFrom',
-            'dateTo'
-          ].includes(key)
-      )
-      .forEach((key: string) => {
-        const rawValues = Array.isArray(this.queryParams[key])
-          ? this.queryParams[key]
-          : [this.queryParams[key]];
-
-        dataRequest.filters[key as FilterParameterName] = rawValues.map(
-          (paramVal: string) => fromInputSafeName(String(paramVal))
-        );
-      });
+    const filters: Record<string, any> = {
+      percentLinksInOperationFrom: Number(
+        this.form.value.percentLinksInOperationFrom ?? 0
+      ),
+      offset: Number(this.form.value.offset ?? 0),
+      limit: Number(this.form.value.limit ?? 25),
+      dateFrom: this.form.value.dateFrom ?? '',
+      dateTo: this.form.value.dateTo ?? '',
+      datasetName: this.form.value.datasetName
+        ? [this.form.value.datasetName]
+        : []
+    };
 
     if (this.form.value.datasetId) {
-      dataRequest.filters['datasetId'] = fromCSL(this.form.value.datasetId);
+      filters['datasetId'] = fromCSL(this.form.value.datasetId);
     }
-    dataRequest.filters['datasetName'] = this.form.value.datasetName
-      ? [this.form.value.datasetName]
-      : [];
-    dataRequest.filters['dateFrom'] = this.form.value.dateFrom ?? '';
-    dataRequest.filters['dateTo'] = this.form.value.dateTo ?? '';
-    return dataRequest;
+
+    const explicitKeys = new Set([
+      'offset',
+      'limit',
+      'percentLinksInOperationFrom',
+      'datasetId',
+      'datasetName',
+      'dateFrom',
+      'dateTo'
+    ]);
+
+    Object.keys(this.queryParams).forEach((key) => {
+      if (explicitKeys.has(key)) return; // Fast O(1) hash exclusion skip
+
+      const rawValues = this.queryParams[key];
+      const valueArray = Array.isArray(rawValues) ? rawValues : [rawValues];
+
+      filters[key] = valueArray.map((val) => fromInputSafeName(String(val)));
+    });
+
+    return { filters } as CheckDataRequest;
   }
 
-  getSetCheckboxValues(filterName: string): Array<string> {
-    const groupControl = this.form.get(filterName);
-    const vals = groupControl ? groupControl.value : null;
-    return vals ? Object.keys(vals).filter((key: string) => !!vals[key]) : [];
+  isCheckboxChecked(filterName: string, option: string): boolean {
+    const queryParamValue = this.queryParams[filterName];
+    if (!queryParamValue) return false;
+
+    const safeName = this.toInputSafeName(option);
+    return Array.isArray(queryParamValue)
+      ? queryParamValue.includes(safeName)
+      : String(queryParamValue) === safeName;
   }
 
   addOrUpdateFilterControls(name: string, options: Array<string>): void {
     const checkboxes = this.form.get(name) as FormGroup;
-    if (!checkboxes) return;
+    if (!checkboxes) {
+      return;
+    }
 
     options.forEach((option: string) => {
       const fName = toInputSafeName(option);
       const ctrl = checkboxes.get(fName);
-
-      const queryParamValue = this.queryParams[name];
-      const defaultValue = queryParamValue
-        ? String(queryParamValue).includes(fName)
-        : false;
+      const defaultValue = String(this.queryParams[name] || '').includes(fName);
 
       if (ctrl) {
         ctrl.setValue(defaultValue, { emitEvent: false });
@@ -430,16 +447,14 @@ export class FiltersComponent implements OnInit {
           );
         }
 
-        let averageScore = 0;
-        if (list.length) {
-          averageScore = Math.floor(
-            list.reduce(
-              (sum, obj) => sum + (obj.percentLinksInOperation ?? 0),
-              0
-            ) / list.length
-          );
-        }
-        const listAverageScore = Math.floor(averageScore / 20);
+        const totalScore = list.reduce(
+          (sum, obj) => sum + (obj.percentLinksInOperation ?? 0),
+          0
+        );
+        const listAverageScore = list.length
+          ? Math.floor(totalScore / (list.length * 20))
+          : 0;
+
         const datasetChecks = this.api.groupChecksByDatasetId(list);
         const titleMarkup = this.generateTitleMarkup();
 
@@ -454,13 +469,14 @@ export class FiltersComponent implements OnInit {
       });
   }
 
-  updatePageUrl(clearPagination = false): void {
+  updatePageUrl(clearPagination = false, queryParamsOverride?: Params): void {
     if (clearPagination) {
-      this.form.patchValue({ offset: 0 });
+      this.form.patchValue({ offset: 0 }, { emitEvent: false });
     }
 
+    // Merge parameters dynamically using the clean local override configuration if present
     const qp: Params = {
-      ...this.getFilterParams(),
+      ...this.getFilterParams(queryParamsOverride),
       ...this.getFormQueryParams()
     };
 
@@ -471,15 +487,18 @@ export class FiltersComponent implements OnInit {
     });
   }
 
-  private getFilterParams(): Params {
+  private getFilterParams(sourceParams?: Params): Params {
     const qp: Params = {};
     const currentClioInfo = this.modelClioInfo();
+    const activeParams = sourceParams || this.queryParams;
 
     if (currentClioInfo?.filterOps) {
       Object.keys(currentClioInfo.filterOps).forEach((filterName: string) => {
-        const filterVals = this.getSetCheckboxValues(filterName);
-        if (filterVals.length > 0) {
-          qp[filterName] = filterVals;
+        const existingValues = activeParams[filterName];
+        if (existingValues) {
+          qp[filterName] = Array.isArray(existingValues)
+            ? existingValues
+            : [existingValues];
         }
       });
     }
@@ -496,7 +515,7 @@ export class FiltersComponent implements OnInit {
     if (values.datasetName) qp['datasetName'] = values.datasetName;
     if (values.limit) qp['limit'] = values.limit;
 
-    if (values.offset !== undefined && values.offset !== null) {
+    if (values.offset !== null && values.offset !== undefined) {
       qp['offset'] = values.offset;
     }
 
@@ -528,14 +547,31 @@ export class FiltersComponent implements OnInit {
   }
 
   onFilterCheckboxToggle(filterName: string, option: string): void {
-    const group = this.form.get(filterName) as FormGroup;
-    const safeName = toInputSafeName(option);
+    const safeName = this.toInputSafeName(option);
 
-    if (group && !group.contains(safeName)) {
-      group.addControl(safeName, this.fb.control(true));
+    // local shallow clone respects immutable structures
+    const updatedQueryParams = { ...this.queryParams };
+    const currentValuesRaw = updatedQueryParams[filterName] || [];
+    let currentValues = Array.isArray(currentValuesRaw)
+      ? [...currentValuesRaw]
+      : [currentValuesRaw];
+
+    if (currentValues.includes(safeName)) {
+      currentValues = currentValues.filter((val) => val !== safeName);
+    } else {
+      currentValues.push(safeName);
     }
 
-    this.form.patchValue({ offset: 0 });
-    this.updatePageUrl();
+    if (currentValues.length > 0) {
+      updatedQueryParams[filterName] = currentValues;
+    } else {
+      delete updatedQueryParams[filterName];
+    }
+
+    // Explicitly update the tracking state on the form control tree
+    this.form.patchValue({ offset: 0 }, { emitEvent: false });
+
+    // Pass the fresh object mutation configuration directly down to the router step
+    this.updatePageUrl(false, updatedQueryParams);
   }
 }

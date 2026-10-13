@@ -1,21 +1,40 @@
-<label *ngIf="form" [formGroup]="form" class="checkbox-labelled {{ group }}">
-  <span
-    class="checkmarked-checkbox"
-    [ngClass]="{
-      checked: form.value[group][controlName]
-    }"
-    [formGroupName]="group"
-  >
-    <input
-      #baseInput
-      class="checkbox"
-      type="checkbox"
-      (change)="onChange()"
-      (keyup.Space)="onSpaceKey()"
-      [formControlName]="controlName"
-    />
-  </span>
-  @if (labelText) {
-    <span class="checkbox-label" [innerHTML]="labelText"> </span>
-  }
-</label>
+<!-- If form is provided, use standard reactive bindings. Otherwise, fallback to stateless inputs -->
+@if (form && group && controlName) {
+  <label [formGroup]="form" class="checkbox-labelled {{ group }}">
+    <span
+      class="checkmarked-checkbox"
+      [ngClass]="{
+        checked: form.value[group]?.[controlName]
+      }"
+      [formGroupName]="group"
+    >
+      <input
+        #baseInput
+        class="checkbox"
+        type="checkbox"
+        (change)="onChange()"
+        (keyup.Space)="onSpaceKey()"
+        [formControlName]="controlName"
+      />
+    </span>
+    @if (labelText) {
+      <span class="checkbox-label" [innerHTML]="labelText"></span>
+    }
+  </label>
+} @else {
+  <label class="checkbox-labelled {{ group }}">
+    <span class="checkmarked-checkbox" [ngClass]="{ checked: checked }">
+      <input
+        #baseInput
+        class="checkbox"
+        type="checkbox"
+        [checked]="checked"
+        (change)="onChange()"
+        (keyup.Space)="onSpaceKey()"
+      />
+    </span>
+    @if (labelText) {
+      <span class="checkbox-label" [innerHTML]="labelText"></span>
+    }
+  </label>
+}

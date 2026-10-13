@@ -56,15 +56,12 @@ describe('SliderComponent', () => {
   });
 
   it('should pass value down from parent form to internal control via writeValue', () => {
-    // 1. Initial state check (should be null/unset)
     expect(hostComponent.testForm.get('sliderVal')?.value).toBeNull();
     expect(sliderComponent.internalControl.value).toBeNull();
 
-    // 2. Simulate setting a value via the parent form
     hostComponent.testForm.get('sliderVal')?.setValue(60);
     fixture.detectChanges();
 
-    // 3. Child internal control must reflect the parent value update
     expect(sliderComponent.internalControl.value).toBe(60);
   });
 

@@ -1,6 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, model } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormGroup } from '@angular/forms';
 import { ListingComponent } from '.';
 import { ClioCheck, ClioInfo } from '../_models';
 
@@ -92,14 +91,12 @@ describe('ListingComponent', () => {
     expect(component.getClioClass(19)).toEqual('clio-state-0');
   });
 
-  it('should set the run checkboxes', () => {
-    const cmp = component.form.controls.check_ids as FormGroup;
-
-    expect(cmp.value['1']).toBeTruthy();
-    component.setClioCheckFormValues(false);
-    expect(cmp.value['1']).toBeFalsy();
-    component.setClioCheckFormValues(true);
-    expect(cmp.value['1']).toBeTruthy();
+  it('should toggle individual check row selections cleanly via independent state sets', () => {
+    expect(component.selectedCheckIds().has(1)).toBeTruthy();
+    component.toggleCheckSelection(1);
+    expect(component.selectedCheckIds().has(1)).toBeFalsy();
+    component.toggleCheckSelection(1);
+    expect(component.selectedCheckIds().has(1)).toBeTruthy();
   });
 
   it('should handle clicks outside', () => {
@@ -142,10 +139,18 @@ describe('ListingComponent', () => {
     expect(component.graphMode).toBeFalsy();
   });
 
-  it('should check all', () => {
-    jest.spyOn(component, 'updateIds');
-    component.checkAll('1', []);
-    expect(component.updateIds).toHaveBeenCalled();
+  it('should check all and toggle selection states', () => {
+    const datasetAList = component
+      .clioInfo()
+      .list.filter((r) => r.datasetId === '1');
+
+    // Initial state: '1' is in the dataset group check set
+    expect(component.selectedDatasetIds().has('1')).toBeTruthy();
+
+    // Action: Deselect group '1'
+    component.checkAll('1', datasetAList);
+    expect(component.selectedDatasetIds().has('1')).toBeFalsy();
+    expect(component.selectedCheckIds().has(1)).toBeFalsy();
   });
 
   it('should get the selected run count', () => {
@@ -153,23 +158,22 @@ describe('ListingComponent', () => {
 
     expect(component.getSelectedRunCount(list)).toEqual(2);
 
-    component.form.patchValue({ check_ids: { '1': false } });
+    // Toggle off individual check IDs instead of mutating form values
+    component.toggleCheckSelection(1);
     expect(component.getSelectedRunCount(list)).toEqual(1);
 
-    component.form.patchValue({ check_ids: { '2': false } });
+    component.toggleCheckSelection(2);
     expect(component.getSelectedRunCount(list)).toEqual(0);
   });
 
   it('should update the list selection count', () => {
     expect(component.listSelectionCount).toEqual(2);
-    component.form.setValue({ check_ids: { '1': false, '2': true } });
-    expect(component.listSelectionCount).toEqual(2);
-    component.updateIds();
+
+    // Toggle off individual check nodes directly via state management signals
+    component.toggleCheckSelection(1);
     expect(component.listSelectionCount).toEqual(1);
 
-    component.form.setValue({ check_ids: { '1': false, '2': false } });
-    expect(component.listSelectionCount).toEqual(1);
-    component.updateIds();
+    component.toggleCheckSelection(2);
     expect(component.listSelectionCount).toEqual(0);
   });
 });

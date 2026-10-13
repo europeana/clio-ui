@@ -248,14 +248,18 @@ describe('FiltersComponent', () => {
       expect(ctrlProvider.controls['A']).toBeTruthy();
     });
 
-    it('should get the set checkbox values using correct form group control keys', () => {
-      fixture.detectChanges();
-      component.addOrUpdateFilterControls('provider', ['A', 'B']);
-      const ctrlProvider = component.form.controls.provider as FormGroup;
-
-      expect(component.getSetCheckboxValues('provider').length).toBe(0);
-      ctrlProvider.controls['A'].setValue(true);
-      expect(component.getSetCheckboxValues('provider')).toEqual(['A']);
+    it('should determine if a checkbox is checked based on routing query parameters', () => {
+      component.queryParams = { provider: 'AthenaPlus' };
+      expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(true);
+      expect(component.isCheckboxChecked('provider', 'CultureGrid')).toBe(
+        false
+      );
+      component.queryParams = { provider: ['AthenaPlus', 'CultureGrid'] };
+      expect(component.isCheckboxChecked('provider', 'CultureGrid')).toBe(true);
+      expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(true);
+      expect(component.isCheckboxChecked('provider', 'Bulgariana')).toBe(false);
+      component.queryParams = {};
+      expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(false);
     });
 
     it('should generate the title markup and trigger interactive filter removals via switch mapping loops', () => {
@@ -322,15 +326,20 @@ describe('FiltersComponent', () => {
 
     it('should append or append control configurations onFilterCheckboxToggle loops execution paths', () => {
       fixture.detectChanges();
-      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
+      const spyUpdate = jest
+        .spyOn(component, 'updatePageUrl')
+        .mockImplementation(() => {});
 
-      const providerGroup = component.form.get('provider') as FormGroup;
-      expect(providerGroup.contains('Z')).toBe(false);
+      component.queryParams = {}; // Initialize clean mock
 
       component.onFilterCheckboxToggle('provider', 'Z');
-      expect(providerGroup.contains('Z')).toBe(true);
+
+      expect(spyUpdate).toHaveBeenCalledWith(
+        false,
+        expect.objectContaining({ provider: ['Z'] })
+      );
+
       expect(component.form.value.offset).toBe(0);
-      expect(component.updatePageUrl).toHaveBeenCalled();
     });
   });
 

@@ -12,12 +12,12 @@
       <span>{{
         time | date: (graphMode ? DATE_CONCISE_FMT : DATE_DEFAULT_FMT)
       }}</span>
+
       <app-checkbox
-        [form]="form"
-        [controlName]="id + ''"
+        [checked]="selectedCheckIds().has(+id)"
         [title]="'include in export'"
         [group]="'check_ids'"
-        (valueChanged)="updateIds()"
+        (valueChanged)="toggleCheckSelection(+id)"
       ></app-checkbox>
     </span>
 
@@ -25,12 +25,10 @@
       <span class="time-all">
         <span>all ({{ datasetCount }})</span>
         <app-checkbox
-          [form]="formDatasets"
-          [controlName]="datasetId + ''"
+          [checked]="selectedDatasetIds().has(datasetId + '')"
           [attr.title]="
-            (formDatasets.value['dataset_ids'][datasetId]
-              ? 'uncheck'
-              : 'check') + ' all'
+            (selectedDatasetIds().has(datasetId + '') ? 'uncheck' : 'check') +
+            ' all'
           "
           [group]="'dataset_ids'"
           (valueChanged)="checkAll(datasetId, datasetList)"

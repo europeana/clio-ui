@@ -52,15 +52,13 @@ export class AppComponent {
   }
 
   downloadDataset(id: string): void {
-    const runIdsForDatasetId = this.listing()
-      .clioInfo()
-      .datasetChecks[id].list.map((run: ClioCheck) => {
-        return `${run.id}`;
-      });
-
-    const exclusionMap = this.listing().form.value['check_ids'];
-    const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
-      return !exclusionMap[key] && new Set(runIdsForDatasetId).has(key);
+    const datasetRuns = this.listing().clioInfo().datasetChecks[id]?.list || [];
+    const activeChecks = this.listing().selectedCheckIds();
+    const exclusionList: string[] = [];
+    datasetRuns.forEach((run: ClioCheck) => {
+      if (!activeChecks.has(run.id)) {
+        exclusionList.push(`${run.id}`);
+      }
     });
 
     const downloadRequest = this.filters().getDataServerDataRequest();
@@ -73,9 +71,14 @@ export class AppComponent {
   }
 
   downloadAll(): void {
-    const exclusionMap = this.listing().form.value['check_ids'];
-    const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
-      return !exclusionMap[key];
+    const allVisibleRuns = this.listing().clioInfo()?.list || [];
+    const activeChecks = this.listing().selectedCheckIds();
+
+    const exclusionList: string[] = [];
+    allVisibleRuns.forEach((run: ClioCheck) => {
+      if (!activeChecks.has(run.id)) {
+        exclusionList.push(`${run.id}`);
+      }
     });
 
     this.api.getDownload({

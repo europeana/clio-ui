@@ -6,7 +6,7 @@ import {
   OnInit,
   Output
 } from '@angular/core';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import {
   ControlValueAccessor,
   FormControl,
@@ -25,7 +25,7 @@ import { Subject, takeUntil } from 'rxjs';
       multi: true
     }
   ],
-  imports: [NgClass, NgIf, ReactiveFormsModule]
+  imports: [NgClass, ReactiveFormsModule]
 })
 export class SliderComponent
   implements ControlValueAccessor, OnInit, OnDestroy

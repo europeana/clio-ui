@@ -8,7 +8,7 @@ describe('CheckboxComponent', () => {
   let fixture: ComponentFixture<CheckboxComponent>;
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, CheckboxComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
@@ -39,13 +39,20 @@ describe('CheckboxComponent', () => {
 
   it('should handle the field change', () => {
     const spyEmit = jest.spyOn(component.valueChanged, 'emit');
+    component.checked = false; // Initialize state test boundary explicitly
     component.onChange();
-    expect(spyEmit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalledWith(true); // Verifies it correctly pushes the toggled value up
   });
 
   it('should handle the space key', () => {
     const spyEmit = jest.spyOn(component.keySelectionMade, 'emit');
+    component.group = 'provider';
+    component.controlName = 'AthenaPlus';
+
     component.onSpaceKey();
-    expect(spyEmit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalledWith({
+      group: 'provider',
+      controlName: 'AthenaPlus'
+    });
   });
 });

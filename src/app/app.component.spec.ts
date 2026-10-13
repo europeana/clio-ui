@@ -1,4 +1,9 @@
-import { CUSTOM_ELEMENTS_SCHEMA, signal, WritableSignal } from '@angular/core';
+import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  signal,
+  Signal,
+  WritableSignal
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -41,6 +46,8 @@ describe('AppComponent', () => {
   let mockListing: {
     form: FormGroup;
     clioInfo: WritableSignal<Record<string, unknown>>;
+    selectedCheckIds: Signal<Set<number>>;
+    selectedDatasetIds: Signal<Set<string>>;
   };
 
   const formVals = {
@@ -89,7 +96,9 @@ describe('AppComponent', () => {
       // Centralized Listing Mock Setup using a real writable signal for clioInfo
       mockListing = {
         form: formVals,
-        clioInfo: signal({ datasetChecks: {} })
+        clioInfo: signal({ datasetChecks: {} }),
+        selectedCheckIds: signal(new Set<number>()),
+        selectedDatasetIds: signal(new Set<string>())
       };
 
       // Inject the filters viewChild signal cleanly
@@ -189,7 +198,6 @@ describe('AppComponent', () => {
     }));
 
     it('should compute the correct visual page string text via the reactive query params stream', fakeAsync(() => {
-      // 1. Set the mock dataset values through the real signal payload channel
       mockListing.clioInfo.set({
         datasetChecks: {
           'dataset-1': { list: [] },
@@ -197,18 +205,14 @@ describe('AppComponent', () => {
         }
       });
 
-      // 2. Force change detection so the parent computed blocks re-evaluate
       fixture.detectChanges();
 
-      // Since we have 2 datasets (less than the limit of 25), maxBound becomes 0 + 2 = 2
       expect(app.paginationText()).toBe('0 - 2');
 
-      // 3. Update query parameters stream (offset: 50, limit: 10)
       mockQueryParams$.next({ offset: 50, limit: 10 });
       tick(0);
       fixture.detectChanges();
 
-      // Since we have 2 datasets (less than the limit of 10), maxBound becomes 50 + 2 = 52
       expect(app.paginationText()).toBe('50 - 52');
     }));
   });
