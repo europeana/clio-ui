@@ -3,7 +3,7 @@ describe('Filters Dynamic Operations Flow', () => {
 
   beforeEach(() => {
     // intercept standard search API requests to observe serialized payload states
-    cy.intercept('POST', '**/runs/summary*').as('searchRequest');
+    cy.intercept('POST', '**/datasets*').as('searchRequest');
   });
 
   describe('Prefilling State Initialization', () => {

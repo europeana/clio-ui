@@ -29,12 +29,7 @@ import {
   toInputSafeName
 } from '../_helpers/date-helpers';
 import { filterList } from '../_helpers/string-helpers';
-import {
-  CheckDataRequest,
-  CheckDataResults,
-  ClioInfo,
-  FilterParameterName
-} from '../_models';
+import { CheckDataRequest, CheckDataResults, ClioInfo } from '../_models';
 import { CheckboxComponent } from '../checkbox';
 import { SliderComponent } from '../slider';
 
@@ -182,7 +177,6 @@ export class FiltersComponent implements OnInit {
       });
   }
 
-  // 💡 Safe ISO Parsing: Avoids UTC shifts modifying date selection by exactly one calendar day
   getDateAsISOString(localDate: Date): string {
     if (Number.isNaN(localDate.getTime())) return '';
     const date = new Date(localDate.toISOString());
@@ -202,14 +196,13 @@ export class FiltersComponent implements OnInit {
       return [{ label: 'All checks' }];
     }
 
-    // Define strategy handlers for uniform filter inputs
     const standardFilters: Record<
       string,
       {
         prefix: string;
-        labelFactory: (v: string) => string;
+        labelFactory: (v: string | number | string[]) => string;
         control: string;
-        defaultVal: any;
+        defaultVal: string | number | null;
       }
     > = {
       datasetId: {
@@ -330,7 +323,7 @@ export class FiltersComponent implements OnInit {
    * @returns {CheckDataRequest}
    */
   getDataServerDataRequest(): CheckDataRequest {
-    const filters: Record<string, any> = {
+    const filters: Record<string, string | number | string[]> = {
       percentLinksInOperationFrom: Number(
         this.form.value.percentLinksInOperationFrom ?? 0
       ),
@@ -568,10 +561,10 @@ export class FiltersComponent implements OnInit {
       delete updatedQueryParams[filterName];
     }
 
-    // Explicitly update the tracking state on the form control tree
+    // explicitly update the tracking state on the form control tree
     this.form.patchValue({ offset: 0 }, { emitEvent: false });
 
-    // Pass the fresh object mutation configuration directly down to the router step
+    // pass the fresh object mutation configuration directly down to the router step
     this.updatePageUrl(false, updatedQueryParams);
   }
 }

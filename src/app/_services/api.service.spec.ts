@@ -64,7 +64,7 @@ describe('API Service', () => {
       expect(data).toBeTruthy();
     });
 
-    const url = `${apiSettings.serverAPI}/runs/summary`;
+    const url = `${apiSettings.serverAPI}/datasets`;
     const req = httpTesting.expectOne(url);
     req.flush({ filterOptions: {} });
     httpTesting.verify();

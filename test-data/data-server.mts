@@ -229,22 +229,23 @@ export function dataServerRequest(
             res = false;
           }
         }
-      } else if (fName === 'dateFrom') {
-        if (firstVal && String(firstVal).trim() !== '') {
-          const dateParam = Date.parse(String(firstVal));
-          const checkDate = Date.parse(check['date']);
-          if (!isNaN(dateParam) && checkDate < dateParam) {
-            res = false;
+        } else if (fName === 'dateFrom') {
+          if (firstVal && String(firstVal).trim() !== '') {
+            const dateParam = Date.parse(String(firstVal));
+            const checkDate = Date.parse(check['date']!);
+            if (!isNaN(dateParam) && checkDate < dateParam) {
+              res = false;
+            }
           }
         }
-      } else if (fName === 'dateTo') {
-        if (firstVal && String(firstVal).trim() !== '') {
-          const dateParam = Date.parse(String(firstVal));
-          const checkDate = Date.parse(check['date']);
-          if (!isNaN(dateParam) && checkDate > dateParam) {
-            res = false;
+        else if (fName === 'dateTo') {
+          if (firstVal && String(firstVal).trim() !== '') {
+            const dateParam = Date.parse(String(firstVal));
+            const checkDate = Date.parse(check['date']!);
+            if (!isNaN(dateParam) && checkDate > dateParam) {
+              res = false;
+            }
           }
-        }
       } else if (fName === 'percentLinksInOperationFrom') {
         const scoreParam = Number.parseInt(String(firstVal || 0), 10);
         if (check.percentLinksInOperation < scoreParam) {

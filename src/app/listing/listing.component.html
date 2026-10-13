@@ -194,11 +194,14 @@
             tabindex="0"
             class="opener"
             [ngClass]="{ opened: group.opened }"
-            (click)="group.opened = !group.opened"
-            (keyUp.enter)="group.opened = !group.opened"
+            (click)="toggleGroupOpenStatus(dsId, group)"
+            (keyUp.enter)="toggleGroupOpenStatus(dsId, group)"
           >
             <span class="opener-content">
               {{ dsId }}
+              @if (group.list[0]?.datasetSize) {
+                ({{ group.list[0].datasetSize }})
+              }
             </span>
           </a>
 
@@ -280,8 +283,8 @@
                       class="csv-download"
                       target="_blank"
                       title="export check data"
-                      (click)="requestDownloadCheck.emit(entry.id)"
-                      (keyUp.enter)="requestDownloadCheck.emit(entry.id)"
+                      (click)="requestDownloadCheck.emit(entry.id!)"
+                      (keyUp.enter)="requestDownloadCheck.emit(entry.id!)"
                     ></a>
                   </span>
 
@@ -289,7 +292,7 @@
                     [ngTemplateOutlet]="dateCheckbox"
                     [ngTemplateOutletContext]="{
                       time: entry.date,
-                      id: entry.id + ''
+                      id: entry.id! + ''
                     }"
                   >
                   </ng-container>

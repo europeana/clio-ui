@@ -24,6 +24,7 @@ class TestHostComponent {
       sliderVal: [null]
     });
   }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onSliderChange(_: number | null): void {}
 }
 

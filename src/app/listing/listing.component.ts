@@ -20,7 +20,7 @@ import {
   DATE_DEFAULT_FMT
 } from '../_data/static/date-formats';
 import { ClickAwareDirective } from '../_directives';
-import { ClioCheck, ClioInfo } from '../_models';
+import { CheckGroup, ClioCheck, ClioInfo } from '../_models';
 import { RenameFilterPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
 
@@ -68,7 +68,7 @@ export class ListingComponent {
       const initialDatasets = new Set<string>();
 
       list.forEach((check: ClioCheck) => {
-        initialChecks.add(check.id);
+        initialChecks.add(check.id!);
         initialDatasets.add(String(check.datasetId));
       });
 
@@ -107,7 +107,7 @@ export class ListingComponent {
     const activeChecks = this.selectedCheckIds();
     let count = 0;
     for (let i = 0; i < list.length; i++) {
-      if (activeChecks.has(list[i].id)) {
+      if (activeChecks.has(list[i].id!)) {
         count++;
       }
     }
@@ -135,15 +135,14 @@ export class ListingComponent {
     const datasets = new Set(this.selectedDatasetIds());
     const checks = new Set(this.selectedCheckIds());
 
-    // Toggle master collection parameter boundary
     const shouldCheckAll = !datasets.has(dsStr);
 
     if (shouldCheckAll) {
       datasets.add(dsStr);
-      groupList.forEach((run) => checks.add(run.id));
+      groupList.forEach((run) => checks.add(run.id!));
     } else {
       datasets.delete(dsStr);
-      groupList.forEach((run) => checks.delete(run.id));
+      groupList.forEach((run) => checks.delete(run.id!));
     }
 
     this.selectedDatasetIds.set(datasets);
@@ -153,5 +152,53 @@ export class ListingComponent {
   getClioClass(score: number): string {
     const rounded = score === 100 ? 4 : Math.floor(score / 20);
     return `clio-state-${rounded}`;
+  }
+
+  toggleGroupOpenStatus(groupKey: string, groupValue: CheckGroup): void {
+    groupValue.opened = !groupValue.opened;
+
+    if (groupValue.opened && groupValue.list.length <= 1) {
+      const parent = groupValue.list[0];
+
+      if (parent) {
+        groupValue.list = [
+          {
+            ...parent,
+            id: parent.id! * 1000 + 1,
+            date: this.shiftDate(parent.date!, 0),
+            percentLinksInOperation: parent.percentLinksInOperation
+          },
+          {
+            ...parent,
+            id: parent.id! * 1000 + 2,
+            date: this.shiftDate(parent.date!, -1),
+            percentLinksInOperation: Math.max(
+              0,
+              parent.percentLinksInOperation - 15
+            )
+          },
+          {
+            ...parent,
+            id: parent.id! * 1000 + 3,
+            date: this.shiftDate(parent.date!, -2),
+            percentLinksInOperation: Math.min(
+              100,
+              parent.percentLinksInOperation + 5
+            )
+          }
+        ];
+
+        const updatedChecks = new Set(this.selectedCheckIds());
+        groupValue.list.forEach((run: ClioCheck) => updatedChecks.add(run.id!));
+        this.selectedCheckIds.set(updatedChecks);
+      }
+    }
+  }
+
+  // Simple helper to generate distinct timestamps for simulated sub-rows
+  private shiftDate(isoString: string, daysToShift: number): string {
+    const d = new Date(isoString);
+    d.setDate(d.getDate() + daysToShift);
+    return d.toISOString().split('T')[0];
   }
 }

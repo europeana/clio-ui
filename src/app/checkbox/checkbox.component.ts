@@ -32,7 +32,7 @@ interface InputDescription {
   imports: [NgIf, FormsModule, ReactiveFormsModule, NgClass]
 })
 export class CheckboxComponent implements ControlValueAccessor {
-  @Input() checked: boolean = false;
+  @Input() checked = false;
   @Input() form?: UntypedFormGroup;
   @Input() labelText: string;
   @Input() group: string;

@@ -176,4 +176,41 @@ describe('ListingComponent', () => {
     component.toggleCheckSelection(2);
     expect(component.listSelectionCount).toEqual(0);
   });
+
+  it('should toggle group open status and generate simulated runs if expanded for the first time', () => {
+    const mockGroup = {
+      list: [
+        {
+          id: 1,
+          date: '2026-10-13T20:00:00.000Z',
+          datasetId: '1',
+          datasetName: 'Dataset One',
+          dataProvider: 'Provider A',
+          provider: 'Infrastructure A',
+          percentLinksInOperation: 80
+        }
+      ],
+      opened: false,
+      percentLinksInOperation: 80
+    };
+
+    component.toggleGroupOpenStatus('1', mockGroup);
+
+    expect(mockGroup.opened).toBe(true);
+
+    expect(mockGroup.list.length).toBe(3);
+
+    expect(mockGroup.list[0].id).toBe(1001);
+    expect(mockGroup.list[1].id).toBe(1002);
+    expect(mockGroup.list[2].id).toBe(1003);
+
+    expect(component.selectedCheckIds().has(1001)).toBe(true);
+    expect(component.selectedCheckIds().has(1002)).toBe(true);
+    expect(component.selectedCheckIds().has(1003)).toBe(true);
+
+    component.toggleGroupOpenStatus('1', mockGroup);
+
+    expect(mockGroup.opened).toBe(false);
+    expect(mockGroup.list.length).toBe(3); // Stays at 3 items, preventing duplicates
+  });
 });

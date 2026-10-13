@@ -54,9 +54,10 @@ export class AppComponent {
   downloadDataset(id: string): void {
     const datasetRuns = this.listing().clioInfo().datasetChecks[id]?.list || [];
     const activeChecks = this.listing().selectedCheckIds();
+
     const exclusionList: string[] = [];
     datasetRuns.forEach((run: ClioCheck) => {
-      if (!activeChecks.has(run.id)) {
+      if (!activeChecks.has(run.id!)) {
         exclusionList.push(`${run.id}`);
       }
     });
@@ -76,7 +77,7 @@ export class AppComponent {
 
     const exclusionList: string[] = [];
     allVisibleRuns.forEach((run: ClioCheck) => {
-      if (!activeChecks.has(run.id)) {
+      if (!activeChecks.has(run.id!)) {
         exclusionList.push(`${run.id}`);
       }
     });
