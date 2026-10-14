@@ -52,6 +52,8 @@ export class AppComponent {
   }
 
   downloadDataset(id: string): void {
+    console.log('downloadDataset');
+
     const datasetRuns = this.listing().clioInfo().datasetChecks[id]?.list || [];
     const activeChecks = this.listing().selectedCheckIds();
 
@@ -65,13 +67,21 @@ export class AppComponent {
     const downloadRequest = this.filters().getDataServerDataRequest();
     downloadRequest.filters['datasetId'] = [id];
 
-    this.api.getDownload({
+    const payload = {
       ...downloadRequest,
-      excluded_check_ids: exclusionList
-    });
+      excluded_check_ids: exclusionList,
+      pagination: {
+        offset: 0,
+        limit: 100000
+      }
+    };
+
+    this.api.getDownload(payload as unknown as DownloadRequest);
   }
 
   downloadAll(): void {
+    console.log('downloadAll');
+
     const allVisibleRuns = this.listing().clioInfo()?.list || [];
     const activeChecks = this.listing().selectedCheckIds();
 
@@ -82,10 +92,18 @@ export class AppComponent {
       }
     });
 
-    this.api.getDownload({
-      ...this.filters().getDataServerDataRequest(),
-      excluded_check_ids: exclusionList
-    });
+    const downloadRequest = this.filters().getDataServerDataRequest();
+
+    const payload = {
+      ...downloadRequest,
+      excluded_check_ids: exclusionList,
+      pagination: {
+        offset: 0,
+        limit: 100000
+      }
+    };
+
+    this.api.getDownload(payload as unknown as DownloadRequest);
   }
 
   // Reactive URL routing query stream wrapper matching core contract types

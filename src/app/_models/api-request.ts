@@ -27,11 +27,20 @@ export interface CheckDataResults {
   results: Array<ClioCheck>;
 }
 
-export interface Dataset {
-  id: number;
+export interface DatasetSummary {
+  datasetId: string;
   datasetName: string;
-  dataProvider: string;
   provider: string;
+  dataProvider: string;
+  percentLinksInOperation: number;
+  datasetSize: number;
+  datasetLastIndex: string;
+}
+
+export interface DatasetRun {
+  runId: number;
+  startingTime: string;
+  percentLinksInOperation: number;
 }
 
 export interface ClioCheck {

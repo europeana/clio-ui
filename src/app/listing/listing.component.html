@@ -206,15 +206,15 @@
           </a>
 
           <span class="align-left">
-            {{ group.list[0].datasetName }}
+            {{ group.list[0]?.datasetName }}
           </span>
 
           <span>
-            {{ group.list[0].dataProvider }}
+            {{ group.list[0]?.dataProvider }}
           </span>
 
           <span>
-            {{ group.list[0].provider }}
+            {{ group.list[0]?.provider }}
           </span>
 
           @let selectedRunCount = getSelectedRunCount(group.list);
@@ -245,8 +245,8 @@
           <ng-container
             [ngTemplateOutlet]="dateCheckbox"
             [ngTemplateOutletContext]="{
-              time: group.list[0].date,
-              id: group.list[0].id + '',
+              time: group.list[0]?.date,
+              id: group.list[0]?.id + '',
               isTopTime: true,
               datasetId: dsId,
               datasetList: group.list,

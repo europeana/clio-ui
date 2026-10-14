@@ -9,6 +9,7 @@ import {
 import {
   Component,
   effect,
+  inject,
   Input,
   ModelSignal,
   output,
@@ -21,6 +22,7 @@ import {
 } from '../_data/static/date-formats';
 import { ClickAwareDirective } from '../_directives';
 import { CheckGroup, ClioCheck, ClioInfo } from '../_models';
+import { APIService } from '../_services';
 import { RenameFilterPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
 
@@ -43,6 +45,7 @@ import { CheckboxComponent } from '../checkbox';
 export class ListingComponent {
   public readonly DATE_CONCISE_FMT = DATE_CONCISE_FMT;
   public readonly DATE_DEFAULT_FMT = DATE_DEFAULT_FMT;
+  private readonly apiService = inject(APIService);
 
   graphMode = false;
   requestDownloadCheck = output<number>();
@@ -157,41 +160,40 @@ export class ListingComponent {
   toggleGroupOpenStatus(groupKey: string, groupValue: CheckGroup): void {
     groupValue.opened = !groupValue.opened;
 
-    if (groupValue.opened && groupValue.list.length <= 1) {
-      const parent = groupValue.list[0];
+    const hasOnlyPlaceholder =
+      groupValue.list.length === 1 &&
+      String(groupValue.list[0].id) === String(groupKey);
 
-      if (parent) {
-        groupValue.list = [
-          {
-            ...parent,
-            id: parent.id! * 1000 + 1,
-            date: this.shiftDate(parent.date!, 0),
-            percentLinksInOperation: parent.percentLinksInOperation
+    if (groupValue.opened && hasOnlyPlaceholder) {
+      const parentRow = groupValue.list[0];
+
+      this.apiService
+        .getDatasetRuns(
+          groupKey,
+          parentRow.datasetName,
+          parentRow.provider,
+          parentRow.dataProvider
+        )
+        .subscribe({
+          next: (realRuns: Array<ClioCheck>) => {
+            if (realRuns && realRuns.length > 0) {
+              groupValue.list = realRuns;
+            }
+
+            // Sync selection set trackers
+            const updatedChecks = new Set(this.selectedCheckIds());
+            groupValue.list.forEach((run: ClioCheck) =>
+              updatedChecks.add(run.id!)
+            );
+            this.selectedCheckIds.set(updatedChecks);
           },
-          {
-            ...parent,
-            id: parent.id! * 1000 + 2,
-            date: this.shiftDate(parent.date!, -1),
-            percentLinksInOperation: Math.max(
-              0,
-              parent.percentLinksInOperation - 15
-            )
-          },
-          {
-            ...parent,
-            id: parent.id! * 1000 + 3,
-            date: this.shiftDate(parent.date!, -2),
-            percentLinksInOperation: Math.min(
-              100,
-              parent.percentLinksInOperation + 5
-            )
+          error: (err: unknown) => {
+            console.error(
+              'Failed to resolve sub-runs for dataset: ' + groupKey,
+              err
+            );
           }
-        ];
-
-        const updatedChecks = new Set(this.selectedCheckIds());
-        groupValue.list.forEach((run: ClioCheck) => updatedChecks.add(run.id!));
-        this.selectedCheckIds.set(updatedChecks);
-      }
+        });
     }
   }
 

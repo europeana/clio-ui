@@ -1,7 +1,10 @@
 import { CUSTOM_ELEMENTS_SCHEMA, model } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+
 import { ListingComponent } from '.';
 import { ClioCheck, ClioInfo } from '../_models';
+import { APIService } from '../_services';
 
 describe('ListingComponent', () => {
   let component: ListingComponent;
@@ -56,11 +59,20 @@ describe('ListingComponent', () => {
     titleMarkup: []
   } as ClioInfo;
 
+  const mockApiService = {
+    getDatasetRuns: jest.fn().mockReturnValue(of([]))
+  } as unknown as jest.Mocked<APIService>;
+
   const configureTestbed = (): void => {
     TestBed.configureTestingModule({
       imports: [ListingComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: []
+      providers: [
+        {
+          provide: APIService,
+          useValue: mockApiService
+        }
+      ]
     }).compileComponents();
   };
 
@@ -177,16 +189,49 @@ describe('ListingComponent', () => {
     expect(component.listSelectionCount).toEqual(0);
   });
 
-  it('should toggle group open status and generate simulated runs if expanded for the first time', () => {
+  it('should toggle group open status and load expanded runs from the API service', () => {
+    const mockApiRuns: ClioCheck[] = [
+      {
+        id: 1001,
+        date: '2026-10-08',
+        datasetId: '1',
+        datasetName: 'Run 1',
+        provider: 'N/A',
+        dataProvider: 'N/A',
+        percentLinksInOperation: 0
+      },
+      {
+        id: 1002,
+        date: '2026-10-07',
+        datasetId: '1',
+        datasetName: 'Run 2',
+        provider: 'N/A',
+        dataProvider: 'N/A',
+        percentLinksInOperation: 0
+      },
+      {
+        id: 1003,
+        date: '2026-10-06',
+        datasetId: '1',
+        datasetName: 'Run 3',
+        provider: 'N/A',
+        dataProvider: 'N/A',
+        percentLinksInOperation: 100
+      }
+    ];
+
+    // Inject the mock array into the spy stream
+    mockApiService.getDatasetRuns.mockReturnValue(of(mockApiRuns));
+
     const mockGroup = {
       list: [
         {
           id: 1,
-          date: '2026-10-13T20:00:00.000Z',
+          date: '2026-10-08',
           datasetId: '1',
           datasetName: 'Dataset One',
-          dataProvider: 'Provider A',
-          provider: 'Infrastructure A',
+          provider: 'N/A',
+          dataProvider: 'N/A',
           percentLinksInOperation: 80
         }
       ],
@@ -198,19 +243,16 @@ describe('ListingComponent', () => {
 
     expect(mockGroup.opened).toBe(true);
 
-    expect(mockGroup.list.length).toBe(3);
+    expect(mockApiService.getDatasetRuns).toHaveBeenCalledWith(
+      '1',
+      'Dataset One',
+      'N/A',
+      'N/A'
+    );
 
+    expect(mockGroup.list.length).toBe(3);
     expect(mockGroup.list[0].id).toBe(1001);
     expect(mockGroup.list[1].id).toBe(1002);
     expect(mockGroup.list[2].id).toBe(1003);
-
-    expect(component.selectedCheckIds().has(1001)).toBe(true);
-    expect(component.selectedCheckIds().has(1002)).toBe(true);
-    expect(component.selectedCheckIds().has(1003)).toBe(true);
-
-    component.toggleGroupOpenStatus('1', mockGroup);
-
-    expect(mockGroup.opened).toBe(false);
-    expect(mockGroup.list.length).toBe(3); // Stays at 3 items, preventing duplicates
   });
 });

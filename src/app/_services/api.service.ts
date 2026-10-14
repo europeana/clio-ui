@@ -7,6 +7,7 @@ import {
   CheckDataResults,
   CheckGroup,
   ClioCheck,
+  DatasetRun,
   DownloadRequest
 } from '../_models';
 import { apiSettings } from '../../environments/apisettings';
@@ -153,5 +154,39 @@ export class APIService {
       .subscribe((data: unknown) => {
         this.download(data as string, 'clio_report');
       });
+  }
+
+  /**
+   * Fetches the complete run execution history for a given dataset on-demand.
+   * Seamlessly builds fully-populated, type-safe ClioCheck array entries
+   * using real parent metadata context parameters.
+   */
+  getDatasetRuns(
+    datasetId: string,
+    datasetName: string,
+    provider: string,
+    dataProvider: string
+  ): Observable<ClioCheck[]> {
+    return this.http
+      .get<DatasetRun[]>(`${apiSettings.serverAPI}/runs`, {
+        params: { datasetId }
+      })
+      .pipe(
+        map((rawRuns: DatasetRun[]) => {
+          const runList = Array.isArray(rawRuns) ? rawRuns : [];
+
+          return runList.map((run: DatasetRun) => {
+            return {
+              datasetId,
+              datasetName,
+              provider,
+              dataProvider,
+              id: Number(run.runId),
+              date: run.startingTime,
+              percentLinksInOperation: Number(run.percentLinksInOperation || 0)
+            };
+          });
+        })
+      );
   }
 }

@@ -4,7 +4,7 @@ import {
   CheckDataResults
 } from './src-copy/api-request.mjs';
 
-import { dataServerRequest } from './data-server.mjs';
+import { dataServerRequest, getDatasetRuns } from './data-server.mjs';
 
 new (class {
   serverName = 'Clio';
@@ -62,6 +62,25 @@ new (class {
 
     const route = (request.url as string).split('?')[0];
 
+    if (request.method === 'GET' && route.match(/\/runs/)) {
+      const queryString = (request.url as string).split('?')[1] || '';
+      const params = new URLSearchParams(queryString);
+      const datasetId = params.get('datasetId');
+
+      if (!datasetId) {
+        response.writeHead(400, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify({ error: 'Missing required query parameter: datasetId' }));
+        return;
+      }
+
+      this.headerJSON(response);
+
+      const runsResult = getDatasetRuns(datasetId);
+
+      response.end(JSON.stringify(runsResult));
+      return;
+    }
+
     if (request.method === 'POST') {
       let body = '';
       request.on('data', (chunk) => {
@@ -69,17 +88,12 @@ new (class {
       });
       request.on('end', () => {
         const br = JSON.parse(body) as CheckDataRequest;
-        if(route.match(/\/download/)) {
+        if (route.match(/\/download/)) {
           this.headerText(response);
           const data = dataServerRequest(br).results;
-          /*
-          const srv = new ExportCSVService();
-          const csvData = srv.csvFromClioChecks(data);
-          response.end(csvData);
-          */
           response.end(data);
         }
-        else if(route.match(/\/datasets/)) {
+        else if (route.match(/\/datasets/)) {
           this.handleCheckDataRequest(response, br);
         }
       });

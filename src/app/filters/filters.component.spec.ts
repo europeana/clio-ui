@@ -5,7 +5,7 @@ import {
   TestBed,
   tick
 } from '@angular/core/testing';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -20,7 +20,7 @@ describe('FiltersComponent', () => {
   let router: Router;
   let queryParams$: BehaviorSubject<Params>;
 
-  const createMockParamMap = (params: Record<string, string>) => ({
+  const createMockParamMap = (params: Record<string, string>): ParamMap => ({
     has: (key: string) => key in params,
     get: (key: string) => params[key] || null,
     getAll: (key: string) => (params[key] ? [params[key]] : []),
@@ -99,7 +99,7 @@ describe('FiltersComponent', () => {
     });
 
     it('should initialise', fakeAsync(() => {
-      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+      jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({
@@ -184,7 +184,9 @@ describe('FiltersComponent', () => {
 
     it('should go to the target page via limit calculation sets', () => {
       fixture.detectChanges();
-      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
+      jest
+        .spyOn(component, 'updatePageUrl')
+        .mockImplementation(() => undefined);
       component.form.patchValue({ offset: 50, limit: 25 });
       component.goToPage(2);
       expect(component.form.value.offset).toBe(50);
@@ -205,7 +207,7 @@ describe('FiltersComponent', () => {
     });
 
     it('should react to the page params (datasetName)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+      jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetName: 'my_dataset' });
@@ -216,7 +218,7 @@ describe('FiltersComponent', () => {
     }));
 
     it('should react to the page params (datasetId)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+      jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetId: '1' });
@@ -227,7 +229,7 @@ describe('FiltersComponent', () => {
     }));
 
     it('should react to individual and comma-separated datasetIds', fakeAsync(() => {
-      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+      jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetId: '1,2' });
@@ -289,11 +291,15 @@ describe('FiltersComponent', () => {
       markup = component.generateTitleMarkup();
 
       expect(markup.map((m) => m.label).join(' ')).toEqual(
-        'provider A or B and dataProvider C or D and Dataset Id (101) and Dataset Name "MyDataset" from Dec 12th until June 10th and Percent In Operation >= 60%'
+        'provider A or B and dataProvider C or D and Dataset Id (101) ' +
+          'and Dataset Name "MyDataset" from Dec 12th until June 10th ' +
+          'and Percent In Operation >= 60%'
       );
 
       jest.spyOn(component.form, 'patchValue');
-      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
+      jest
+        .spyOn(component, 'updatePageUrl')
+        .mockImplementation(() => undefined);
 
       markup.forEach((m: { fn?: () => void }) => {
         if (m.fn) m.fn();
@@ -328,7 +334,7 @@ describe('FiltersComponent', () => {
       fixture.detectChanges();
       const spyUpdate = jest
         .spyOn(component, 'updatePageUrl')
-        .mockImplementation(() => {});
+        .mockImplementation(() => undefined);
 
       component.queryParams = {}; // Initialize clean mock
 

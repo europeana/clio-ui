@@ -33,7 +33,6 @@ describe('Filters Dynamic Operations Flow', () => {
   });
 
   describe('Interactive Filter State Alterations (Adding and Removing)', () => {
-
     it('should append parameters to url and payload on manual search execution inputs', () => {
       cy.visit('/');
       cy.wait('@searchRequest');
@@ -67,7 +66,9 @@ describe('Filters Dynamic Operations Flow', () => {
           cy.get('app-checkbox').first().click();
           cy.url().should('contain', 'offset=0');
         } else {
-          cy.log('Skipping checkbox click interaction: No filter options returned from test server payload.');
+          cy.log(
+            'Skipping checkbox click interaction: No filter options returned from test server payload.'
+          );
         }
       });
     });
@@ -85,7 +86,6 @@ describe('Filters Dynamic Operations Flow', () => {
       cy.url().should('contain', 'offset=0');
     });
 
-
     it('should drop sliders parameter to null when modified or updated via slide changes', () => {
       // Visit with a preset value
       cy.visit('/?percentLinksInOperationFrom=75');
@@ -97,6 +97,5 @@ describe('Filters Dynamic Operations Flow', () => {
       cy.url().should('contain', 'percentLinksInOperationFrom=20');
       cy.url().should('contain', 'offset=0');
     });
-
   });
 });
