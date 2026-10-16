@@ -1,10 +1,11 @@
 name: '* CI'
 on:
-  push
+  push:
+    branches:
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
-  #run-ci:
-  #  name: 'code-format-checks'
-  #  uses: ./.github/workflows/run-lint.yaml
   run-unit:
     name: 'tests'
     uses: ./.github/workflows/run-tests.yaml
