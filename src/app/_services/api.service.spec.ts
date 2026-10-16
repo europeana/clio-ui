@@ -71,6 +71,25 @@ describe('API Service', () => {
     httpTesting.verify();
   });
 
+  it('should map the filtered reports', () => {
+    const mockChecksPayload = [
+      { id: 101, datasetId: 'DS-1', percentLinksInOperation: 95 }
+    ];
+
+    service
+      .getDatasetRuns('DS-1', 'Name', 'Prov', 'DataProv')
+      .subscribe((checks) => {
+        expect(checks.length).toBe(1);
+        expect(checks[0].id).toBe(101);
+      });
+
+    const url = `${apiSettings.serverAPI}/runs?datasetId=DS-1`;
+    const req = httpTesting.expectOne(url);
+
+    req.flush(mockChecksPayload);
+    httpTesting.verify();
+  });
+
   it('should get the download', () => {
     const url = `${apiSettings.serverAPI}/runs/links/export`;
     service.getDownload({

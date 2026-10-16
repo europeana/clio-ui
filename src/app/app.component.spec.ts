@@ -154,6 +154,25 @@ describe('AppComponent', () => {
       expect(api.getDownload).toHaveBeenCalled();
     });
 
+    it('should compile an accurate exclusions map inside downloadAll loops', () => {
+      jest.spyOn(api, 'getDownload').mockImplementation(() => undefined);
+
+      mockListing.clioInfo.set({
+        list: [{ id: 10 }, { id: 20 }, { id: 30 }]
+      } as any);
+
+      const activeSelections = new Set<number>([20]);
+      (mockListing as any).selectedCheckIds = signal(activeSelections);
+
+      app.downloadAll();
+
+      expect(api.getDownload).toHaveBeenCalledWith(
+        expect.objectContaining({
+          excluded_check_ids: ['10', '30']
+        })
+      );
+    });
+
     it('should download checking records by precise single ID', () => {
       jest.spyOn(api, 'getDownload');
       app.downloadCheck(1);

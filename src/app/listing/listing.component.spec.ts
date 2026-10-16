@@ -189,6 +189,24 @@ describe('ListingComponent', () => {
     expect(component.listSelectionCount).toEqual(0);
   });
 
+  it('should calculate accurate timestamp strings inside shiftDate utilities', () => {
+    const shifted = (component as any).shiftDate('2026-01-15T00:00:00.000Z', 5);
+    expect(shifted).toBe('2026-01-20');
+  });
+
+  it('should uncheck sibling keys cleanly when shouldCheckAll evaluates to false', () => {
+    const mockDatasetId = 'DS-99';
+    const mockRuns = [{ id: 500 } as ClioCheck];
+
+    component.selectedDatasetIds.set(new Set([mockDatasetId]));
+    component.selectedCheckIds.set(new Set([500]));
+
+    component.checkAll(mockDatasetId, mockRuns);
+
+    expect(component.selectedDatasetIds().has(mockDatasetId)).toBe(false);
+    expect(component.selectedCheckIds().has(500)).toBe(false);
+  });
+
   it('should toggle group open status and load expanded runs from the API service', () => {
     const mockApiRuns: ClioCheck[] = [
       {

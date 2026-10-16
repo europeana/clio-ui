@@ -133,7 +133,20 @@ describe('FiltersComponent', () => {
       expect(req.filters.limit).toBe(25);
     });
 
-    it('should updatePageUrl and leverage internal private helper parameters blocks', () => {
+    it('should parse explicit criteria values inside getDataServerDataRequest safely', () => {
+      component.form.patchValue({
+        datasetId: '71, 72',
+        datasetName: 'ArchiveExpress',
+        percentLinksInOperationFrom: 40
+      });
+
+      const requestPayload = component.getDataServerDataRequest();
+
+      expect(requestPayload.filters['datasetId']).toEqual(['71', '72']);
+      expect(requestPayload.filters['datasetName']).toEqual(['ArchiveExpress']);
+    });
+
+    it('should updatePageUrl', () => {
       fixture.detectChanges();
       jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
