@@ -158,11 +158,17 @@ describe('API Service', () => {
 
   it('should get the download', () => {
     const url = `${apiSettings.serverAPI}/runs/links/export`;
-    service.getDownload({
+    const mockRequest = {
       filterOptions: {},
       excluded_check_ids: []
-    } as unknown as DownloadRequest);
+    } as unknown as DownloadRequest;
+
+    service.getDownload(mockRequest);
+
     const req = httpTesting.expectOne(url);
+
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(mockRequest);
     req.flush('csv');
     httpTesting.verify();
   });
