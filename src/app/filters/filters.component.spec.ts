@@ -325,9 +325,11 @@ describe('FiltersComponent', () => {
       ).toBe(true);
     });
 
-    it('should trigger router navigation onFilterCheckboxToggle with offset reset parameters', () => {
+    it('should handle all toggle combinations onFilterCheckboxToggle including removals and property deletion', () => {
       queryParams$.next({});
+
       component.onFilterCheckboxToggle('provider', 'Z');
+
       expect(router.navigate).toHaveBeenCalledWith(
         [],
         expect.objectContaining({
@@ -337,6 +339,24 @@ describe('FiltersComponent', () => {
           })
         })
       );
+
+      queryParams$.next({ provider: ['Z'] });
+
+      component.onFilterCheckboxToggle('provider', 'Z');
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        [],
+        expect.objectContaining({
+          queryParams: expect.objectContaining({
+            offset: 0
+          })
+        })
+      );
+
+      const lastCallArgs = (router.navigate as jest.Mock).mock.calls;
+      const lastQueryParams =
+        lastCallArgs[lastCallArgs.length - 1][1].queryParams;
+      expect(lastQueryParams.provider).toBeUndefined();
     });
 
     it('should update the target optionFilters dictionary property when search text is typed', () => {

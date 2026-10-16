@@ -151,18 +151,20 @@ describe('ListingComponent', () => {
     expect(component.graphMode).toBeFalsy();
   });
 
-  it('should check all and toggle selection states', () => {
+  it('should toggle selection states back and forth to cover all checkAll branch paths', () => {
     const datasetAList = component
       .clioInfo()
       .list.filter((r) => r.datasetId === '1');
 
-    // Initial state: '1' is in the dataset group check set
-    expect(component.selectedDatasetIds().has('1')).toBeTruthy();
+    expect(component.selectedDatasetIds().has('1')).toBe(true);
 
-    // Action: Deselect group '1'
     component.checkAll('1', datasetAList);
-    expect(component.selectedDatasetIds().has('1')).toBeFalsy();
-    expect(component.selectedCheckIds().has(1)).toBeFalsy();
+    expect(component.selectedDatasetIds().has('1')).toBe(false);
+    expect(component.selectedCheckIds().has(1)).toBe(false);
+
+    component.checkAll('1', datasetAList);
+    expect(component.selectedDatasetIds().has('1')).toBe(true);
+    expect(component.selectedCheckIds().has(1)).toBe(true);
   });
 
   it('should get the selected run count', () => {

@@ -55,21 +55,78 @@ describe('API Service', () => {
     expect(grouped).toBeTruthy();
   });
 
-  it('should get the filtered reports', () => {
-    const param = {
+  it('should get the filtered reports', async () => {
+    const mockRequest = {
       filters: {
-        limit: '5',
-        offset: '0'
+        provider: ['AWS'],
+        dataProvider: ['Europeana'],
+        datasetId: ['71'],
+        datasetName: ['ArchiveExpress'],
+        excludedDatasetId: ['99'],
+        dateFrom: '2026-06-01',
+        dateTo: '2026-08-31',
+        percentLinksInOperationFrom: 20,
+        percentLinksInOperationTo: 80,
+        offset: 50,
+        limit: 10
       }
-    } as CheckDataRequest;
+    } as unknown as CheckDataRequest;
 
-    service.getFilteredClioChecks(param).subscribe((data: unknown) => {
-      expect(data).toBeTruthy();
-    });
+    const reportsPromise = firstValueFrom(
+      service.getFilteredClioChecks(mockRequest)
+    );
+    const url = `${apiSettings.serverAPI}/datasets`;
+    const req = httpTesting.expectOne(url);
+    const sentBody = req.request.body;
+    expect(sentBody.filters.provider).toEqual(['AWS']);
+    expect(sentBody.filters.dateFrom).toBe('2026-06-01');
+    expect(sentBody.filters.percentLinksInOperationFrom).toBe(20);
+    expect(sentBody.pagination.offset).toBe(50);
+
+    req.flush({ filterOptions: {}, results: [] });
+    await reportsPromise;
+    httpTesting.verify();
+  });
+
+  it('should get the filtered reports (missing or invalid)', async () => {
+    const mockRequest = {
+      filters: {
+        provider: 'not-an-array',
+        dataProvider: null,
+        datasetId: undefined,
+        datasetName: {},
+        excludedDatasetId: 42,
+        dateFrom: 12345,
+        dateTo: null,
+        percentLinksInOperationFrom: '',
+        percentLinksInOperationTo: '',
+        offset: '',
+        limit: ''
+      }
+    } as unknown as CheckDataRequest;
+
+    const reportsPromise = firstValueFrom(
+      service.getFilteredClioChecks(mockRequest)
+    );
 
     const url = `${apiSettings.serverAPI}/datasets`;
     const req = httpTesting.expectOne(url);
-    req.flush({ filterOptions: {} });
+
+    const sentBody = req.request.body;
+    expect(sentBody.filters.provider).toEqual([]);
+    expect(sentBody.filters.dataProvider).toEqual([]);
+    expect(sentBody.filters.datasetId).toEqual([]);
+    expect(sentBody.filters.datasetName).toEqual([]);
+    expect(sentBody.filters.excludedDatasetId).toEqual([]);
+    expect(sentBody.filters.dateFrom).toBe('2026-01-01');
+    expect(sentBody.filters.dateTo).toBe('2026-12-31');
+    expect(sentBody.filters.percentLinksInOperationFrom).toBe(0);
+    expect(sentBody.filters.percentLinksInOperationTo).toBe(100);
+    expect(sentBody.pagination.offset).toBe(0);
+    expect(sentBody.pagination.limit).toBe(25);
+
+    req.flush({ filterOptions: {}, results: [] });
+    await reportsPromise;
     httpTesting.verify();
   });
 
