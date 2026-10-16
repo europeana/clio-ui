@@ -9,6 +9,8 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 
+import { firstValueFrom } from 'rxjs';
+
 import { CheckDataRequest, ClioCheck, DownloadRequest } from '../_models';
 import { APIService } from './';
 
@@ -71,23 +73,30 @@ describe('API Service', () => {
     httpTesting.verify();
   });
 
-  it('should map the filtered reports', () => {
+  it('should map the filtered reports', async () => {
     const mockChecksPayload = [
-      { id: 101, datasetId: 'DS-1', percentLinksInOperation: 95 }
+      {
+        runId: 101,
+        percentLinksInOperation: 95,
+        startingTime: '2026-10-16'
+      }
     ];
 
-    service
-      .getDatasetRuns('DS-1', 'Name', 'Prov', 'DataProv')
-      .subscribe((checks) => {
-        expect(checks.length).toBe(1);
-        expect(checks[0].id).toBe(101);
-      });
+    const checksPromise = firstValueFrom(
+      service.getDatasetRuns('DS-1', 'Name', 'Prov', 'DataProv')
+    );
 
     const url = `${apiSettings.serverAPI}/runs?datasetId=DS-1`;
     const req = httpTesting.expectOne(url);
 
     req.flush(mockChecksPayload);
     httpTesting.verify();
+
+    const checks = await checksPromise;
+
+    expect(checks).toHaveLength(1);
+    expect(checks[0].id).toBe(101);
+    expect(checks[0].datasetName).toBe('Name');
   });
 
   it('should get the download', () => {

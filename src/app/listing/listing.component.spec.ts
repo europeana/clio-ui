@@ -268,7 +268,7 @@ describe('ListingComponent', () => {
       'N/A'
     );
 
-    expect(mockGroup.list.length).toBe(3);
+    expect(mockGroup.list).toHaveLength(3);
     expect(mockGroup.list[0].id).toBe(1001);
     expect(mockGroup.list[1].id).toBe(1002);
     expect(mockGroup.list[2].id).toBe(1003);

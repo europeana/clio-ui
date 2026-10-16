@@ -53,6 +53,6 @@ describe('ExportCSVService', () => {
   });
 
   it('should get the tuple', () => {
-    expect(service.getTuple(3).length).toEqual(3);
+    expect(service.getTuple(3)).toHaveLength(3);
   });
 });
