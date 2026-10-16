@@ -28,7 +28,7 @@ export class APIService {
     results.forEach((run: ClioCheck) => {
       const id = run.datasetId;
       res[id] = {
-        list: [run], // Initialize with our mapped dataset entry
+        list: [run],
         opened: false,
         percentLinksInOperation: run.percentLinksInOperation
       };
