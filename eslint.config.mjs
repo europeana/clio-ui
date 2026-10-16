@@ -96,4 +96,10 @@ export default [{
             memberSyntaxSortOrder: ["none", "all", "single", "multiple"],
         }],
     },
+},
+{
+    files: ["**/*.spec.ts", "**/*.cy.ts", "cypress/**/*.ts"],
+    rules: {
+        "@typescript-eslint/no-explicit-any": "off"
+    }
 }];

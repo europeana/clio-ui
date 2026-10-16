@@ -8,11 +8,13 @@ export type FilterParameterName =
   | 'id'
   | 'offset'
   | 'limit'
-  | 'percentLinksInOperationFrom';
+  | 'percentLinksInOperationFrom'
+  | 'excludedDatasetId'
+  | 'percentLinksInOperationTo';
 
 export interface CheckDataRequest {
   filters: {
-    [details in FilterParameterName]: Array<string> | string;
+    [details in FilterParameterName]?: Array<string> | string | number;
   };
 }
 
@@ -25,21 +27,36 @@ export interface CheckDataResults {
   results: Array<ClioCheck>;
 }
 
-export interface Dataset {
-  id: number;
-  datasetName: string;
-  dataProvider: string;
-  provider: string;
-}
-
-export interface ClioCheck {
-  id: number;
-  date: string;
+export interface DatasetSummary {
   datasetId: string;
   datasetName: string;
   provider: string;
   dataProvider: string;
   percentLinksInOperation: number;
+  datasetSize: number;
+  datasetLastIndex: string;
+}
+
+export interface DatasetRun {
+  runId: number;
+  startingTime: string;
+  percentLinksInOperation: number;
+}
+
+export interface ClioCheck {
+  datasetId: string;
+  datasetName: string;
+  provider: string;
+  dataProvider: string;
+  percentLinksInOperation: number;
+
+  // Pre-aggregated dataset summary parameters
+  datasetSize?: number;
+  datasetLastIndex?: string;
+
+  // Standalone run parameters (Optional for lazy-loaded sub-rows)
+  id?: number;
+  date?: string;
 }
 
 export interface CheckGroup {

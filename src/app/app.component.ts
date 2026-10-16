@@ -6,7 +6,6 @@ import {
   Signal,
   viewChild
 } from '@angular/core';
-
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Params } from '@angular/router';
 
@@ -39,95 +38,89 @@ export class AppComponent {
    * - (picked up by the click-aware directive)
    **/
   @HostListener('document:click', ['$event'])
-  documentClick(event: { target: HTMLElement }): boolean | void {
+  public documentClick(event: { target: HTMLElement }): boolean | void {
     this.clickService.documentClickedTarget.next(event.target);
   }
 
-  downloadCheck(id: number): void {
+  public downloadCheck(id: number): void {
     this.api.getDownload({
-      filters: {
-        id: [`${id}`]
-      }
+      filters: { id: [`${id}`] }
     } as DownloadRequest);
   }
 
-  downloadDataset(id: string): void {
-    const runIdsForDatasetId = this.listing()
-      .clioInfo()
-      .datasetChecks[id].list.map((run: ClioCheck) => {
-        return `${run.id}`;
-      });
+  public downloadDataset(id: string): void {
+    const datasetRuns = this.listing().clioInfo().datasetChecks[id]?.list || [];
+    const activeChecks = this.listing().selectedCheckIds();
 
-    const exclusionMap = this.listing().form.value['check_ids'];
-    const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
-      return !exclusionMap[key] && new Set(runIdsForDatasetId).has(key);
+    const exclusionList: string[] = [];
+    datasetRuns.forEach((run: ClioCheck) => {
+      if (!activeChecks.has(run.id!)) {
+        exclusionList.push(`${run.id}`);
+      }
     });
 
     const downloadRequest = this.filters().getDataServerDataRequest();
     downloadRequest.filters['datasetId'] = [id];
 
-    this.api.getDownload({
+    const payload = {
       ...downloadRequest,
-      excluded_check_ids: exclusionList
-    });
+      excluded_check_ids: exclusionList,
+      pagination: { offset: 0, limit: 100000 }
+    };
+
+    this.api.getDownload(payload as unknown as DownloadRequest);
   }
 
-  downloadAll(): void {
-    const exclusionMap = this.listing().form.value['check_ids'];
-    const exclusionList = Object.keys(exclusionMap).filter((key: string) => {
-      return !exclusionMap[key];
+  public downloadAll(): void {
+    const allVisibleRuns = this.listing().clioInfo()?.list || [];
+    const activeChecks = this.listing().selectedCheckIds();
+
+    const exclusionList: string[] = [];
+    allVisibleRuns.forEach((run: ClioCheck) => {
+      if (!activeChecks.has(run.id!)) {
+        exclusionList.push(`${run.id}`);
+      }
     });
 
-    this.api.getDownload({
-      ...this.filters().getDataServerDataRequest(),
-      excluded_check_ids: exclusionList
-    });
+    const downloadRequest = this.filters().getDataServerDataRequest();
+
+    const payload = {
+      ...downloadRequest,
+      excluded_check_ids: exclusionList,
+      pagination: { offset: 0, limit: 100000 }
+    };
+
+    this.api.getDownload(payload as unknown as DownloadRequest);
   }
 
-  // Reactive URL routing query stream wrapper matching core contract types
   private readonly queryParamsSignal = toSignal<Params, Params>(
     this.route.queryParams,
-    {
-      initialValue: {} as Params
-    }
+    { initialValue: {} as Params }
   );
 
-  // Computes previous page navigation visibility state directly off the active URL parameter stream
   public readonly canLoadPrevPageSignal: Signal<boolean> = computed(() => {
     const params = this.queryParamsSignal();
     const offset = Number(params['offset'] ?? 0);
     return offset > 0;
   });
 
-  // Calculates structural range text limits dynamically using real visible item counts
   public readonly paginationText: Signal<string> = computed(() => {
     const params = this.queryParamsSignal();
     const offset = Number(params['offset'] ?? 0);
     const limit = Number(params['limit'] ?? 25);
-
-    const datasetChecksMap = this.listing().clioInfo()?.datasetChecks;
-    const visibleDatasetCount = datasetChecksMap
-      ? Object.keys(datasetChecksMap).length
-      : 0;
-
-    const maxBound =
-      visibleDatasetCount < limit
-        ? offset + visibleDatasetCount
-        : offset + limit;
-
+    const maxBound = offset + limit;
     return `${offset} - ${maxBound}`;
   });
 
-  // Computes next page validation parameters smoothly off the required child filter signals
-  readonly canLoadNextPageSignal = computed(() => {
+  public readonly canLoadNextPageSignal = computed(() => {
     return !!this.filters().hasMoreAvailable();
   });
 
-  loadPrevPage(): void {
+  public loadPrevPage(): void {
     this.filters().dropPage();
   }
 
-  loadNextPage(): void {
+  public loadNextPage(): void {
     this.filters().bumpPage();
   }
 }

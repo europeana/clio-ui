@@ -1,18 +1,13 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { FormControl, FormGroup } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
+import { FormGroup } from '@angular/forms';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { FiltersComponent } from './filters.component';
 import { APIService } from '../_services';
-import { CheckDataResults } from '../_models';
+import { CheckDataResults, ClioInfo } from '../_models';
 
 describe('FiltersComponent', () => {
   let component: FiltersComponent;
@@ -20,7 +15,7 @@ describe('FiltersComponent', () => {
   let router: Router;
   let queryParams$: BehaviorSubject<Params>;
 
-  const createMockParamMap = (params: Record<string, string>) => ({
+  const createMockParamMap = (params: Record<string, string>): ParamMap => ({
     has: (key: string) => key in params,
     get: (key: string) => params[key] || null,
     getAll: (key: string) => (params[key] ? [params[key]] : []),
@@ -98,10 +93,9 @@ describe('FiltersComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should initialise', fakeAsync(() => {
-      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+    it('should initialise', async () => {
+      jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
-
       queryParams$.next({
         percentLinksInOperationFrom: ['85'],
         limit: 50,
@@ -110,14 +104,16 @@ describe('FiltersComponent', () => {
         dateFrom: undefined,
         dateTo: ['2026-12-31']
       });
-      tick(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
       fixture.detectChanges();
 
       const datasetIdsGroup = component.form.get('datasetIds') as FormGroup;
       expect(datasetIdsGroup.contains('999')).toBe(true);
       expect(datasetIdsGroup.contains('888')).toBe(true);
       expect(component.loadData).toHaveBeenCalled();
-    }));
+    });
 
     it('should cover the server request mapping data translation fallback branches', () => {
       fixture.detectChanges();
@@ -130,7 +126,6 @@ describe('FiltersComponent', () => {
         dateFrom: null,
         dateTo: null
       });
-      component.queryParams = { customFilter: 'value' };
 
       const req = component.getDataServerDataRequest();
       expect(req.filters.percentLinksInOperationFrom).toBe(0);
@@ -138,7 +133,20 @@ describe('FiltersComponent', () => {
       expect(req.filters.limit).toBe(25);
     });
 
-    it('should updatePageUrl and leverage internal private helper parameters blocks', () => {
+    it('should parse explicit criteria values inside getDataServerDataRequest safely', () => {
+      component.form.patchValue({
+        datasetId: '71, 72',
+        datasetName: 'ArchiveExpress',
+        percentLinksInOperationFrom: 40
+      });
+
+      const requestPayload = component.getDataServerDataRequest();
+
+      expect(requestPayload.filters['datasetId']).toEqual(['71', '72']);
+      expect(requestPayload.filters['datasetName']).toEqual(['ArchiveExpress']);
+    });
+
+    it('should updatePageUrl', () => {
       fixture.detectChanges();
       jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
@@ -184,7 +192,9 @@ describe('FiltersComponent', () => {
 
     it('should go to the target page via limit calculation sets', () => {
       fixture.detectChanges();
-      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
+      jest
+        .spyOn(component, 'updatePageUrl')
+        .mockImplementation(() => undefined);
       component.form.patchValue({ offset: 50, limit: 25 });
       component.goToPage(2);
       expect(component.form.value.offset).toBe(50);
@@ -204,67 +214,68 @@ describe('FiltersComponent', () => {
       expect(router.navigate).toHaveBeenCalled();
     });
 
-    it('should react to the page params (datasetName)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+    it('should react to the page params (datasetName)', async () => {
+      jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetName: 'my_dataset' });
-      tick(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
       fixture.detectChanges();
 
       expect(component.loadData).toHaveBeenCalled();
-    }));
+    });
 
-    it('should react to the page params (datasetId)', fakeAsync(() => {
-      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+    it('should react to the page params (datasetId)', async () => {
+      jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetId: '1' });
-      tick(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
       fixture.detectChanges();
 
       expect(component.loadData).toHaveBeenCalled();
-    }));
+    });
 
-    it('should react to individual and comma-separated datasetIds', fakeAsync(() => {
-      jest.spyOn(component, 'loadData').mockImplementation(() => {});
+    it('should react to individual and comma-separated datasetIds', async () => {
+      jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetId: '1,2' });
-      tick(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
       fixture.detectChanges();
 
       const datasetIdsGroup = component.form.get('datasetIds') as FormGroup;
       expect(datasetIdsGroup.contains('1')).toBe(true);
       expect(datasetIdsGroup.contains('2')).toBe(true);
-    }));
-
-    it('should add or update filter controls using expected casing format keys', () => {
-      fixture.detectChanges();
-      const ctrlProvider = component.form.controls.provider as FormGroup;
-
-      expect(ctrlProvider.controls['A']).toBeFalsy();
-      component.addOrUpdateFilterControls('provider', ['A', 'B']);
-      expect(ctrlProvider.controls['A']).toBeTruthy();
     });
 
-    it('should get the set checkbox values using correct form group control keys', () => {
-      fixture.detectChanges();
-      component.addOrUpdateFilterControls('provider', ['A', 'B']);
-      const ctrlProvider = component.form.controls.provider as FormGroup;
+    it('should determine if a checkbox is checked based on routing query parameters', () => {
+      queryParams$.next({ provider: 'AthenaPlus' });
+      expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(true);
+      expect(component.isCheckboxChecked('provider', 'CultureGrid')).toBe(
+        false
+      );
 
-      expect(component.getSetCheckboxValues('provider').length).toBe(0);
-      ctrlProvider.controls['A'].setValue(true);
-      expect(component.getSetCheckboxValues('provider')).toEqual(['A']);
+      queryParams$.next({ provider: ['AthenaPlus', 'CultureGrid'] });
+      expect(component.isCheckboxChecked('provider', 'CultureGrid')).toBe(true);
+      expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(true);
+      expect(component.isCheckboxChecked('provider', 'Bulgariana')).toBe(false);
+
+      queryParams$.next({});
+      expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(false);
     });
 
     it('should generate the title markup and trigger interactive filter removals via switch mapping loops', () => {
       fixture.detectChanges();
 
+      queryParams$.next({});
       let markup = component.generateTitleMarkup();
       expect(markup[0].label).toBe('All checks');
 
-      component.queryParams = {
+      queryParams$.next({
         provider: ['A', 'B'],
         dataProvider: ['C', 'D'],
         datasetId: ['101'],
@@ -272,24 +283,18 @@ describe('FiltersComponent', () => {
         dateFrom: ['Dec 12th'],
         dateTo: ['June 10th'],
         percentLinksInOperationFrom: ['60']
-      };
-
-      const providerGroup = component.form.get('provider') as FormGroup;
-      const dataProviderGroup = component.form.get('dataProvider') as FormGroup;
-
-      providerGroup.addControl('A', new FormControl(true));
-      providerGroup.addControl('B', new FormControl(true));
-      dataProviderGroup.addControl('C', new FormControl(true));
-      dataProviderGroup.addControl('D', new FormControl(true));
+      });
 
       markup = component.generateTitleMarkup();
 
       expect(markup.map((m) => m.label).join(' ')).toEqual(
-        'provider A or B and dataProvider C or D and Dataset Id (101) and Dataset Name "MyDataset" from Dec 12th until June 10th and Percent In Operation >= 60%'
+        'provider A or B and dataProvider C or D and Dataset Id (101) ' +
+          'and Dataset Name "MyDataset" from Dec 12th until June 10th ' +
+          'and Percent In Operation >= 60%'
       );
 
       jest.spyOn(component.form, 'patchValue');
-      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
+      jest.spyOn(router, 'navigate');
 
       markup.forEach((m: { fn?: () => void }) => {
         if (m.fn) m.fn();
@@ -301,36 +306,89 @@ describe('FiltersComponent', () => {
     it('should evaluate title markup parsing edge cases for all individual fields', () => {
       fixture.detectChanges();
 
-      component.queryParams = { dateFrom: ['2026-01-01'] };
+      queryParams$.next({ dateFrom: ['2026-01-01'] });
       let markup = component.generateTitleMarkup();
       expect(markup.some((m) => m.label?.includes('from'))).toBe(true);
 
-      component.queryParams = { dateTo: ['2026-01-02'] };
+      queryParams$.next({ dateTo: ['2026-01-02'] });
       markup = component.generateTitleMarkup();
       expect(markup.some((m) => m.label?.includes('until'))).toBe(true);
 
-      component.queryParams = { datasetId: ['XYZ'] };
+      queryParams$.next({ datasetId: ['XYZ'] });
       markup = component.generateTitleMarkup();
       expect(markup.some((m) => m.label?.includes('Dataset Id'))).toBe(true);
 
-      component.queryParams = { percentLinksInOperationFrom: ['50'] };
+      queryParams$.next({ percentLinksInOperationFrom: ['50'] });
       markup = component.generateTitleMarkup();
       expect(
         markup.some((m) => m.label?.includes('Percent In Operation'))
       ).toBe(true);
     });
 
-    it('should append or append control configurations onFilterCheckboxToggle loops execution paths', () => {
-      fixture.detectChanges();
-      jest.spyOn(component, 'updatePageUrl').mockImplementation(() => {});
-
-      const providerGroup = component.form.get('provider') as FormGroup;
-      expect(providerGroup.contains('Z')).toBe(false);
+    it('should handle all toggle combinations onFilterCheckboxToggle including removals and property deletion', () => {
+      queryParams$.next({});
 
       component.onFilterCheckboxToggle('provider', 'Z');
-      expect(providerGroup.contains('Z')).toBe(true);
-      expect(component.form.value.offset).toBe(0);
-      expect(component.updatePageUrl).toHaveBeenCalled();
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        [],
+        expect.objectContaining({
+          queryParams: expect.objectContaining({
+            provider: ['Z'],
+            offset: 0
+          })
+        })
+      );
+
+      queryParams$.next({ provider: ['Z'] });
+
+      component.onFilterCheckboxToggle('provider', 'Z');
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        [],
+        expect.objectContaining({
+          queryParams: expect.objectContaining({
+            offset: 0
+          })
+        })
+      );
+
+      const lastCallArgs = (router.navigate as jest.Mock).mock.calls;
+      const lastQueryParams =
+        lastCallArgs[lastCallArgs.length - 1][1].queryParams;
+      expect(lastQueryParams.provider).toBeUndefined();
+    });
+
+    it('should update the target optionFilters dictionary property when search text is typed', () => {
+      const mockEvent = {
+        target: { value: 'Athena' }
+      } as unknown as Event;
+      component.updateOptionFilter('provider', mockEvent);
+      expect(component.optionFilters()['provider']).toBe('Athena');
+    });
+
+    it('should reactively filter list options based on user text search updates', () => {
+      component.modelClioInfo.set({
+        filterOps: { provider: ['Netherlands', 'Belgium', 'Germany'] }
+      } as unknown as ClioInfo);
+
+      component.optionFilters.set({ provider: 'lands', dataProvider: '' });
+      fixture.detectChanges();
+
+      const output = component.sortedFilterOptions();
+      expect(output['provider']).toEqual(['Netherlands']);
+    });
+
+    it('should guarantee that checked options float seamlessly to the top of the computed array output', () => {
+      component.modelClioInfo.set({
+        filterOps: { provider: ['Netherlands', 'Belgium', 'Germany'] }
+      } as unknown as ClioInfo);
+
+      queryParams$.next({ provider: 'Germany' });
+      fixture.detectChanges();
+
+      const output = component.sortedFilterOptions();
+      expect(output['provider'][0]).toBe('Germany');
     });
   });
 
@@ -341,12 +399,13 @@ describe('FiltersComponent', () => {
       component = fixture.componentInstance;
     });
 
-    it('should handle load errors gracefully', fakeAsync(() => {
+    it('should handle load errors gracefully', async () => {
       fixture.detectChanges();
       expect(component.error).toBeFalsy();
       component.loadData();
-      tick(0);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      fixture.detectChanges();
       expect(component.error).toBeTruthy();
-    }));
+    });
   });
 });

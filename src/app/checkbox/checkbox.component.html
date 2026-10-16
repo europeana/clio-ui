@@ -1,21 +1,15 @@
-<label *ngIf="form" [formGroup]="form" class="checkbox-labelled {{ group }}">
-  <span
-    class="checkmarked-checkbox"
-    [ngClass]="{
-      checked: form.value[group][controlName]
-    }"
-    [formGroupName]="group"
-  >
+<label class="checkbox-labelled {{ group() }}">
+  <span class="checkmarked-checkbox" [ngClass]="{ checked: checked() }">
     <input
       #baseInput
       class="checkbox"
       type="checkbox"
+      [checked]="checked()"
       (change)="onChange()"
-      (keyup.Space)="onSpaceKey()"
-      [formControlName]="controlName"
+      (keyup.space)="onSpaceKey()"
     />
   </span>
-  @if (labelText) {
-    <span class="checkbox-label" [innerHTML]="labelText"> </span>
+  @if (labelText()) {
+    <span class="checkbox-label" [innerHTML]="labelText()"></span>
   }
 </label>

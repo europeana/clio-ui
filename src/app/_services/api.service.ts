@@ -7,6 +7,7 @@ import {
   CheckDataResults,
   CheckGroup,
   ClioCheck,
+  DatasetRun,
   DownloadRequest
 } from '../_models';
 import { apiSettings } from '../../environments/apisettings';
@@ -23,50 +24,105 @@ export class APIService {
     [key: string]: CheckGroup;
   } {
     const res: { [key: string]: CheckGroup } = {};
-    const mapped = results.reduce(
-      (map: { [key: string]: Array<ClioCheck> }, run: ClioCheck) => {
-        const id = run.datasetId;
-        map[id] = map[id] ?? [];
-        map[id].push(run);
-        return map;
-      },
-      {}
-    );
 
-    Object.keys(mapped).forEach((id: string) => {
-      const list = mapped[id];
-      const percentLinksInOperation = Math.floor(
-        list.reduce((sum, obj) => sum + obj.percentLinksInOperation, 0) /
-          list.length
-      );
+    results.forEach((run: ClioCheck) => {
+      const id = run.datasetId;
       res[id] = {
-        list,
+        list: [run],
         opened: false,
-        percentLinksInOperation
+        percentLinksInOperation: run.percentLinksInOperation
       };
     });
+
     return res;
   }
 
   getFilteredClioChecks(
     request: CheckDataRequest
   ): Observable<CheckDataResults> {
+    const originFilters = request.filters || {};
+    const reshapedPayload = {
+      filters: {
+        provider: Array.isArray(originFilters.provider)
+          ? originFilters.provider
+          : [],
+        dataProvider: Array.isArray(originFilters.dataProvider)
+          ? originFilters.dataProvider
+          : [],
+        datasetId: Array.isArray(originFilters.datasetId)
+          ? originFilters.datasetId
+          : [],
+        datasetName: Array.isArray(originFilters.datasetName)
+          ? originFilters.datasetName
+          : [],
+        excludedDatasetId: Array.isArray(originFilters.excludedDatasetId)
+          ? originFilters.excludedDatasetId
+          : [],
+
+        dateFrom:
+          typeof originFilters.dateFrom === 'string'
+            ? originFilters.dateFrom
+            : '2026-01-01',
+        dateTo:
+          typeof originFilters.dateTo === 'string'
+            ? originFilters.dateTo
+            : '2026-12-31',
+        percentLinksInOperationFrom: Number(
+          originFilters.percentLinksInOperationFrom || 0
+        ),
+        percentLinksInOperationTo: Number(
+          originFilters.percentLinksInOperationTo || 100
+        )
+      },
+      pagination: {
+        offset: Number(originFilters.offset || 0),
+        limit: Number(originFilters.limit || 25)
+      }
+    };
+
     return this.http
-      .post<CheckDataResults>(`${apiSettings.serverAPI}/runs/summary`, request)
+      .post<CheckDataResults>(
+        `${apiSettings.serverAPI}/datasets`,
+        reshapedPayload
+      )
       .pipe(
         map((cdr: CheckDataResults) => {
-          const {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            limit: _,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            offset: __,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            percentLinksInOperationFrom: ___,
-            ...realFilters
-          } = cdr.filterOptions;
+          // Fallback parsing handles untyped response payload roots safely
+          const rawResponse = cdr as unknown as Record<string, unknown>;
+          const rawDatasets = (rawResponse['datasets'] ||
+            cdr.results ||
+            []) as Array<Record<string, unknown>>;
+
+          const mappedResults: ClioCheck[] = rawDatasets.map((dataset) => {
+            return {
+              datasetId: String(dataset['datasetId'] || 'N/A'),
+              datasetName: String(dataset['datasetName'] || 'Unnamed Dataset'),
+              datasetSize: Number(dataset['datasetSize'] || 0),
+              datasetLastIndex: String(
+                dataset['datasetLastIndex'] || '2026-01-01'
+              ),
+              provider: String(dataset['provider'] || 'N/A'),
+              dataProvider: String(dataset['dataProvider'] || 'N/A'),
+              percentLinksInOperation: Number(
+                dataset['percentLinksInOperation'] || 0
+              ),
+              id:
+                Number(dataset['datasetId']) ||
+                Math.floor(Math.random() * 10000),
+              date: String(
+                dataset['datasetLastIndex'] || new Date().toISOString()
+              )
+            };
+          });
+
+          const realFilters = { ...cdr.filterOptions };
+          delete realFilters['limit'];
+          delete realFilters['offset'];
+          delete realFilters['percentLinksInOperationFrom'];
+
           return {
             filterOptions: realFilters,
-            results: cdr.results
+            results: mappedResults
           };
         })
       );
@@ -98,5 +154,39 @@ export class APIService {
       .subscribe((data: unknown) => {
         this.download(data as string, 'clio_report');
       });
+  }
+
+  /**
+   * Fetches the complete run execution history for a given dataset on-demand.
+   * Seamlessly builds fully-populated, type-safe ClioCheck array entries
+   * using real parent metadata context parameters.
+   */
+  getDatasetRuns(
+    datasetId: string,
+    datasetName: string,
+    provider: string,
+    dataProvider: string
+  ): Observable<ClioCheck[]> {
+    return this.http
+      .get<DatasetRun[]>(`${apiSettings.serverAPI}/runs`, {
+        params: { datasetId }
+      })
+      .pipe(
+        map((rawRuns: DatasetRun[]) => {
+          const runList = Array.isArray(rawRuns) ? rawRuns : [];
+
+          return runList.map((run: DatasetRun) => {
+            return {
+              datasetId,
+              datasetName,
+              provider,
+              dataProvider,
+              id: Number(run.runId),
+              date: run.startingTime,
+              percentLinksInOperation: Number(run.percentLinksInOperation || 0)
+            };
+          });
+        })
+      );
   }
 }

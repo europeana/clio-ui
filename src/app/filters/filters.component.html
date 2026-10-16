@@ -18,41 +18,33 @@
         @if (field.value && field.value.length > 5) {
           <span class="search-icon"></span>
           <!-- Dynamic search filter for long lists -->
+
           <input
             [id]="field.key"
             [attr.aria-labelledby]="field.key + '-title'"
             class="checkbox-filter-input"
             placeholder="Search ({{ field.value.length }} entries)"
-            (input)="optionFilters[field.key] = $any($event.target).value"
-            [value]="optionFilters[field.key] || ''"
+            (input)="updateOptionFilter(field.key, $event)"
+            [value]="optionFilters()[field.key] || ''"
           />
         }
       </span>
 
       <div class="filter-wrapper">
-        <!-- Kept layout maintainer clean using modern track syntax -->
         <ul class="filter-height-maintainer">
-          @for (
-            option of filterList(optionFilters[field.key], field.value);
-            track option
-          ) {
+          @for (option of sortedFilterOptions()[field.key]; track option) {
             <li>&nbsp;</li>
           }
         </ul>
 
         <ul class="filter">
-          @for (
-            option of filterList(optionFilters[field.key], field.value);
-            track option
-          ) {
+          @for (option of sortedFilterOptions()[field.key]; track option) {
             <li>
               <app-checkbox
-                [form]="form"
-                [controlName]="toInputSafeName(option)"
+                [checked]="isCheckboxChecked(field.key, option)"
                 [labelText]="option"
                 [group]="field.key"
                 (valueChanged)="onFilterCheckboxToggle(field.key, option)"
-                title="Test"
               ></app-checkbox>
             </li>
           }
