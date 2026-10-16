@@ -1,10 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { BehaviorSubject, of, throwError } from 'rxjs';
@@ -98,10 +93,9 @@ describe('FiltersComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should initialise', fakeAsync(() => {
+    it('should initialise', async () => {
       jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
-
       queryParams$.next({
         percentLinksInOperationFrom: ['85'],
         limit: 50,
@@ -110,14 +104,16 @@ describe('FiltersComponent', () => {
         dateFrom: undefined,
         dateTo: ['2026-12-31']
       });
-      tick(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
       fixture.detectChanges();
 
       const datasetIdsGroup = component.form.get('datasetIds') as FormGroup;
       expect(datasetIdsGroup.contains('999')).toBe(true);
       expect(datasetIdsGroup.contains('888')).toBe(true);
       expect(component.loadData).toHaveBeenCalled();
-    }));
+    });
 
     it('should cover the server request mapping data translation fallback branches', () => {
       fixture.detectChanges();
@@ -205,40 +201,43 @@ describe('FiltersComponent', () => {
       expect(router.navigate).toHaveBeenCalled();
     });
 
-    it('should react to the page params (datasetName)', fakeAsync(() => {
+    it('should react to the page params (datasetName)', async () => {
       jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetName: 'my_dataset' });
-      tick(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
       fixture.detectChanges();
 
       expect(component.loadData).toHaveBeenCalled();
-    }));
+    });
 
-    it('should react to the page params (datasetId)', fakeAsync(() => {
+    it('should react to the page params (datasetId)', async () => {
       jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetId: '1' });
-      tick(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
       fixture.detectChanges();
 
       expect(component.loadData).toHaveBeenCalled();
-    }));
+    });
 
-    it('should react to individual and comma-separated datasetIds', fakeAsync(() => {
+    it('should react to individual and comma-separated datasetIds', async () => {
       jest.spyOn(component, 'loadData').mockImplementation(() => undefined);
       component.ngOnInit();
 
       queryParams$.next({ datasetId: '1,2' });
-      tick(0);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
       fixture.detectChanges();
 
       const datasetIdsGroup = component.form.get('datasetIds') as FormGroup;
       expect(datasetIdsGroup.contains('1')).toBe(true);
       expect(datasetIdsGroup.contains('2')).toBe(true);
-    }));
+    });
 
     it('should determine if a checkbox is checked based on routing query parameters', () => {
       queryParams$.next({ provider: 'AthenaPlus' });
@@ -367,12 +366,13 @@ describe('FiltersComponent', () => {
       component = fixture.componentInstance;
     });
 
-    it('should handle load errors gracefully', fakeAsync(() => {
+    it('should handle load errors gracefully', async () => {
       fixture.detectChanges();
       expect(component.error).toBeFalsy();
       component.loadData();
-      tick(0);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      fixture.detectChanges();
       expect(component.error).toBeTruthy();
-    }));
+    });
   });
 });

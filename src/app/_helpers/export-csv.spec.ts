@@ -1,4 +1,4 @@
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ExportCSVService } from './export-csv';
 
 describe('ExportCSVService', () => {
@@ -28,12 +28,13 @@ describe('ExportCSVService', () => {
     }
   ];
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [ExportCSVService]
-    }).compileComponents();
+    });
+
     service = TestBed.inject(ExportCSVService);
-  }));
+  });
 
   it('should sanitise the value', () => {
     expect(service.sanitiseVal('"')).toEqual('""""');
@@ -54,12 +55,4 @@ describe('ExportCSVService', () => {
   it('should get the tuple', () => {
     expect(service.getTuple(3).length).toEqual(3);
   });
-
-  /*
-  it('should download', () => {
-    jest.spyOn(window.URL, 'createObjectURL');
-    expect(service.download('', '')).toBeTruthy();
-    expect(window.URL.createObjectURL).toHaveBeenCalled();
-  });
-  */
 });

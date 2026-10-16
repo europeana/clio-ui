@@ -24,9 +24,10 @@
 
     @if (isTopTime) {
       <span class="time-all">
-        <span>all ({{ datasetCount }})</span>
+        <span>({{ datasetCount }})</span>
         <!-- disable fine-grain download-functionality for now -->
         <!--
+        <span>all ({{ datasetCount }})</span>
         <app-checkbox
           [checked]="selectedDatasetIds().has(datasetId + '')"
           [group]="'dataset_ids'"
@@ -125,7 +126,10 @@
         <a
           class="csv-download-block"
           [ngClass]="{
-            asterisked: listSelectionCount !== clioInfo().listLength
+            asterisked:
+              'TODO'.length ===
+                'disable fine-grain download-functionality for now'.length &&
+              listSelectionCount !== clioInfo().listLength
           }"
           [attr.title]="text"
           tabindex="0"

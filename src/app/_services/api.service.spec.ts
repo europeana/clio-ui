@@ -3,7 +3,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting
 } from '@angular/common/http/testing';
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import {
   provideHttpClient,
   withInterceptorsFromDi
@@ -16,16 +16,17 @@ describe('API Service', () => {
   let service: APIService;
   let httpTesting: HttpTestingController;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
       ]
-    }).compileComponents();
+    });
+
     service = TestBed.inject(APIService);
     httpTesting = TestBed.inject(HttpTestingController);
-  }));
+  });
 
   it('should create', () => {
     expect(service).toBeTruthy();
@@ -90,6 +91,7 @@ describe('API Service', () => {
     const downloadSpy = jest
       .spyOn(service, 'download')
       .mockResolvedValue(undefined);
+
     service.getDownload(mockRequest);
     const req = httpTesting.expectOne(url);
     req.flush('Server Error', { status: 500, statusText: 'Server Error' });
