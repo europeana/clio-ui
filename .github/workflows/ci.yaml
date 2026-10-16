@@ -9,8 +9,12 @@ jobs:
   run-unit:
     name: 'tests'
     uses: ./.github/workflows/run-tests.yaml
+    with:
+      tag_name: ${{ github.event.pull_request.head.ref || github.sha }}
     secrets: inherit
   run-sonar:
     needs: [run-unit]
     uses: ./.github/workflows/run-sonar.yaml
+    with:
+      tag_name: ${{ github.event.pull_request.head.ref || github.sha }}
     secrets: inherit
