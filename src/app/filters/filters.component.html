@@ -32,7 +32,11 @@
       <div class="filter-wrapper">
         <ul class="filter-height-maintainer">
           @for (
-            option of filterList(optionFilters[field.key], field.value);
+            option of filterList(
+              optionFilters[field.key],
+              field.value,
+              field.key
+            );
             track option
           ) {
             <li>&nbsp;</li>
@@ -41,7 +45,11 @@
 
         <ul class="filter">
           @for (
-            option of filterList(optionFilters[field.key], field.value);
+            option of filterList(
+              optionFilters[field.key],
+              field.value,
+              field.key
+            );
             track option
           ) {
             <li>
@@ -50,7 +58,6 @@
                 [labelText]="option"
                 [group]="field.key"
                 (valueChanged)="onFilterCheckboxToggle(field.key, option)"
-                title="Test"
               ></app-checkbox>
             </li>
           }

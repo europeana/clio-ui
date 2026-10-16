@@ -1,7 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { CheckboxComponent } from '.';
+import { CheckboxComponent } from './checkbox.component';
 
 describe('CheckboxComponent', () => {
   let component: CheckboxComponent;
@@ -9,16 +7,13 @@ describe('CheckboxComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, CheckboxComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      imports: [CheckboxComponent]
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(CheckboxComponent);
     component = fixture.componentInstance;
-    expect(component).toBeTruthy();
-    fixture.debugElement.injector.get(NG_VALUE_ACCESSOR);
     fixture.detectChanges();
   });
 
@@ -26,30 +21,23 @@ describe('CheckboxComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should implement ControlValueAccessor', () => {
-    expect(component.registerOnChange).toBeTruthy();
-    expect(component.registerOnTouched).toBeTruthy();
-    expect(component.writeValue).toBeTruthy();
-    component.writeValue();
-    component.registerOnTouched();
-    component.registerOnChange(() => {
-      console.log('unimplemented');
-    });
-  });
-
-  it('should handle the field change', () => {
+  it('should handle the field change and emit inverted value', () => {
     const spyEmit = jest.spyOn(component.valueChanged, 'emit');
-    component.checked = false; // Initialize state test boundary explicitly
+    fixture.componentRef.setInput('checked', false);
+    fixture.detectChanges();
     component.onChange();
-    expect(spyEmit).toHaveBeenCalledWith(true); // Verifies it correctly pushes the toggled value up
+    expect(spyEmit).toHaveBeenCalledWith(true);
   });
 
-  it('should handle the space key', () => {
+  it('should handle the space key with structural metadata payloads', () => {
     const spyEmit = jest.spyOn(component.keySelectionMade, 'emit');
-    component.group = 'provider';
-    component.controlName = 'AthenaPlus';
+
+    fixture.componentRef.setInput('group', 'provider');
+    fixture.componentRef.setInput('controlName', 'AthenaPlus');
+    fixture.detectChanges();
 
     component.onSpaceKey();
+
     expect(spyEmit).toHaveBeenCalledWith({
       group: 'provider',
       controlName: 'AthenaPlus'

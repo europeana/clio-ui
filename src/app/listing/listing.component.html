@@ -15,7 +15,6 @@
 
       <app-checkbox
         [checked]="selectedCheckIds().has(+id)"
-        [title]="'include in export'"
         [group]="'check_ids'"
         (valueChanged)="toggleCheckSelection(+id)"
       ></app-checkbox>
@@ -24,13 +23,14 @@
     @if (isTopTime) {
       <span class="time-all">
         <span>all ({{ datasetCount }})</span>
+
         <app-checkbox
           [checked]="selectedDatasetIds().has(datasetId + '')"
+          [group]="'dataset_ids'"
           [attr.title]="
             (selectedDatasetIds().has(datasetId + '') ? 'uncheck' : 'check') +
             ' all'
           "
-          [group]="'dataset_ids'"
           (valueChanged)="checkAll(datasetId, datasetList)"
         ></app-checkbox>
       </span>

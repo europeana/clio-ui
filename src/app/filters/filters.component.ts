@@ -9,6 +9,7 @@ import {
   OnInit,
   signal
 } from '@angular/core';
+
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
@@ -67,13 +68,41 @@ export class FiltersComponent implements OnInit {
   private readonly api = inject(APIService);
   private readonly destroyRef = inject(DestroyRef);
 
-  public filterList = filterList;
+  public queryParamsSignal = toSignal(this.route.queryParams, {
+    initialValue: {} as Params
+  });
+
+  /**
+   * Wraps the imported string filter utility to float checked items to the top
+   */
+  public filterList(
+    searchText: string,
+    options: string[],
+    fieldKey: string
+  ): string[] {
+    if (!options) {
+      return [];
+    }
+    const filtered = filterList(searchText, options);
+    return [...filtered].sort((a, b) => {
+      const aChecked = this.isCheckboxChecked(fieldKey, a);
+      const bChecked = this.isCheckboxChecked(fieldKey, b);
+
+      if (aChecked && !bChecked) {
+        return -1;
+      }
+      if (!aChecked && bChecked) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+
   public toInputSafeName = toInputSafeName;
 
   hasMoreAvailable = signal(false);
   queryParams: Params = {};
   titleMarkup: Array<{ label: string; fn?: () => void }> = [];
-
   modelClioInfo: ModelSignal<ClioInfo> = model({
     datasetChecks: {},
     list: [],
@@ -188,58 +217,31 @@ export class FiltersComponent implements OnInit {
 
   generateTitleMarkup(): Array<{ label: string; fn?: () => void }> {
     const res: Array<{ label: string; fn?: () => void }> = [];
-    const queryKeys = Object.keys(this.queryParams).filter(
-      (key) => !['offset', 'limit'].includes(key)
-    );
+    const currentParams = this.queryParamsSignal();
 
-    if (queryKeys.length === 0) {
-      return [{ label: 'All checks' }];
+    const queryKeys = Object.keys(currentParams).filter((key: string) => {
+      return !['offset', 'limit'].includes(key);
+    });
+
+    if (!queryKeys || queryKeys.length === 0) {
+      res.push({ label: 'All checks' });
+      return res;
     }
 
-    const standardFilters: Record<
-      string,
-      {
-        prefix: string;
-        labelFactory: (v: string | number | string[]) => string;
-        control: string;
-        defaultVal: string | number | null;
-      }
-    > = {
-      datasetId: {
-        prefix: 'and',
-        labelFactory: (v) => `Dataset Id (${v})`,
-        control: 'datasetId',
-        defaultVal: ''
-      },
-      datasetName: {
-        prefix: 'and',
-        labelFactory: (v) => `Dataset Name "${v}"`,
-        control: 'datasetName',
-        defaultVal: ''
-      },
-      percentLinksInOperationFrom: {
-        prefix: 'and',
-        labelFactory: (v) => `Percent In Operation >= ${v}%`,
-        control: 'percentLinksInOperationFrom',
-        defaultVal: null
-      }
-    };
-
     queryKeys.forEach((key: string, index: number) => {
-      const rawValues = Array.isArray(this.queryParams[key])
-        ? this.queryParams[key]
-        : [this.queryParams[key]];
+      const rawValues = Array.isArray(currentParams[key])
+        ? currentParams[key]
+        : [currentParams[key]];
 
-      const values = rawValues.map((val: unknown) =>
-        fromInputSafeName(String(val))
+      const values = rawValues.map((paramName: unknown) =>
+        fromInputSafeName(String(paramName))
       );
-      const isFirstFilter = index === 0;
 
       if (key === 'dateFrom') {
         res.push(
           { label: 'from' },
           {
-            label: values[0],
+            label: `${values[0]}`,
             fn: () => {
               this.form.patchValue({ dateFrom: '', offset: 0 });
               this.updatePageUrl();
@@ -250,46 +252,74 @@ export class FiltersComponent implements OnInit {
         res.push(
           { label: 'until' },
           {
-            label: values[0],
+            label: `${values[0]}`,
             fn: () => {
               this.form.patchValue({ dateTo: '', offset: 0 });
               this.updatePageUrl();
             }
           }
         );
-      }
-      // handle single
-      else if (standardFilters[key]) {
-        const config = standardFilters[key];
-        if (!isFirstFilter) res.push({ label: config.prefix });
-
+      } else if (key === 'datasetId') {
+        const label = 'Dataset Id';
+        if (index > 0) res.push({ label: 'and' });
         res.push({
-          label: config.labelFactory(values[0]),
+          label: `${label} (${values[0]})`,
+          fn: () => {
+            this.form.patchValue({ datasetId: '', offset: 0 });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'datasetName') {
+        const label = 'Dataset Name';
+        if (index > 0) res.push({ label: 'and' });
+        res.push({
+          label: `${label} "${values[0]}"`,
+          fn: () => {
+            this.form.patchValue({ datasetName: '', offset: 0 });
+            this.updatePageUrl();
+          }
+        });
+      } else if (key === 'percentLinksInOperationFrom') {
+        const label = 'Percent In Operation';
+        if (index > 0) res.push({ label: 'and' });
+        res.push({
+          label: `${label} >= ${values[0]}%`,
           fn: () => {
             this.form.patchValue({
-              [config.control]: config.defaultVal,
+              percentLinksInOperationFrom: null,
               offset: 0
             });
             this.updatePageUrl();
           }
         });
-      }
-      // handle arrays
-      else {
+      } else {
         rawValues.forEach((valPart: string, indexInner: number) => {
           if (indexInner === 0) {
-            res.push({ label: isFirstFilter ? key : `and ${key}` });
+            res.push({ label: index > 0 ? 'and ' + key : key });
           }
 
           res.push({
-            label: values[indexInner],
+            label: `${values[indexInner]}`,
             fn: () => {
-              const group = this.form.get(key) as FormGroup;
-              if (group) {
-                group.removeControl(toInputSafeName(rawValues[indexInner]));
+              // Mutate a local query parameter clone directly from the signal state context
+              const updatedQueryParams = { ...this.queryParamsSignal() };
+              let currentValues = Array.isArray(updatedQueryParams[key])
+                ? [...updatedQueryParams[key]]
+                : [updatedQueryParams[key]];
+
+              // Filter out the active clicked entry matching the internal raw parameter string
+              currentValues = currentValues.filter(
+                (val) => val !== rawValues[indexInner]
+              );
+
+              if (currentValues.length > 0) {
+                updatedQueryParams[key] = currentValues;
+              } else {
+                delete updatedQueryParams[key];
               }
-              this.form.patchValue({ offset: 0 });
-              this.updatePageUrl();
+
+              this.form.patchValue({ offset: 0 }, { emitEvent: false });
+              this.updatePageUrl(false, updatedQueryParams);
             }
           });
 
@@ -299,7 +329,6 @@ export class FiltersComponent implements OnInit {
         });
       }
     });
-
     return res;
   }
 
@@ -323,6 +352,8 @@ export class FiltersComponent implements OnInit {
    * @returns {CheckDataRequest}
    */
   getDataServerDataRequest(): CheckDataRequest {
+    const currentParams = this.queryParamsSignal();
+
     const filters: Record<string, string | number | string[]> = {
       percentLinksInOperationFrom: Number(
         this.form.value.percentLinksInOperationFrom ?? 0
@@ -350,10 +381,13 @@ export class FiltersComponent implements OnInit {
       'dateTo'
     ]);
 
-    Object.keys(this.queryParams).forEach((key) => {
-      if (explicitKeys.has(key)) return; // Fast O(1) hash exclusion skip
+    // Read all remaining dynamic checkbox parameters straight from the Signal state
+    Object.keys(currentParams).forEach((key) => {
+      if (explicitKeys.has(key)) {
+        return;
+      }
 
-      const rawValues = this.queryParams[key];
+      const rawValues = currentParams[key];
       const valueArray = Array.isArray(rawValues) ? rawValues : [rawValues];
 
       filters[key] = valueArray.map((val) => fromInputSafeName(String(val)));
@@ -363,34 +397,14 @@ export class FiltersComponent implements OnInit {
   }
 
   isCheckboxChecked(filterName: string, option: string): boolean {
-    const queryParamValue = this.queryParams[filterName];
+    const currentParams = this.queryParamsSignal();
+    const queryParamValue = currentParams[filterName];
     if (!queryParamValue) return false;
 
-    const safeName = this.toInputSafeName(option);
+    const safeName = toInputSafeName(option);
     return Array.isArray(queryParamValue)
       ? queryParamValue.includes(safeName)
       : String(queryParamValue) === safeName;
-  }
-
-  addOrUpdateFilterControls(name: string, options: Array<string>): void {
-    const checkboxes = this.form.get(name) as FormGroup;
-    if (!checkboxes) {
-      return;
-    }
-
-    options.forEach((option: string) => {
-      const fName = toInputSafeName(option);
-      const ctrl = checkboxes.get(fName);
-      const defaultValue = String(this.queryParams[name] || '').includes(fName);
-
-      if (ctrl) {
-        ctrl.setValue(defaultValue, { emitEvent: false });
-      } else {
-        checkboxes.addControl(fName, this.fb.control(defaultValue), {
-          emitEvent: false
-        });
-      }
-    });
   }
 
   loadData(): void {
@@ -421,12 +435,7 @@ export class FiltersComponent implements OnInit {
         delete cleanOps['percentLinksInOperationTo'];
         delete cleanOps['percentLinksInOperationFrom'];
         delete cleanOps['hasMoreAvailable'];
-
-        Object.keys(cleanOps).forEach((key: string) => {
-          if (cleanOps[key]) {
-            this.addOrUpdateFilterControls(key, cleanOps[key]);
-          }
-        });
+        delete cleanOps['excludedDatasetId'];
 
         const queryParamMap = this.route.snapshot.queryParamMap;
 
@@ -540,11 +549,10 @@ export class FiltersComponent implements OnInit {
   }
 
   onFilterCheckboxToggle(filterName: string, option: string): void {
-    const safeName = this.toInputSafeName(option);
+    const safeName = toInputSafeName(option);
+    const currentParams = { ...this.queryParamsSignal() };
+    const currentValuesRaw = currentParams[filterName] || [];
 
-    // local shallow clone respects immutable structures
-    const updatedQueryParams = { ...this.queryParams };
-    const currentValuesRaw = updatedQueryParams[filterName] || [];
     let currentValues = Array.isArray(currentValuesRaw)
       ? [...currentValuesRaw]
       : [currentValuesRaw];
@@ -556,15 +564,21 @@ export class FiltersComponent implements OnInit {
     }
 
     if (currentValues.length > 0) {
-      updatedQueryParams[filterName] = currentValues;
+      currentParams[filterName] = currentValues;
     } else {
-      delete updatedQueryParams[filterName];
+      delete currentParams[filterName];
     }
 
-    // explicitly update the tracking state on the form control tree
-    this.form.patchValue({ offset: 0 }, { emitEvent: false });
+    // Reset pagination cleanly via local object replacement mapping
+    const finalParams = {
+      ...currentParams,
+      offset: 0
+    };
 
-    // pass the fresh object mutation configuration directly down to the router step
-    this.updatePageUrl(false, updatedQueryParams);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: finalParams,
+      queryParamsHandling: ''
+    });
   }
 }

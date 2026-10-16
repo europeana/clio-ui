@@ -241,36 +241,32 @@ describe('FiltersComponent', () => {
       expect(datasetIdsGroup.contains('2')).toBe(true);
     }));
 
-    it('should add or update filter controls using expected casing format keys', () => {
-      fixture.detectChanges();
-      const ctrlProvider = component.form.controls.provider as FormGroup;
-
-      expect(ctrlProvider.controls['A']).toBeFalsy();
-      component.addOrUpdateFilterControls('provider', ['A', 'B']);
-      expect(ctrlProvider.controls['A']).toBeTruthy();
-    });
-
     it('should determine if a checkbox is checked based on routing query parameters', () => {
-      component.queryParams = { provider: 'AthenaPlus' };
+      queryParams$.next({ provider: 'AthenaPlus' });
       expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(true);
       expect(component.isCheckboxChecked('provider', 'CultureGrid')).toBe(
         false
       );
-      component.queryParams = { provider: ['AthenaPlus', 'CultureGrid'] };
+
+      queryParams$.next({ provider: ['AthenaPlus', 'CultureGrid'] });
       expect(component.isCheckboxChecked('provider', 'CultureGrid')).toBe(true);
       expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(true);
       expect(component.isCheckboxChecked('provider', 'Bulgariana')).toBe(false);
-      component.queryParams = {};
+
+      queryParams$.next({});
       expect(component.isCheckboxChecked('provider', 'AthenaPlus')).toBe(false);
     });
 
     it('should generate the title markup and trigger interactive filter removals via switch mapping loops', () => {
       fixture.detectChanges();
 
+      // Verify default baseline
+      queryParams$.next({});
       let markup = component.generateTitleMarkup();
       expect(markup[0].label).toBe('All checks');
 
-      component.queryParams = {
+      // Push all testing metrics directly into the stream context
+      queryParams$.next({
         provider: ['A', 'B'],
         dataProvider: ['C', 'D'],
         datasetId: ['101'],
@@ -278,18 +274,11 @@ describe('FiltersComponent', () => {
         dateFrom: ['Dec 12th'],
         dateTo: ['June 10th'],
         percentLinksInOperationFrom: ['60']
-      };
-
-      const providerGroup = component.form.get('provider') as FormGroup;
-      const dataProviderGroup = component.form.get('dataProvider') as FormGroup;
-
-      providerGroup.addControl('A', new FormControl(true));
-      providerGroup.addControl('B', new FormControl(true));
-      dataProviderGroup.addControl('C', new FormControl(true));
-      dataProviderGroup.addControl('D', new FormControl(true));
+      });
 
       markup = component.generateTitleMarkup();
 
+      // Verify layout structure assembly order rules match exactly
       expect(markup.map((m) => m.label).join(' ')).toEqual(
         'provider A or B and dataProvider C or D and Dataset Id (101) ' +
           'and Dataset Name "MyDataset" from Dec 12th until June 10th ' +
@@ -297,9 +286,7 @@ describe('FiltersComponent', () => {
       );
 
       jest.spyOn(component.form, 'patchValue');
-      jest
-        .spyOn(component, 'updatePageUrl')
-        .mockImplementation(() => undefined);
+      jest.spyOn(router, 'navigate');
 
       markup.forEach((m: { fn?: () => void }) => {
         if (m.fn) m.fn();
@@ -311,41 +298,37 @@ describe('FiltersComponent', () => {
     it('should evaluate title markup parsing edge cases for all individual fields', () => {
       fixture.detectChanges();
 
-      component.queryParams = { dateFrom: ['2026-01-01'] };
+      queryParams$.next({ dateFrom: ['2026-01-01'] });
       let markup = component.generateTitleMarkup();
       expect(markup.some((m) => m.label?.includes('from'))).toBe(true);
 
-      component.queryParams = { dateTo: ['2026-01-02'] };
+      queryParams$.next({ dateTo: ['2026-01-02'] });
       markup = component.generateTitleMarkup();
       expect(markup.some((m) => m.label?.includes('until'))).toBe(true);
 
-      component.queryParams = { datasetId: ['XYZ'] };
+      queryParams$.next({ datasetId: ['XYZ'] });
       markup = component.generateTitleMarkup();
       expect(markup.some((m) => m.label?.includes('Dataset Id'))).toBe(true);
 
-      component.queryParams = { percentLinksInOperationFrom: ['50'] };
+      queryParams$.next({ percentLinksInOperationFrom: ['50'] });
       markup = component.generateTitleMarkup();
       expect(
         markup.some((m) => m.label?.includes('Percent In Operation'))
       ).toBe(true);
     });
 
-    it('should append or append control configurations onFilterCheckboxToggle loops execution paths', () => {
-      fixture.detectChanges();
-      const spyUpdate = jest
-        .spyOn(component, 'updatePageUrl')
-        .mockImplementation(() => undefined);
-
-      component.queryParams = {}; // Initialize clean mock
-
+    it('should trigger router navigation onFilterCheckboxToggle with offset reset parameters', () => {
+      queryParams$.next({});
       component.onFilterCheckboxToggle('provider', 'Z');
-
-      expect(spyUpdate).toHaveBeenCalledWith(
-        false,
-        expect.objectContaining({ provider: ['Z'] })
+      expect(router.navigate).toHaveBeenCalledWith(
+        [],
+        expect.objectContaining({
+          queryParams: expect.objectContaining({
+            provider: ['Z'],
+            offset: 0
+          })
+        })
       );
-
-      expect(component.form.value.offset).toBe(0);
     });
   });
 

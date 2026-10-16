@@ -98,4 +98,27 @@ describe('Filters Dynamic Operations Flow', () => {
       cy.url().should('contain', 'offset=0');
     });
   });
+
+  describe('Breadcrumbs', () => {
+    it('should remove dynamic group array parameters when clicking breadcrumb markup items', () => {
+      cy.visit('/?provider=Bulgariana&provider=CultureGridlimit=25&offset=0');
+      cy.wait('@searchRequest');
+
+      cy.get('.summary-bar .title').contains('Bulgariana').click();
+
+      cy.url().should('contain', 'offset=0');
+      cy.url().should('contain', 'provider=CultureGrid');
+      cy.url().should('not.contain', 'provider=Bulgariana');
+    });
+
+    it('should remove standard group fields when clicking explicit markup items', () => {
+      cy.visit('/?datasetName=my_dataset_5 &datasetId=57');
+      cy.wait('@searchRequest');
+
+      cy.get('.summary-bar .title').contains('Dataset Id').click();
+
+      cy.url().should('not.contain', 'datasetId=57');
+      cy.url().should('contain', 'datasetName=my_dataset_5');
+    });
+  });
 });
