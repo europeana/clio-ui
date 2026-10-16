@@ -34,4 +34,4 @@ jobs:
             -Dsonar.test.inclusions=**/*.spec.ts
             -Dsonar.exclusions=src/**/_mocked/**,**/*.spec.ts
             -Dsonar.javascript.lcov.reportPaths=./lcov.info
-            -Dsonar.projectBaseDir=/home/runner/work/clio-ui/clio-ui
+            -Dsonar.projectBaseDir=.
