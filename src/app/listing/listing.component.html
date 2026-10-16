@@ -12,18 +12,21 @@
       <span>{{
         time | date: (graphMode ? DATE_CONCISE_FMT : DATE_DEFAULT_FMT)
       }}</span>
-
+      <!-- disable fine-grain download-functionality for now -->
+      <!--
       <app-checkbox
         [checked]="selectedCheckIds().has(+id)"
         [group]="'check_ids'"
         (valueChanged)="toggleCheckSelection(+id)"
       ></app-checkbox>
+      -->
     </span>
 
     @if (isTopTime) {
       <span class="time-all">
         <span>all ({{ datasetCount }})</span>
-
+        <!-- disable fine-grain download-functionality for now -->
+        <!--
         <app-checkbox
           [checked]="selectedDatasetIds().has(datasetId + '')"
           [group]="'dataset_ids'"
@@ -33,6 +36,7 @@
           "
           (valueChanged)="checkAll(datasetId, datasetList)"
         ></app-checkbox>
+        -->
       </span>
     }
   </span>
@@ -144,11 +148,14 @@
         <span class="list-header">Data Provider</span>
         <span class="list-header">Provider</span>
         <span class="list-header align-centre">
+          <!-- disable fine-grain download-functionality for now -->
+          <!--
           @if (!graphMode) {
             Export
           } @else {
             CSV
           }
+          -->
         </span>
         <span class="list-header align-left">
           @if (!graphMode) {
@@ -219,7 +226,9 @@
 
           @let selectedRunCount = getSelectedRunCount(group.list);
 
+          <!-- disable fine-grain download-functionality for now -->
           <span class="centre">
+            <!--
             @let disabled = selectedRunCount === 0;
             @let asterisked = selectedRunCount !== group.list.length;
             @let selectedCountText =
@@ -240,6 +249,7 @@
               (click)="requestDownloadDataset.emit(dsId)"
               (keyUp.enter)="requestDownloadDataset.emit(dsId)"
             ></a>
+          -->
           </span>
 
           <ng-container
@@ -279,6 +289,8 @@
                   </span>
 
                   <span class="centre">
+                    <!-- disable fine-grain download-functionality for now -->
+                    <!--
                     <a
                       class="csv-download"
                       target="_blank"
@@ -286,6 +298,7 @@
                       (click)="requestDownloadCheck.emit(entry.id!)"
                       (keyUp.enter)="requestDownloadCheck.emit(entry.id!)"
                     ></a>
+                    -->
                   </span>
 
                   <ng-container

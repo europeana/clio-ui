@@ -3,7 +3,7 @@
 <div class="fit-to-page">
   <div class="columns">
     <div class="left-col">
-      <app-filters #filters> </app-filters>
+      <app-filters #filters></app-filters>
     </div>
     <div class="right-col">
       <app-listing
@@ -47,7 +47,7 @@
         >
           <a
             aria-label="open the Common European Data Space For Cultural Heritage page"
-            href="{{ apiSettings.dataspaceURL }}"
+            [href]="apiSettings.dataspaceURL"
             rel="noopener"
             target="_blank"
           ></a>

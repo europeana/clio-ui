@@ -4,12 +4,7 @@ import {
   Signal,
   WritableSignal
 } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { By } from '@angular/platform-browser';
@@ -33,7 +28,6 @@ describe('AppComponent', () => {
   let api: APIService;
   let mockQueryParams$: BehaviorSubject<Params>;
 
-  // Track shared mock spies globally across the suite context
   let mockFilters: {
     hasMoreAvailable: WritableSignal<boolean>;
     form: FormGroup;
@@ -42,7 +36,6 @@ describe('AppComponent', () => {
     bumpPage: jest.Mock;
   };
 
-  // Track shared mock listing structures reactively
   let mockListing: {
     form: FormGroup;
     clioInfo: WritableSignal<Record<string, unknown>>;
@@ -84,7 +77,6 @@ describe('AppComponent', () => {
       fixture = TestBed.createComponent(AppComponent);
       app = fixture.componentInstance;
 
-      // Centralized Filters Mock Setup
       mockFilters = {
         hasMoreAvailable: signal(false),
         form: formVals,
@@ -93,7 +85,6 @@ describe('AppComponent', () => {
         bumpPage: jest.fn()
       };
 
-      // Centralized Listing Mock Setup using a real writable signal for clioInfo
       mockListing = {
         form: formVals,
         clioInfo: signal({ datasetChecks: {} }),
@@ -101,14 +92,12 @@ describe('AppComponent', () => {
         selectedDatasetIds: signal(new Set<string>())
       };
 
-      // Inject the filters viewChild signal cleanly
       Object.defineProperty(app, 'filters', {
         value: signal(mockFilters),
         writable: true,
         configurable: true
       });
 
-      // Inject the listing viewChild signal cleanly to avoid TS2540 compilation errors
       Object.defineProperty(app, 'listing', {
         value: signal(mockListing),
         writable: true,
@@ -122,13 +111,13 @@ describe('AppComponent', () => {
       expect(app).toBeTruthy();
     });
 
-    it('should listen for document clicks', fakeAsync(() => {
+    it('should listen for document clicks', () => {
       const spyNext = jest
         .spyOn(clicks.documentClickedTarget, 'next')
         .mockImplementation();
       const el = fixture.debugElement.query(By.css('*'));
+
       el.nativeElement.click();
-      tick(1);
       expect(clicks.documentClickedTarget.next).toHaveBeenCalled();
 
       app.documentClick({
@@ -137,7 +126,7 @@ describe('AppComponent', () => {
         } as unknown as HTMLElement
       });
       expect(spyNext).toHaveBeenCalledTimes(2);
-    }));
+    });
 
     it('should download datasets and map run IDs correctly', () => {
       jest.spyOn(api, 'getDownload');
@@ -158,9 +147,7 @@ describe('AppComponent', () => {
 
     it('should download all', () => {
       jest.spyOn(api, 'getDownload');
-
       mockListing.form = formVals;
-
       app.downloadAll();
 
       expect(mockFilters.getDataServerDataRequest).toHaveBeenCalled();
@@ -183,37 +170,34 @@ describe('AppComponent', () => {
       expect(mockFilters.bumpPage).toHaveBeenCalledTimes(1);
     });
 
-    it('should determine if can load prev page based on URL route query state', fakeAsync(() => {
+    it('should react to the page params (datasetName)', () => {
+      jest.spyOn(app.filters(), 'dropPage').mockImplementation(() => undefined);
+      mockQueryParams$.next({ datasetName: 'my_dataset' });
+      fixture.detectChanges();
+
+      expect(app.canLoadPrevPageSignal()).toBeFalsy();
+    });
+
+    it('should determine if can load prev page based on URL route query state', () => {
       expect(app.canLoadPrevPageSignal()).toBeFalsy();
 
       mockQueryParams$.next({ offset: 50, limit: 10 });
-      tick(0);
       fixture.detectChanges();
       expect(app.canLoadPrevPageSignal()).toBeTruthy();
 
       mockQueryParams$.next({ offset: 0, limit: 100 });
-      tick(0);
       fixture.detectChanges();
       expect(app.canLoadPrevPageSignal()).toBeFalsy();
-    }));
+    });
 
-    it('should compute the correct visual page string text via the reactive query params stream', fakeAsync(() => {
-      mockListing.clioInfo.set({
-        datasetChecks: {
-          'dataset-1': { list: [] },
-          'dataset-2': { list: [] }
-        }
-      });
-
+    it('should compute the correct visual page string text via the reactive query params stream', () => {
+      mockQueryParams$.next({ offset: 0, limit: 25 });
       fixture.detectChanges();
-
-      expect(app.paginationText()).toBe('0 - 2');
+      expect(app.paginationText()).toBe('0 - 25');
 
       mockQueryParams$.next({ offset: 50, limit: 10 });
-      tick(0);
       fixture.detectChanges();
-
-      expect(app.paginationText()).toBe('50 - 52');
-    }));
+      expect(app.paginationText()).toBe('50 - 60');
+    });
   });
 });

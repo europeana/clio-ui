@@ -6,13 +6,13 @@ import {
   tick
 } from '@angular/core/testing';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { FiltersComponent } from './filters.component';
 import { APIService } from '../_services';
-import { CheckDataResults } from '../_models';
+import { CheckDataResults, ClioInfo } from '../_models';
 
 describe('FiltersComponent', () => {
   let component: FiltersComponent;
@@ -130,7 +130,6 @@ describe('FiltersComponent', () => {
         dateFrom: null,
         dateTo: null
       });
-      component.queryParams = { customFilter: 'value' };
 
       const req = component.getDataServerDataRequest();
       expect(req.filters.percentLinksInOperationFrom).toBe(0);
@@ -260,12 +259,10 @@ describe('FiltersComponent', () => {
     it('should generate the title markup and trigger interactive filter removals via switch mapping loops', () => {
       fixture.detectChanges();
 
-      // Verify default baseline
       queryParams$.next({});
       let markup = component.generateTitleMarkup();
       expect(markup[0].label).toBe('All checks');
 
-      // Push all testing metrics directly into the stream context
       queryParams$.next({
         provider: ['A', 'B'],
         dataProvider: ['C', 'D'],
@@ -278,7 +275,6 @@ describe('FiltersComponent', () => {
 
       markup = component.generateTitleMarkup();
 
-      // Verify layout structure assembly order rules match exactly
       expect(markup.map((m) => m.label).join(' ')).toEqual(
         'provider A or B and dataProvider C or D and Dataset Id (101) ' +
           'and Dataset Name "MyDataset" from Dec 12th until June 10th ' +
@@ -329,6 +325,38 @@ describe('FiltersComponent', () => {
           })
         })
       );
+    });
+
+    it('should update the target optionFilters dictionary property when search text is typed', () => {
+      const mockEvent = {
+        target: { value: 'Athena' }
+      } as unknown as Event;
+      component.updateOptionFilter('provider', mockEvent);
+      expect(component.optionFilters()['provider']).toBe('Athena');
+    });
+
+    it('should reactively filter list options based on user text search updates', () => {
+      component.modelClioInfo.set({
+        filterOps: { provider: ['Netherlands', 'Belgium', 'Germany'] }
+      } as unknown as ClioInfo);
+
+      component.optionFilters.set({ provider: 'lands', dataProvider: '' });
+      fixture.detectChanges();
+
+      const output = component.sortedFilterOptions();
+      expect(output['provider']).toEqual(['Netherlands']);
+    });
+
+    it('should guarantee that checked options float seamlessly to the top of the computed array output', () => {
+      component.modelClioInfo.set({
+        filterOps: { provider: ['Netherlands', 'Belgium', 'Germany'] }
+      } as unknown as ClioInfo);
+
+      queryParams$.next({ provider: 'Germany' });
+      fixture.detectChanges();
+
+      const output = component.sortedFilterOptions();
+      expect(output['provider'][0]).toBe('Germany');
     });
   });
 
