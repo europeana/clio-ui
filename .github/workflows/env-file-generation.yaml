@@ -16,7 +16,6 @@ jobs:
       - run: |
           touch env_file
           echo APP_DATASPACE_URL=${{ secrets.DATASPACE_URL }} >> env_file
-          # FIXED: Swapped github.event.inputs to inputs context
           case ${{ inputs.deploy_environment }} in
             'production')
               echo APP_SERVER_API=${{ secrets.PRODUCTION_SERVER_API }} >> env_file

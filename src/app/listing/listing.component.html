@@ -12,29 +12,32 @@
       <span>{{
         time | date: (graphMode ? DATE_CONCISE_FMT : DATE_DEFAULT_FMT)
       }}</span>
+      <!-- disable fine-grain download-functionality for now -->
+      <!--
       <app-checkbox
-        [form]="form"
-        [controlName]="id + ''"
-        [title]="'include in export'"
+        [checked]="selectedCheckIds().has(+id)"
         [group]="'check_ids'"
-        (valueChanged)="updateIds()"
+        (valueChanged)="toggleCheckSelection(+id)"
       ></app-checkbox>
+      -->
     </span>
 
     @if (isTopTime) {
       <span class="time-all">
+        <span>({{ datasetCount }})</span>
+        <!-- disable fine-grain download-functionality for now -->
+        <!--
         <span>all ({{ datasetCount }})</span>
         <app-checkbox
-          [form]="formDatasets"
-          [controlName]="datasetId + ''"
-          [attr.title]="
-            (formDatasets.value['dataset_ids'][datasetId]
-              ? 'uncheck'
-              : 'check') + ' all'
-          "
+          [checked]="selectedDatasetIds().has(datasetId + '')"
           [group]="'dataset_ids'"
+          [attr.title]="
+            (selectedDatasetIds().has(datasetId + '') ? 'uncheck' : 'check') +
+            ' all'
+          "
           (valueChanged)="checkAll(datasetId, datasetList)"
         ></app-checkbox>
+        -->
       </span>
     }
   </span>
@@ -123,7 +126,10 @@
         <a
           class="csv-download-block"
           [ngClass]="{
-            asterisked: listSelectionCount !== clioInfo().listLength
+            asterisked:
+              'TODO'.length ===
+                'disable fine-grain download-functionality for now'.length &&
+              listSelectionCount !== clioInfo().listLength
           }"
           [attr.title]="text"
           tabindex="0"
@@ -146,11 +152,14 @@
         <span class="list-header">Data Provider</span>
         <span class="list-header">Provider</span>
         <span class="list-header align-centre">
+          <!-- disable fine-grain download-functionality for now -->
+          <!--
           @if (!graphMode) {
             Export
           } @else {
             CSV
           }
+          -->
         </span>
         <span class="list-header align-left">
           @if (!graphMode) {
@@ -196,29 +205,34 @@
             tabindex="0"
             class="opener"
             [ngClass]="{ opened: group.opened }"
-            (click)="group.opened = !group.opened"
-            (keyUp.enter)="group.opened = !group.opened"
+            (click)="toggleGroupOpenStatus(dsId, group)"
+            (keyUp.enter)="toggleGroupOpenStatus(dsId, group)"
           >
             <span class="opener-content">
               {{ dsId }}
+              @if (group.list[0]?.datasetSize) {
+                ({{ group.list[0].datasetSize }})
+              }
             </span>
           </a>
 
           <span class="align-left">
-            {{ group.list[0].datasetName }}
+            {{ group.list[0]?.datasetName }}
           </span>
 
           <span>
-            {{ group.list[0].dataProvider }}
+            {{ group.list[0]?.dataProvider }}
           </span>
 
           <span>
-            {{ group.list[0].provider }}
+            {{ group.list[0]?.provider }}
           </span>
 
           @let selectedRunCount = getSelectedRunCount(group.list);
 
+          <!-- disable fine-grain download-functionality for now -->
           <span class="centre">
+            <!--
             @let disabled = selectedRunCount === 0;
             @let asterisked = selectedRunCount !== group.list.length;
             @let selectedCountText =
@@ -239,13 +253,14 @@
               (click)="requestDownloadDataset.emit(dsId)"
               (keyUp.enter)="requestDownloadDataset.emit(dsId)"
             ></a>
+          -->
           </span>
 
           <ng-container
             [ngTemplateOutlet]="dateCheckbox"
             [ngTemplateOutletContext]="{
-              time: group.list[0].date,
-              id: group.list[0].id + '',
+              time: group.list[0]?.date,
+              id: group.list[0]?.id + '',
               isTopTime: true,
               datasetId: dsId,
               datasetList: group.list,
@@ -278,20 +293,23 @@
                   </span>
 
                   <span class="centre">
+                    <!-- disable fine-grain download-functionality for now -->
+                    <!--
                     <a
                       class="csv-download"
                       target="_blank"
                       title="export check data"
-                      (click)="requestDownloadCheck.emit(entry.id)"
-                      (keyUp.enter)="requestDownloadCheck.emit(entry.id)"
+                      (click)="requestDownloadCheck.emit(entry.id!)"
+                      (keyUp.enter)="requestDownloadCheck.emit(entry.id!)"
                     ></a>
+                    -->
                   </span>
 
                   <ng-container
                     [ngTemplateOutlet]="dateCheckbox"
                     [ngTemplateOutletContext]="{
                       time: entry.date,
-                      id: entry.id + ''
+                      id: entry.id! + ''
                     }"
                   >
                   </ng-container>

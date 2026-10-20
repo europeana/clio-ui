@@ -1,8 +1,10 @@
 import { CUSTOM_ELEMENTS_SCHEMA, model } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormGroup } from '@angular/forms';
+import { of } from 'rxjs';
+
 import { ListingComponent } from '.';
 import { ClioCheck, ClioInfo } from '../_models';
+import { APIService } from '../_services';
 
 describe('ListingComponent', () => {
   let component: ListingComponent;
@@ -57,11 +59,20 @@ describe('ListingComponent', () => {
     titleMarkup: []
   } as ClioInfo;
 
+  const mockApiService = {
+    getDatasetRuns: jest.fn().mockReturnValue(of([]))
+  } as unknown as jest.Mocked<APIService>;
+
   const configureTestbed = (): void => {
     TestBed.configureTestingModule({
       imports: [ListingComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: []
+      providers: [
+        {
+          provide: APIService,
+          useValue: mockApiService
+        }
+      ]
     }).compileComponents();
   };
 
@@ -92,14 +103,12 @@ describe('ListingComponent', () => {
     expect(component.getClioClass(19)).toEqual('clio-state-0');
   });
 
-  it('should set the run checkboxes', () => {
-    const cmp = component.form.controls.check_ids as FormGroup;
-
-    expect(cmp.value['1']).toBeTruthy();
-    component.setClioCheckFormValues(false);
-    expect(cmp.value['1']).toBeFalsy();
-    component.setClioCheckFormValues(true);
-    expect(cmp.value['1']).toBeTruthy();
+  it('should toggle individual check row selections cleanly via independent state sets', () => {
+    expect(component.selectedCheckIds().has(1)).toBeTruthy();
+    component.toggleCheckSelection(1);
+    expect(component.selectedCheckIds().has(1)).toBeFalsy();
+    component.toggleCheckSelection(1);
+    expect(component.selectedCheckIds().has(1)).toBeTruthy();
   });
 
   it('should handle clicks outside', () => {
@@ -142,10 +151,20 @@ describe('ListingComponent', () => {
     expect(component.graphMode).toBeFalsy();
   });
 
-  it('should check all', () => {
-    jest.spyOn(component, 'updateIds');
-    component.checkAll('1', []);
-    expect(component.updateIds).toHaveBeenCalled();
+  it('should toggle selection states back and forth to cover all checkAll branch paths', () => {
+    const datasetAList = component
+      .clioInfo()
+      .list.filter((r) => r.datasetId === '1');
+
+    expect(component.selectedDatasetIds().has('1')).toBe(true);
+
+    component.checkAll('1', datasetAList);
+    expect(component.selectedDatasetIds().has('1')).toBe(false);
+    expect(component.selectedCheckIds().has(1)).toBe(false);
+
+    component.checkAll('1', datasetAList);
+    expect(component.selectedDatasetIds().has('1')).toBe(true);
+    expect(component.selectedCheckIds().has(1)).toBe(true);
   });
 
   it('should get the selected run count', () => {
@@ -153,23 +172,107 @@ describe('ListingComponent', () => {
 
     expect(component.getSelectedRunCount(list)).toEqual(2);
 
-    component.form.patchValue({ check_ids: { '1': false } });
+    // Toggle off individual check IDs instead of mutating form values
+    component.toggleCheckSelection(1);
     expect(component.getSelectedRunCount(list)).toEqual(1);
 
-    component.form.patchValue({ check_ids: { '2': false } });
+    component.toggleCheckSelection(2);
     expect(component.getSelectedRunCount(list)).toEqual(0);
   });
 
   it('should update the list selection count', () => {
     expect(component.listSelectionCount).toEqual(2);
-    component.form.setValue({ check_ids: { '1': false, '2': true } });
-    expect(component.listSelectionCount).toEqual(2);
-    component.updateIds();
+
+    // Toggle off individual check nodes directly via state management signals
+    component.toggleCheckSelection(1);
     expect(component.listSelectionCount).toEqual(1);
 
-    component.form.setValue({ check_ids: { '1': false, '2': false } });
-    expect(component.listSelectionCount).toEqual(1);
-    component.updateIds();
+    component.toggleCheckSelection(2);
     expect(component.listSelectionCount).toEqual(0);
+  });
+
+  it('should calculate accurate timestamp strings inside shiftDate utilities', () => {
+    const shifted = (component as any).shiftDate('2026-01-15T00:00:00.000Z', 5);
+    expect(shifted).toBe('2026-01-20');
+  });
+
+  it('should uncheck sibling keys cleanly when shouldCheckAll evaluates to false', () => {
+    const mockDatasetId = 'DS-99';
+    const mockRuns = [{ id: 500 } as ClioCheck];
+
+    component.selectedDatasetIds.set(new Set([mockDatasetId]));
+    component.selectedCheckIds.set(new Set([500]));
+
+    component.checkAll(mockDatasetId, mockRuns);
+
+    expect(component.selectedDatasetIds().has(mockDatasetId)).toBe(false);
+    expect(component.selectedCheckIds().has(500)).toBe(false);
+  });
+
+  it('should toggle group open status and load expanded runs from the API service', () => {
+    const mockApiRuns: ClioCheck[] = [
+      {
+        id: 1001,
+        date: '2026-10-08',
+        datasetId: '1',
+        datasetName: 'Run 1',
+        provider: 'N/A',
+        dataProvider: 'N/A',
+        percentLinksInOperation: 0
+      },
+      {
+        id: 1002,
+        date: '2026-10-07',
+        datasetId: '1',
+        datasetName: 'Run 2',
+        provider: 'N/A',
+        dataProvider: 'N/A',
+        percentLinksInOperation: 0
+      },
+      {
+        id: 1003,
+        date: '2026-10-06',
+        datasetId: '1',
+        datasetName: 'Run 3',
+        provider: 'N/A',
+        dataProvider: 'N/A',
+        percentLinksInOperation: 100
+      }
+    ];
+
+    // Inject the mock array into the spy stream
+    mockApiService.getDatasetRuns.mockReturnValue(of(mockApiRuns));
+
+    const mockGroup = {
+      list: [
+        {
+          id: 1,
+          date: '2026-10-08',
+          datasetId: '1',
+          datasetName: 'Dataset One',
+          provider: 'N/A',
+          dataProvider: 'N/A',
+          percentLinksInOperation: 80
+        }
+      ],
+      opened: false,
+      percentLinksInOperation: 80
+    };
+
+    component.toggleGroupOpenStatus('1', mockGroup);
+
+    expect(mockGroup.opened).toBe(true);
+
+    expect(mockApiService.getDatasetRuns).toHaveBeenCalledWith(
+      '1',
+      'Dataset One',
+      'N/A',
+      'N/A'
+    );
+
+    expect(mockGroup.list).toHaveLength(3);
+    expect(mockGroup.list[0].id).toBe(1001);
+    expect(mockGroup.list[1].id).toBe(1002);
+    expect(mockGroup.list[2].id).toBe(1003);
   });
 });

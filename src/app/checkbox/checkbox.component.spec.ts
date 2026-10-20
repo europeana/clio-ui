@@ -1,24 +1,19 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { CheckboxComponent } from '.';
+import { CheckboxComponent } from './checkbox.component';
 
 describe('CheckboxComponent', () => {
   let component: CheckboxComponent;
   let fixture: ComponentFixture<CheckboxComponent>;
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, CheckboxComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    await TestBed.configureTestingModule({
+      imports: [CheckboxComponent]
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(CheckboxComponent);
     component = fixture.componentInstance;
-    expect(component).toBeTruthy();
-    fixture.debugElement.injector.get(NG_VALUE_ACCESSOR);
     fixture.detectChanges();
   });
 
@@ -26,26 +21,26 @@ describe('CheckboxComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should implement ControlValueAccessor', () => {
-    expect(component.registerOnChange).toBeTruthy();
-    expect(component.registerOnTouched).toBeTruthy();
-    expect(component.writeValue).toBeTruthy();
-    component.writeValue();
-    component.registerOnTouched();
-    component.registerOnChange(() => {
-      console.log('unimplemented');
-    });
-  });
-
-  it('should handle the field change', () => {
+  it('should handle the field change and emit inverted value', () => {
     const spyEmit = jest.spyOn(component.valueChanged, 'emit');
+    fixture.componentRef.setInput('checked', false);
+    fixture.detectChanges();
     component.onChange();
-    expect(spyEmit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalledWith(true);
   });
 
-  it('should handle the space key', () => {
+  it('should handle the space key with structural metadata payloads', () => {
     const spyEmit = jest.spyOn(component.keySelectionMade, 'emit');
+
+    fixture.componentRef.setInput('group', 'provider');
+    fixture.componentRef.setInput('controlName', 'AthenaPlus');
+    fixture.detectChanges();
+
     component.onSpaceKey();
-    expect(spyEmit).toHaveBeenCalled();
+
+    expect(spyEmit).toHaveBeenCalledWith({
+      group: 'provider',
+      controlName: 'AthenaPlus'
+    });
   });
 });

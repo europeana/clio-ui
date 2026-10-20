@@ -3,7 +3,7 @@ describe('Filters Dynamic Operations Flow', () => {
 
   beforeEach(() => {
     // intercept standard search API requests to observe serialized payload states
-    cy.intercept('POST', '**/runs/summary*').as('searchRequest');
+    cy.intercept('POST', '**/datasets*').as('searchRequest');
   });
 
   describe('Prefilling State Initialization', () => {
@@ -33,7 +33,6 @@ describe('Filters Dynamic Operations Flow', () => {
   });
 
   describe('Interactive Filter State Alterations (Adding and Removing)', () => {
-
     it('should append parameters to url and payload on manual search execution inputs', () => {
       cy.visit('/');
       cy.wait('@searchRequest');
@@ -67,7 +66,9 @@ describe('Filters Dynamic Operations Flow', () => {
           cy.get('app-checkbox').first().click();
           cy.url().should('contain', 'offset=0');
         } else {
-          cy.log('Skipping checkbox click interaction: No filter options returned from test server payload.');
+          cy.log(
+            'Skipping checkbox click interaction: No filter options returned from test server payload.'
+          );
         }
       });
     });
@@ -85,7 +86,6 @@ describe('Filters Dynamic Operations Flow', () => {
       cy.url().should('contain', 'offset=0');
     });
 
-
     it('should drop sliders parameter to null when modified or updated via slide changes', () => {
       // Visit with a preset value
       cy.visit('/?percentLinksInOperationFrom=75');
@@ -97,6 +97,28 @@ describe('Filters Dynamic Operations Flow', () => {
       cy.url().should('contain', 'percentLinksInOperationFrom=20');
       cy.url().should('contain', 'offset=0');
     });
+  });
 
+  describe('Breadcrumbs', () => {
+    it('should remove dynamic group array parameters when clicking breadcrumb markup items', () => {
+      cy.visit('/?provider=Bulgariana&provider=CultureGridlimit=25&offset=0');
+      cy.wait('@searchRequest');
+
+      cy.get('.summary-bar .title').contains('Bulgariana').click();
+
+      cy.url().should('contain', 'offset=0');
+      cy.url().should('contain', 'provider=CultureGrid');
+      cy.url().should('not.contain', 'provider=Bulgariana');
+    });
+
+    it('should remove standard group fields when clicking explicit markup items', () => {
+      cy.visit('/?datasetName=my_dataset_5 &datasetId=57');
+      cy.wait('@searchRequest');
+
+      cy.get('.summary-bar .title').contains('Dataset Id').click();
+
+      cy.url().should('not.contain', 'datasetId=57');
+      cy.url().should('contain', 'datasetName=my_dataset_5');
+    });
   });
 });

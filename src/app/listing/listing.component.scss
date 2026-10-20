@@ -204,9 +204,12 @@ $cell-height: 2.25em;
 .opener {
   display: flex;
   align-items: center;
+  flex-grow: 1;
   justify-content: space-between;
-  position: relative;
+  margin-right: 1em;
+  min-width: max-content;
   padding-right: 1em;
+  position: relative;
 
   &::after {
     content: '\25b6';
