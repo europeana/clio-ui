@@ -122,7 +122,8 @@ export class APIService {
 
           return {
             filterOptions: realFilters,
-            results: mappedResults
+            results: mappedResults,
+            pagination: cdr.pagination
           };
         })
       );

@@ -301,13 +301,17 @@ export function dataServerRequest(
   const limit = Number(paginationConf.limit ?? (dataRequest.filters as any)['limit'] ?? 25);
 
   const totalCountBeforeSlice = filteredRuns.length;
-  (filterOptions as any)['hasMoreAvailable'] = (offset + limit) < totalCountBeforeSlice;
 
   filteredRuns = filteredRuns.slice(offset, offset + limit);
 
   return {
     filterOptions,
-    results: filteredRuns
+    results: filteredRuns,
+    pagination: {
+      hasMoreAvailable: (offset + limit) < totalCountBeforeSlice,
+      limit: limit,
+      offset: offset
+    }
   };
 }
 
