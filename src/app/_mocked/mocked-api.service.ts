@@ -34,7 +34,12 @@ export class MockAPIService {
         datasetId: [''],
         datasetName: ['']
       },
-      results: []
+      results: [],
+      pagination: {
+        hasMoreAvailable: false,
+        limit: 0,
+        offset: 0
+      }
     } as CheckDataResults);
   }
 }

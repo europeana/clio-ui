@@ -22,9 +22,16 @@ export interface DownloadRequest extends CheckDataRequest {
   excluded_check_ids?: Array<string>;
 }
 
+export interface Pagination {
+  hasMoreAvailable: boolean;
+  limit: number;
+  offset: number;
+}
+
 export interface CheckDataResults {
   filterOptions: { [key: string]: Array<string> };
   results: Array<ClioCheck>;
+  pagination: Pagination;
 }
 
 export interface DatasetSummary {

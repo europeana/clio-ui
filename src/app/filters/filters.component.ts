@@ -421,6 +421,7 @@ export class FiltersComponent implements OnInit {
       .subscribe((checkDataResults: CheckDataResults) => {
         const list = checkDataResults.results || [];
         const filterOps = checkDataResults.filterOptions || {};
+        const pagination = checkDataResults.pagination || {};
 
         const cleanOps = { ...filterOps };
         delete cleanOps['datasetId'];
@@ -435,7 +436,7 @@ export class FiltersComponent implements OnInit {
 
         const queryParamMap = this.route.snapshot.queryParamMap;
 
-        this.hasMoreAvailable.set(!!filterOps['hasMoreAvailable']);
+        this.hasMoreAvailable.set(!!pagination['hasMoreAvailable']);
 
         if (queryParamMap.has('percentLinksInOperationFrom')) {
           const rawPercent = queryParamMap.get('percentLinksInOperationFrom');

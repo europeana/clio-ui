@@ -24,14 +24,12 @@ import { ClickAwareDirective } from '../_directives';
 import { CheckGroup, ClioCheck, ClioInfo } from '../_models';
 import { APIService } from '../_services';
 import { RenameFilterPipe } from '../_translate';
-import { CheckboxComponent } from '../checkbox';
 
 @Component({
   selector: 'app-listing',
   templateUrl: './listing.component.html',
   styleUrls: ['./listing.component.scss'],
   imports: [
-    CheckboxComponent,
     ClickAwareDirective,
     DatePipe,
     KeyValuePipe,
