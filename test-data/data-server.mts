@@ -8,13 +8,6 @@ import {
 export const today = new Date().toISOString().split('T')[0];
 export const yearZero = new Date(Date.parse('20 Nov 2008 12:00:00 GMT'));
 
-export interface Dataset {
-  id: number;
-  datasetName: string;
-  dataProvider: string;
-  provider: string;
-}
-
 interface DataProvider {
   id: number;
   name: string;
@@ -136,49 +129,38 @@ const dataProviders: Array<DataProvider> = [
   }
 ];
 
-export const dataSets: Array<Dataset> = new Array(100)
-  .fill(null)
-  .map((_: unknown, index: number) => {
-    const dataProvider = dataProviders[index % dataProviders.length];
-    const provider =
-      providers[
-        dataProvider.providers[(index + 1) % dataProvider.providers.length]
-      ];
-
-    return {
-      id: index,
-      datasetName: `my_dataset_${index}`,
-      dataProvider: dataProvider.name,
-      provider
-    };
-  });
-
 // Factory of all checks
 const numChecks = 1000;
 const checks: Array<ClioCheck> = new Array(numChecks)
   .fill(null)
   .map((_: unknown, index: number) => {
-    const id = index;
-    const dataset = dataSets[index % dataSets.length];
-    const datasetId = `${dataset.id}`;
-    const datasetName = dataset.datasetName;
-    const dataProvider = dataset.dataProvider;
-    const provider = dataset.provider;
+    const datasetId = `${index}`;
+    const dp = dataProviders[index % dataProviders.length];
+    const provider =
+      providers[dp.providers[(index + 1) % dp.providers.length]];
+    const datasetName = `my_dataset_${index}`;
+    const dataProvider = dp.name;
     const percentLinksInOperation = 100 - Math.floor((index * 17.6) % 100);
+    const datasetSize = 100 + ((index * 137) % 9900);
     const date = new Date(today);
 
     date.setDate(yearZero.getDate() - index);
 
+    const lastIndexDate = new Date(date);
+    lastIndexDate.setDate(lastIndexDate.getDate() + (index % 31));
+
     return {
-      id,
-      date: date.toISOString(),
       datasetId,
+      date: date.toISOString(),
       datasetName,
       dataProvider,
       provider,
-      percentLinksInOperation
+      percentLinksInOperation,
+      datasetSize,
+      datasetLastIndex: lastIndexDate.toISOString()
     };
   });
+
 
 const allChecks: Array<ClioCheck> = checks;
 
@@ -314,14 +296,6 @@ export function dataServerRequest(
     }
   };
 }
-
-/**
- * Filters the shared mock data pool by datasetId and maps the rows
- * directly onto the keys expected by the new /runs schema contract.
- *
- * @param {string} datasetId Target identifier to pull records for.
- * @returns {Array<Object>} Collection of mapped child execution runs.
- */
 
  /**
   * Filters the shared mock data pool by datasetId and maps the rows

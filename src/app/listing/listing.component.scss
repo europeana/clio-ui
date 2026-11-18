@@ -91,7 +91,6 @@ $cell-height: 2.25em;
     grid-template-columns: subgrid;
     position: relative;
 
-    .time-all,
     .time {
       font-weight: bold;
       display: flex;
@@ -100,9 +99,6 @@ $cell-height: 2.25em;
 
     &:not(:has(.opener.opened)) {
       border-right: 1px solid transparent;
-      .top-time .time-all {
-        display: none;
-      }
     }
     &:has(.opener.opened) {
       border-image: linear-gradient(
@@ -140,10 +136,6 @@ $cell-height: 2.25em;
       height: $cell-height;
       justify-content: center;
       transform: scale(0.75);
-
-      &.asterisked::before {
-        font-size: 24px;
-      }
     }
 
     .run-list {
@@ -199,6 +191,7 @@ $cell-height: 2.25em;
   align-items: center;
   justify-content: center;
   margin-right: 0.25em;
+  grid-column: -1;
 }
 
 .opener {
