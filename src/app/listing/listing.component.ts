@@ -175,10 +175,12 @@ export class ListingComponent {
         .subscribe({
           next: (realRuns: Array<ClioCheck>) => {
             if (realRuns && realRuns.length > 0) {
+              realRuns.forEach((run) => {
+                run.datasetSize ??= parentRow.datasetSize;
+              });
               groupValue.list = realRuns;
             }
 
-            // Sync selection set trackers
             const updatedChecks = new Set(this.selectedCheckIds());
             groupValue.list.forEach((run: ClioCheck) =>
               updatedChecks.add(run.id!)
