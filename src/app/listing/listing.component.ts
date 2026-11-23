@@ -8,6 +8,7 @@ import {
 } from '@angular/common';
 import {
   Component,
+  computed,
   effect,
   inject,
   Input,
@@ -50,6 +51,8 @@ export class ListingComponent {
   requestDownloadAll = output<void>();
   requestDownloadDataset = output<string>();
 
+  readonly listSelectionCount = computed(() => this.selectedCheckIds().size);
+
   selectedCheckIds = signal<Set<number>>(new Set());
   selectedDatasetIds = signal<Set<string>>(new Set());
 
@@ -78,17 +81,22 @@ export class ListingComponent {
     });
   }
 
-  // Pure compute mapping metrics: yields lightning fast O(1) checks
-  get listSelectionCount(): number {
-    return this.selectedCheckIds().size;
-  }
-
   clickOutside(): void {
     const datasetChecks = this.clioInfo().datasetChecks;
-    if (datasetChecks) {
-      Object.keys(datasetChecks).forEach((key: string) => {
-        datasetChecks[key].opened = false;
-      });
+    if (!datasetChecks) return;
+
+    const updatedChecks = new Set(this.selectedCheckIds());
+    let changed = false;
+
+    Object.entries(datasetChecks).forEach(([key, group]) => {
+      if (group.opened) {
+        this.collapseGroup(key, group, updatedChecks);
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      this.selectedCheckIds.set(updatedChecks);
     }
   }
 
@@ -156,49 +164,76 @@ export class ListingComponent {
   }
 
   toggleGroupOpenStatus(groupKey: string, groupValue: CheckGroup): void {
-    groupValue.opened = !groupValue.opened;
+    const updatedChecks = new Set(this.selectedCheckIds());
 
-    const hasOnlyPlaceholder =
-      groupValue.list.length === 1 &&
-      String(groupValue.list[0].id) === String(groupKey);
-
-    if (groupValue.opened && hasOnlyPlaceholder) {
-      const parentRow = groupValue.list[0];
-
-      this.apiService
-        .getDatasetRuns(
-          groupKey,
-          parentRow.datasetName,
-          parentRow.provider,
-          parentRow.dataProvider
-        )
-        .subscribe({
-          next: (realRuns: Array<ClioCheck>) => {
-            if (realRuns && realRuns.length > 0) {
-              groupValue.list = realRuns;
-            }
-
-            // Sync selection set trackers
-            const updatedChecks = new Set(this.selectedCheckIds());
-            groupValue.list.forEach((run: ClioCheck) =>
-              updatedChecks.add(run.id!)
-            );
-            this.selectedCheckIds.set(updatedChecks);
-          },
-          error: (err: unknown) => {
-            console.error(
-              'Failed to resolve sub-runs for dataset: ' + groupKey,
-              err
-            );
-          }
-        });
+    if (groupValue.opened) {
+      this.collapseGroup(groupKey, groupValue, updatedChecks);
+      this.selectedCheckIds.set(updatedChecks);
+      return;
     }
+
+    groupValue.opened = true;
+    const topLevelId = Number(groupKey);
+    const parentRow = groupValue.list[0];
+    const needsFetch =
+      groupValue.list.length === 1 && String(parentRow.id) === String(groupKey);
+
+    // Already fetched previously: swap top-level ID for cached sub-runs
+    if (!needsFetch) {
+      if (updatedChecks.delete(topLevelId)) {
+        groupValue.list.forEach((run) => updatedChecks.add(run.id!));
+        this.selectedCheckIds.set(updatedChecks);
+      }
+      return;
+    }
+
+    // First time opening: fetch runs, then swap IDs
+    this.apiService
+      .getDatasetRuns(
+        groupKey,
+        parentRow.datasetName,
+        parentRow.provider,
+        parentRow.dataProvider
+      )
+      .subscribe({
+        next: (realRuns: Array<ClioCheck>) => {
+          if (realRuns?.length) {
+            realRuns.forEach(
+              (run) => (run.datasetSize ??= parentRow.datasetSize)
+            );
+            groupValue.list = realRuns;
+          }
+
+          const latestChecks = new Set(this.selectedCheckIds());
+          latestChecks.delete(topLevelId);
+          groupValue.list.forEach((run) => latestChecks.add(run.id!));
+          this.selectedCheckIds.set(latestChecks);
+        },
+        error: (err: unknown) => {
+          console.error(
+            `Failed to resolve sub-runs for dataset: ${groupKey}`,
+            err
+          );
+        }
+      });
   }
 
-  // Simple helper to generate distinct timestamps for simulated sub-rows
-  private shiftDate(isoString: string, daysToShift: number): string {
-    const d = new Date(isoString);
-    d.setDate(d.getDate() + daysToShift);
-    return d.toISOString().split('T')[0];
+  private collapseGroup(
+    groupKey: string,
+    group: CheckGroup,
+    checksSet: Set<number>
+  ): void {
+    group.opened = false;
+    let hadAnySelected = false;
+
+    group.list.forEach((run) => {
+      if (checksSet.delete(run.id!)) {
+        hadAnySelected = true;
+      }
+    });
+
+    if (hadAnySelected) {
+      checksSet.add(Number(groupKey));
+    }
   }
 }

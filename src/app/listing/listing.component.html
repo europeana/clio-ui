@@ -12,34 +12,7 @@
       <span>{{
         time | date: (graphMode ? DATE_CONCISE_FMT : DATE_DEFAULT_FMT)
       }}</span>
-      <!-- disable fine-grain download-functionality for now -->
-      <!--
-      <app-checkbox
-        [checked]="selectedCheckIds().has(+id)"
-        [group]="'check_ids'"
-        (valueChanged)="toggleCheckSelection(+id)"
-      ></app-checkbox>
-      -->
     </span>
-
-    @if (isTopTime) {
-      <span class="time-all">
-        <span>({{ datasetCount }})</span>
-        <!-- disable fine-grain download-functionality for now -->
-        <!--
-        <span>all ({{ datasetCount }})</span>
-        <app-checkbox
-          [checked]="selectedDatasetIds().has(datasetId + '')"
-          [group]="'dataset_ids'"
-          [attr.title]="
-            (selectedDatasetIds().has(datasetId + '') ? 'uncheck' : 'check') +
-            ' all'
-          "
-          (valueChanged)="checkAll(datasetId, datasetList)"
-        ></app-checkbox>
-        -->
-      </span>
-    }
   </span>
 </ng-template>
 
@@ -121,16 +94,10 @@
           </span>
         }
 
-        @let count = listSelectionCount;
+        @let count = listSelectionCount();
         @let text = 'export ' + count + ' check' + (count !== 1 ? 's' : '');
         <a
           class="csv-download-block"
-          [ngClass]="{
-            asterisked:
-              'TODO'.length ===
-                'disable fine-grain download-functionality for now'.length &&
-              listSelectionCount !== clioInfo().listLength
-          }"
           [attr.title]="text"
           tabindex="0"
           (click)="requestDownloadAll.emit()"
@@ -151,17 +118,8 @@
         >
         <span class="list-header">Data Provider</span>
         <span class="list-header">Provider</span>
-        <span class="list-header align-centre">
-          <!-- disable fine-grain download-functionality for now -->
-          <!--
-          @if (!graphMode) {
-            Export
-          } @else {
-            CSV
-          }
-          -->
-        </span>
-        <span class="list-header align-left">
+
+        <span class="list-header align-left last-cell">
           @if (!graphMode) {
             Check
           }
@@ -230,32 +188,6 @@
 
           @let selectedRunCount = getSelectedRunCount(group.list);
 
-          <!-- disable fine-grain download-functionality for now -->
-          <span class="centre">
-            <!--
-            @let disabled = selectedRunCount === 0;
-            @let asterisked = selectedRunCount !== group.list.length;
-            @let selectedCountText =
-              asterisked ? ' (of ' + group.list.length + ')' : '';
-            <a
-              class="csv-download-block"
-              target="_blank"
-              [attr.tabindex]="disabled ? -1 : 0"
-              [ngClass]="{ disabled: disabled, asterisked }"
-              [attr.title]="
-                'export ' +
-                selectedRunCount +
-                selectedCountText +
-                ' checks for dataset \'' +
-                dsId +
-                '\''
-              "
-              (click)="requestDownloadDataset.emit(dsId)"
-              (keyUp.enter)="requestDownloadDataset.emit(dsId)"
-            ></a>
-          -->
-          </span>
-
           <ng-container
             [ngTemplateOutlet]="dateCheckbox"
             [ngTemplateOutletContext]="{
@@ -290,19 +222,6 @@
                       }"
                     >
                     </ng-container>
-                  </span>
-
-                  <span class="centre">
-                    <!-- disable fine-grain download-functionality for now -->
-                    <!--
-                    <a
-                      class="csv-download"
-                      target="_blank"
-                      title="export check data"
-                      (click)="requestDownloadCheck.emit(entry.id!)"
-                      (keyUp.enter)="requestDownloadCheck.emit(entry.id!)"
-                    ></a>
-                    -->
                   </span>
 
                   <ng-container

@@ -1,9 +1,9 @@
 import { CUSTOM_ELEMENTS_SCHEMA, model } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { ListingComponent } from '.';
-import { ClioCheck, ClioInfo } from '../_models';
+import { CheckGroup, ClioCheck, ClioInfo } from '../_models';
 import { APIService } from '../_services';
 
 describe('ListingComponent', () => {
@@ -35,7 +35,7 @@ describe('ListingComponent', () => {
             percentLinksInOperation: 0
           }
         ],
-        opened: true,
+        opened: false,
         percentLinksInOperation: 0
       },
       '2': {
@@ -50,7 +50,7 @@ describe('ListingComponent', () => {
             percentLinksInOperation: 0
           }
         ],
-        opened: true,
+        opened: false,
         percentLinksInOperation: 0
       }
     },
@@ -77,6 +77,7 @@ describe('ListingComponent', () => {
   };
 
   const b4Each = (): void => {
+    jest.clearAllMocks();
     configureTestbed();
     fixture = TestBed.createComponent(ListingComponent);
     component = fixture.componentInstance;
@@ -118,7 +119,16 @@ describe('ListingComponent', () => {
         '1': {
           list: [
             {
-              id: 0,
+              id: 101,
+              date: '',
+              datasetId: '1',
+              datasetName: '1',
+              dataProvider: '',
+              provider: '',
+              percentLinksInOperation: 0
+            },
+            {
+              id: 102,
               date: '',
               datasetId: '1',
               datasetName: '1',
@@ -132,9 +142,16 @@ describe('ListingComponent', () => {
         }
       }
     });
-    expect(component.clioInfo().datasetChecks['1']?.opened).toBeTruthy();
+    component.selectedCheckIds.set(new Set([101, 102, 2]));
+    expect(component.listSelectionCount()).toBe(3);
+
     component.clickOutside();
+
     expect(component.clioInfo().datasetChecks['1']?.opened).toBeFalsy();
+    expect(component.selectedCheckIds().has(101)).toBeFalsy();
+    expect(component.selectedCheckIds().has(102)).toBeFalsy();
+    expect(component.selectedCheckIds().has(1)).toBeTruthy();
+    expect(component.listSelectionCount()).toBe(2);
   });
 
   it('should cancel the graph mode', () => {
@@ -172,7 +189,6 @@ describe('ListingComponent', () => {
 
     expect(component.getSelectedRunCount(list)).toEqual(2);
 
-    // Toggle off individual check IDs instead of mutating form values
     component.toggleCheckSelection(1);
     expect(component.getSelectedRunCount(list)).toEqual(1);
 
@@ -181,19 +197,13 @@ describe('ListingComponent', () => {
   });
 
   it('should update the list selection count', () => {
-    expect(component.listSelectionCount).toEqual(2);
+    expect(component.listSelectionCount()).toEqual(2);
 
-    // Toggle off individual check nodes directly via state management signals
     component.toggleCheckSelection(1);
-    expect(component.listSelectionCount).toEqual(1);
+    expect(component.listSelectionCount()).toEqual(1);
 
     component.toggleCheckSelection(2);
-    expect(component.listSelectionCount).toEqual(0);
-  });
-
-  it('should calculate accurate timestamp strings inside shiftDate utilities', () => {
-    const shifted = (component as any).shiftDate('2026-01-15T00:00:00.000Z', 5);
-    expect(shifted).toBe('2026-01-20');
+    expect(component.listSelectionCount()).toEqual(0);
   });
 
   it('should uncheck sibling keys cleanly when shouldCheckAll evaluates to false', () => {
@@ -209,7 +219,7 @@ describe('ListingComponent', () => {
     expect(component.selectedCheckIds().has(500)).toBe(false);
   });
 
-  it('should toggle group open status and load expanded runs from the API service', () => {
+  it('should swap placeholder ID for fetched runs on open, restore on close, and reuse cached runs on re-open', () => {
     const mockApiRuns: ClioCheck[] = [
       {
         id: 1001,
@@ -240,10 +250,70 @@ describe('ListingComponent', () => {
       }
     ];
 
-    // Inject the mock array into the spy stream
     mockApiService.getDatasetRuns.mockReturnValue(of(mockApiRuns));
 
-    const mockGroup = {
+    const mockGroup: CheckGroup = {
+      list: [
+        {
+          id: 1,
+          date: '2026-10-08',
+          datasetId: '1',
+          datasetName: 'Dataset One',
+          datasetSize: 3,
+          provider: 'N/A',
+          dataProvider: 'N/A',
+          percentLinksInOperation: 80
+        }
+      ],
+      opened: false,
+      percentLinksInOperation: 80
+    };
+
+    // Initial count: dataset 1 (id: 1) + dataset 2 (id: 2)
+    expect(component.listSelectionCount()).toBe(2);
+
+    // 1. Open group -> fetches sub-runs and swaps id 1 for 1001, 1002, 1003
+    component.toggleGroupOpenStatus('1', mockGroup);
+
+    expect(mockGroup.opened).toBe(true);
+    expect(mockApiService.getDatasetRuns).toHaveBeenCalledTimes(1);
+    expect(mockApiService.getDatasetRuns).toHaveBeenCalledWith(
+      '1',
+      'Dataset One',
+      'N/A',
+      'N/A'
+    );
+    expect(mockGroup.list).toHaveLength(3);
+    expect(mockGroup.list[0].datasetSize).toBe(3);
+    expect(component.selectedCheckIds().has(1)).toBe(false);
+    expect(component.selectedCheckIds().has(1001)).toBe(true);
+    expect(component.listSelectionCount()).toBe(4); // 3 sub-runs + dataset 2
+
+    // 2. Close group -> removes sub-run IDs and restores top-level id 1
+    component.toggleGroupOpenStatus('1', mockGroup);
+
+    expect(mockGroup.opened).toBe(false);
+    expect(component.selectedCheckIds().has(1001)).toBe(false);
+    expect(component.selectedCheckIds().has(1)).toBe(true);
+    expect(component.listSelectionCount()).toBe(2);
+
+    // 3. Re-open group -> uses cached runs without calling API again
+    component.toggleGroupOpenStatus('1', mockGroup);
+
+    expect(mockGroup.opened).toBe(true);
+    expect(mockApiService.getDatasetRuns).toHaveBeenCalledTimes(1);
+    expect(component.selectedCheckIds().has(1)).toBe(false);
+    expect(component.selectedCheckIds().has(1001)).toBe(true);
+    expect(component.listSelectionCount()).toBe(4);
+  });
+
+  it('should log an error when fetching sub-runs fails', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    mockApiService.getDatasetRuns.mockReturnValue(
+      throwError(() => new Error('Network error'))
+    );
+
+    const mockGroup: CheckGroup = {
       list: [
         {
           id: 1,
@@ -261,18 +331,12 @@ describe('ListingComponent', () => {
 
     component.toggleGroupOpenStatus('1', mockGroup);
 
-    expect(mockGroup.opened).toBe(true);
+    component.toggleGroupOpenStatus('1', mockGroup);
 
-    expect(mockApiService.getDatasetRuns).toHaveBeenCalledWith(
-      '1',
-      'Dataset One',
-      'N/A',
-      'N/A'
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Failed to resolve sub-runs for dataset: 1',
+      expect.any(Error)
     );
-
-    expect(mockGroup.list).toHaveLength(3);
-    expect(mockGroup.list[0].id).toBe(1001);
-    expect(mockGroup.list[1].id).toBe(1002);
-    expect(mockGroup.list[2].id).toBe(1003);
+    consoleSpy.mockRestore();
   });
 });
