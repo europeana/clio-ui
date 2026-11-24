@@ -51,6 +51,7 @@ export class ListingComponent {
   requestDownloadAll = output<void>();
   requestDownloadDataset = output<string>();
 
+  readonly isDownloading = this.apiService.isDownloading;
   readonly listSelectionCount = computed(() => this.selectedCheckIds().size);
 
   selectedCheckIds = signal<Set<number>>(new Set());

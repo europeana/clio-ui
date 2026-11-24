@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import {
   CheckDataRequest,
   CheckDataResults,
@@ -14,6 +14,8 @@ import { apiSettings } from '../../environments/apisettings';
 
 @Injectable({ providedIn: 'root' })
 export class APIService {
+  readonly isDownloading = signal(false);
+
   constructor(private readonly http: HttpClient) {}
 
   /** groupChecksByDatasetId
@@ -135,14 +137,15 @@ export class APIService {
     anchor.href = window.URL.createObjectURL(
       new Blob([data], { type: 'text/csv;charset=utf-8' })
     );
-    anchor.target = '_blank';
     anchor.download = downloadName;
     document.body.appendChild(anchor);
     anchor.click();
+    window.URL.revokeObjectURL(anchor.href);
     anchor.remove();
   }
 
   getDownload(request: DownloadRequest): void {
+    this.isDownloading.set(true);
     this.http
       .post(`${apiSettings.serverAPI}/runs/links/export`, request, {
         responseType: 'text'
@@ -150,7 +153,8 @@ export class APIService {
       .pipe(
         catchError(() => {
           return of('CSV_DOWNLOAD');
-        })
+        }),
+        finalize(() => this.isDownloading.set(false))
       )
       .subscribe((data: unknown) => {
         this.download(data as string, 'clio_report');
