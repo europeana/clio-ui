@@ -108,8 +108,15 @@ export class AppComponent {
     const params = this.queryParamsSignal();
     const offset = Number(params['offset'] ?? 0);
     const limit = Number(params['limit'] ?? 25);
-    const maxBound = offset + limit;
-    return `${offset} - ${maxBound}`;
+    const itemCount = this.listing().clioInfo()?.list?.length ?? 0;
+
+    if (itemCount === 0) {
+      return '0 - 0';
+    }
+
+    const startBound = offset + 1;
+    const maxBound = offset + Math.min(limit, itemCount);
+    return `${startBound} - ${maxBound}`;
   });
 
   public readonly canLoadNextPageSignal = computed(() => {

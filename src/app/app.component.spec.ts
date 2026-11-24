@@ -210,13 +210,24 @@ describe('AppComponent', () => {
     });
 
     it('should compute the correct visual page string text via the reactive query params stream', () => {
-      mockQueryParams$.next({ offset: 0, limit: 25 });
-      fixture.detectChanges();
-      expect(app.paginationText()).toBe('0 - 25');
-
-      mockQueryParams$.next({ offset: 50, limit: 10 });
-      fixture.detectChanges();
-      expect(app.paginationText()).toBe('50 - 60');
+      const checkPagination = (
+        count: number,
+        params?: { offset: number; limit: number }
+      ): string => {
+        app.listing().clioInfo.set({
+          ...app.listing().clioInfo(),
+          list: Array(count).fill({ id: 1 })
+        });
+        if (params) {
+          mockQueryParams$.next(params);
+        }
+        fixture.detectChanges();
+        return app.paginationText();
+      };
+      expect(checkPagination(0, { offset: 0, limit: 25 })).toBe('0 - 0');
+      expect(checkPagination(25, { offset: 0, limit: 25 })).toBe('1 - 25');
+      expect(checkPagination(12)).toBe('1 - 12');
+      expect(checkPagination(10, { offset: 50, limit: 10 })).toBe('51 - 60');
     });
   });
 });

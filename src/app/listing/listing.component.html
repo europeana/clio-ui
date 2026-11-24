@@ -172,11 +172,17 @@
 
           <a
             [attr.title]="
+              'Dataset ' +
               dsId +
               (group.list[0]?.datasetSize
-                ? ' - ' +
+                ? '\n  ' +
                   group.list[0]?.datasetSize +
                   (group.list[0]?.datasetSize === 1 ? ' record' : ' records')
+                : '') +
+              (fetchedDatasetIds.has(dsId)
+                ? '\n  ' +
+                  group.list.length +
+                  (group.list.length === 1 ? ' run' : ' runs')
                 : '')
             "
             tabindex="0"
