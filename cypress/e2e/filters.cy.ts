@@ -3,7 +3,7 @@ describe('Filters Dynamic Operations Flow', () => {
 
   beforeEach(() => {
     // intercept standard search API requests to observe serialized payload states
-    cy.intercept('POST', '**/datasets*').as('searchRequest');
+    cy.intercept('POST', /\/datasets/).as('searchRequest');
   });
 
   describe('Prefilling State Initialization', () => {
@@ -101,7 +101,7 @@ describe('Filters Dynamic Operations Flow', () => {
 
   describe('Breadcrumbs', () => {
     it('should remove dynamic group array parameters when clicking breadcrumb markup items', () => {
-      cy.visit('/?provider=Bulgariana&provider=CultureGridlimit=25&offset=0');
+      cy.visit('/?provider=Bulgariana&provider=CultureGrid&limit=25&offset=0');
       cy.wait('@searchRequest');
 
       cy.get('.summary-bar .title').contains('Bulgariana').click();
@@ -112,7 +112,7 @@ describe('Filters Dynamic Operations Flow', () => {
     });
 
     it('should remove standard group fields when clicking explicit markup items', () => {
-      cy.visit('/?datasetName=my_dataset_5 &datasetId=57');
+      cy.visit('/?datasetName=my_dataset_5&datasetId=57');
       cy.wait('@searchRequest');
 
       cy.get('.summary-bar .title').contains('Dataset Id').click();
