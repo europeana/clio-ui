@@ -204,9 +204,10 @@ export class ListingComponent {
         next: (realRuns: Array<ClioCheck>) => {
           this.fetchedDatasetIds.add(groupKey);
           if (realRuns?.length) {
-            realRuns.forEach(
-              (run) => (run.datasetSize ??= parentRow.datasetSize)
-            );
+            realRuns.forEach((run) => {
+              run.datasetSize ??= parentRow.datasetSize;
+              run.datasetLastIndex ??= parentRow.datasetLastIndex;
+            });
             groupValue.list = realRuns;
           }
 

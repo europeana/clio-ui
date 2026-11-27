@@ -225,7 +225,7 @@
           <ng-container
             [ngTemplateOutlet]="dateCheckbox"
             [ngTemplateOutletContext]="{
-              time: group.list[0]?.date,
+              time: group.list[0]?.datasetLastIndex || group.list[0]?.date,
               id: group.list[0]?.id + '',
               isTopTime: true,
               datasetId: dsId,
