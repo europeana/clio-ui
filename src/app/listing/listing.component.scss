@@ -17,6 +17,10 @@ $cell-height: 2.25em;
   text-align: right;
 }
 
+.csv-download-block.disabled {
+  opacity: 0.3;
+}
+
 .score-display {
   align-items: center;
   display: flex;
@@ -83,6 +87,9 @@ $cell-height: 2.25em;
       width: 100%;
     }
   }
+  &.wait {
+    cursor: wait;
+  }
 
   .sublisting {
     border-top: 1px solid transparent;
@@ -91,6 +98,7 @@ $cell-height: 2.25em;
     grid-template-columns: subgrid;
     position: relative;
 
+    .btn-download-dataset,
     .time {
       font-weight: bold;
       display: flex;
@@ -99,7 +107,11 @@ $cell-height: 2.25em;
 
     &:not(:has(.opener.opened)) {
       border-right: 1px solid transparent;
+      .btn-download-dataset {
+        display: none;
+      }
     }
+
     &:has(.opener.opened) {
       border-image: linear-gradient(
           to right,
@@ -135,7 +147,10 @@ $cell-height: 2.25em;
     .csv-download-block {
       height: $cell-height;
       justify-content: center;
-      transform: scale(0.75);
+      &::after {
+        margin-left: 0.4em;
+        transform: scale(0.75);
+      }
     }
 
     .run-list {
@@ -220,6 +235,9 @@ $cell-height: 2.25em;
   &.opened::after {
     transform: translate(-0.875em, 0) rotate(90deg) scale(0.75);
   }
+  &.opened .opener-content-detail {
+    display: inline;
+  }
 
   :first-child {
     margin-right: 0.75em;
@@ -227,6 +245,13 @@ $cell-height: 2.25em;
 
   .opener-content {
     margin-right: 1.5em;
+    display: flex;
+  }
+
+  .opener-content-detail {
+    align-self: center;
+    font-size: 12px;
+    margin-left: 0.4rem;
   }
 }
 

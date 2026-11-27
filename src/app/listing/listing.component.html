@@ -13,6 +13,17 @@
         time | date: (graphMode ? DATE_CONCISE_FMT : DATE_DEFAULT_FMT)
       }}</span>
     </span>
+
+    @if (isTopTime) {
+      <button
+        [ngClass]="{ disabled: isDownloading() }"
+        [attr.title]="'export ' + datasetCount + ' checks'"
+        (click)="requestDownloadDataset.emit(id)"
+        class="btn-download-dataset csv-download-block"
+      >
+        all ({{ datasetCount }})
+      </button>
+    }
   </span>
 </ng-template>
 
@@ -57,7 +68,8 @@
 <ul
   class="align-right listing"
   [ngClass]="{
-    'extra-col': graphMode
+    'extra-col': graphMode,
+    wait: isDownloading()
   }"
   libClickAware
   (clickOutside)="clickOutside()"
@@ -96,16 +108,15 @@
 
         @let count = listSelectionCount();
         @let text = 'export ' + count + ' check' + (count !== 1 ? 's' : '');
-        <a
+        <button
           class="csv-download-block"
+          [ngClass]="{ disabled: isDownloading() }"
           [attr.title]="text"
           tabindex="0"
           (click)="requestDownloadAll.emit()"
-          (keyUp.enter)="requestDownloadAll.emit()"
-          [attr.label]="text"
         >
           {{ text }}
-        </a>
+        </button>
       </span>
 
       @if (clioInfoValue.listLength) {
@@ -160,6 +171,20 @@
           </span>
 
           <a
+            [attr.title]="
+              'Dataset ' +
+              dsId +
+              (group.list[0]?.datasetSize
+                ? '\n  ' +
+                  group.list[0]?.datasetSize +
+                  (group.list[0]?.datasetSize === 1 ? ' record' : ' records')
+                : '') +
+              (fetchedDatasetIds.has(dsId)
+                ? '\n  ' +
+                  group.list.length +
+                  (group.list.length === 1 ? ' run' : ' runs')
+                : '')
+            "
             tabindex="0"
             class="opener"
             [ngClass]="{ opened: group.opened }"
@@ -169,7 +194,16 @@
             <span class="opener-content">
               {{ dsId }}
               @if (group.list[0]?.datasetSize) {
-                ({{ group.list[0].datasetSize }})
+                <span class="opener-content-detail">
+                  ({{ group.list[0].datasetSize
+                  }}{{
+                    group.opened
+                      ? group.list[0].datasetSize === 1
+                        ? ' record'
+                        : ' records'
+                      : ''
+                  }})
+                </span>
               }
             </span>
           </a>

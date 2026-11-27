@@ -1,13 +1,15 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
-import { BehaviorSubject, of, throwError } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
+import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { BehaviorSubject } from 'rxjs';
+
+import { APIService } from '../_services';
+import { MockAPIService, MockAPIServiceErrors } from '../_mocked';
+import { ClioInfo } from '../_models';
 
 import { FiltersComponent } from './filters.component';
-import { APIService } from '../_services';
-import { CheckDataResults, ClioInfo } from '../_models';
 
 describe('FiltersComponent', () => {
   let component: FiltersComponent;
@@ -22,33 +24,8 @@ describe('FiltersComponent', () => {
     keys: Object.keys(params)
   });
 
-  const mockApiService = {
-    getFilteredClioChecks: jest.fn().mockReturnValue(
-      of({
-        results: [],
-        filterOptions: { provider: ['A', 'B'], dataProvider: ['C', 'D'] }
-      } as unknown as CheckDataResults)
-    ),
-    groupChecksByDatasetId: jest.fn().mockReturnValue({})
-  };
-
-  const configureTestbed = (throwErrorMode = false): void => {
+  const configureTestbed = (errorMode = false): void => {
     queryParams$ = new BehaviorSubject<Params>({});
-
-    if (throwErrorMode) {
-      mockApiService.getFilteredClioChecks.mockReturnValue(
-        throwError(
-          () => new HttpErrorResponse({ error: 'Network Error', status: 500 })
-        )
-      );
-    } else {
-      mockApiService.getFilteredClioChecks.mockReturnValue(
-        of({
-          results: [],
-          filterOptions: { provider: ['A', 'B'], dataProvider: ['C', 'D'] }
-        } as unknown as CheckDataResults)
-      );
-    }
 
     TestBed.configureTestingModule({
       imports: [FiltersComponent],
@@ -67,7 +44,7 @@ describe('FiltersComponent', () => {
         },
         {
           provide: APIService,
-          useValue: mockApiService
+          useClass: errorMode ? MockAPIServiceErrors : MockAPIService
         },
         {
           provide: Router,
@@ -77,7 +54,6 @@ describe('FiltersComponent', () => {
         }
       ]
     }).compileComponents();
-
     router = TestBed.inject(Router);
   };
 
@@ -403,7 +379,7 @@ describe('FiltersComponent', () => {
       fixture.detectChanges();
       expect(component.error).toBeFalsy();
       component.loadData();
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 1));
       fixture.detectChanges();
       expect(component.error).toBeTruthy();
     });

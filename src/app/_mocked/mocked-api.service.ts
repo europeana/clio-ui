@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { Observable, of, throwError, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
@@ -9,6 +10,7 @@ import {
 
 export class MockAPIService {
   errorMode = false;
+  isDownloading = signal(false);
 
   getError<T>(msg: string): Observable<T> {
     return timer(1).pipe(
@@ -41,6 +43,13 @@ export class MockAPIService {
         offset: 0
       }
     } as CheckDataResults);
+  }
+
+  getDatasetRuns(): Observable<Array<ClioCheck>> {
+    if (this.errorMode) {
+      return this.getError('mock getDatasetRuns throws error');
+    }
+    return of([]);
   }
 }
 

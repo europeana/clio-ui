@@ -47,10 +47,13 @@ export class ListingComponent {
   private readonly apiService = inject(APIService);
 
   graphMode = false;
+  fetchedDatasetIds = new Set<string>();
+
   requestDownloadCheck = output<number>();
   requestDownloadAll = output<void>();
   requestDownloadDataset = output<string>();
 
+  readonly isDownloading = this.apiService.isDownloading;
   readonly listSelectionCount = computed(() => this.selectedCheckIds().size);
 
   selectedCheckIds = signal<Set<number>>(new Set());
@@ -66,6 +69,8 @@ export class ListingComponent {
     effect(() => {
       const info = this.clioInfo();
       const list = info?.list || [];
+
+      this.fetchedDatasetIds.clear();
 
       // Mass initialization executed via single-pass array insertions
       const initialChecks = new Set<number>();
@@ -197,6 +202,7 @@ export class ListingComponent {
       )
       .subscribe({
         next: (realRuns: Array<ClioCheck>) => {
+          this.fetchedDatasetIds.add(groupKey);
           if (realRuns?.length) {
             realRuns.forEach(
               (run) => (run.datasetSize ??= parentRow.datasetSize)
