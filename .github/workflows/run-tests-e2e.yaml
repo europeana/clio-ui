@@ -24,7 +24,7 @@ jobs:
           node-version: '24'
 
       - name: Run Cypress Tests
-        uses: cypress-io/github-action@v10
+        uses: cypress-io/github-action@v6
         with:
           start: npm run start:ci-data
           wait-on: 'npx wait-on tcp:127.0.0.1:3001'
